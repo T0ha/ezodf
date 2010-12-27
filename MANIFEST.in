@@ -1,0 +1,6 @@
+include NEWS.txt README.txt LICENSE.txt TODO.txt
+include runtests.bat
+include runtests.py
+recursive-include examples *.py *.bat *.sh
+recursive-include tests *.py
+recursive-include tests/data *

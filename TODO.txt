@@ -1,0 +1,33 @@
+
+TODO
+====
+
+Version 0.1.0
+-------------
+
+  * open/rewrite odf files, no data manipulation like add, delete or modify
+  * basic docs http://packages.python.org/ezodf/
+
+Version 0.1.1
+-------------
+
+  * modify odf metadata
+
+Version 0.2.0
+-------------
+
+  * ods - OpenDocumentSpreadsheet
+  
+    * create new documents
+	* open existing documents
+	* add/edit/delete data
+
+Version 0.3.0
+-------------
+
+  * odt - OpenDocumentText
+  
+    * create new documents
+	* open existing documents
+	* add/edit/delete data
+	
