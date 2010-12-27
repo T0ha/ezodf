@@ -19,10 +19,10 @@ for more examples see: /examples folder
 Dependencies
 ============
 
-There are no other dependencies than the Standard Python Library.
+No dependencies beyond the Python Standard Library.
 
-The main target platform is Python 3.1+, perhaps I will integrate Python 2.6+ support,
-if there is no great effort to achieve this goal.
+The main target platform is Python 3.1+, perhaps I will integrate Python 2.6+
+support, if there is no great effort to achieve this goal.
 
 
 Installation
