@@ -8,27 +8,22 @@
 
 from xml.etree import ElementTree
 
-from .xmlns import XMLNamespace
+from .xmlns import XMLNamespaces
 
-XMLNS = XMLNamespace(
-    { "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0": "manifest", }
-)
-
-ElementTree._namespace_map.update(XMLNS.nsmap)
-
-MANIFEST = XMLNS.prefix2clark('manifest:manifest')
-FILE_ENTRY = XMLNS.prefix2clark('manifest:file-entry')
-FULL_PATH = XMLNS.prefix2clark('manifest:full-path')
-MEDIA_TYPE = XMLNS.prefix2clark('manifest:media-type')
-VERSION = XMLNS.prefix2clark('manifest:version')
-
+MANIFEST_NS = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
 
 class Manifest:
     def __init__(self, content=None):
+        xmlns = XMLNamespaces(etree=ElementTree)
         if content is None:
-            self.xmltree = ElementTree.Element(M_MANIFEST)
+            # set namespace prefixes to 'manifest' like LibreOffice
+            # self.CN: XMLNamespace object to create Clark Notations for XML node
+            # names and attribute names
+            self.CN = xmlns.register("manifest", MANIFEST_NS)
+            self.xmlroot = ElementTree.Element(self.CN('manifest'))
         else:
-            self.xmltree = ElementTree.fromstring(content)
+            self.xmlroot = xmlns.fromstring(content)
+            self.CN = xmlns.get(MANIFEST_NS)
 
     @staticmethod
     def from_zipfile(zipfile):
@@ -38,12 +33,12 @@ class Manifest:
     def add(self, full_path, media_type="", version=None):
         file_entry = self.find(full_path)
         if file_entry is None:
-            file_entry = ElementTree.SubElement(self.xmltree, FILE_ENTRY)
-            file_entry.set(FULL_PATH, full_path)
+            file_entry = ElementTree.SubElement(self.xmlroot, self.CN('file-entry'))
+            file_entry.set(self.CN('full-path'), full_path)
 
-        file_entry.set(MEDIA_TYPE, media_type)
+        file_entry.set(self.CN('media-type'), media_type)
         if version is not None:
-            file_entry.set(VERSION, version)
+            file_entry.set(self.CN('version'), version)
 
     def remove(self, full_path):
         file_entry = self.find(full_path)
@@ -51,10 +46,10 @@ class Manifest:
             xlmtree.remove(file_entry)
 
     def find(self, full_path):
-        for node in self.xmltree.getchildren():
-            if node.get(FULL_PATH) == full_path:
+        for node in self.xmlroot.getchildren():
+            if node.get(self.CN('full-path')) == full_path:
                 return node
         return None
 
     def toxml(self):
-        return ElementTree.tostring(self.xmltree)
+        return ElementTree.tostring(self.xmlroot)

@@ -20,7 +20,7 @@ class TestManifest(unittest.TestCase):
         odt = ZipFile(os.path.join(testdatapath, "empty.odt"))
         manifest = Manifest.from_zipfile(odt)
         odt.close()
-        self.assertTrue(manifest.xmltree is not None)
+        self.assertTrue(manifest.xmlroot is not None)
 
 
 if __name__=='__main__':

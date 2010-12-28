@@ -9,7 +9,6 @@
 import zipfile
 
 from .manifest import Manifest
-from .xmlns import XMLNamespace
 
 mimetypes = {
     'odt': "application/vnd.oasis.opendocument.text",
@@ -31,26 +30,6 @@ mimetypes = {
 }
 
 file_ext = { mimetype:ext for ext, mimetype in mimetypes.items() }
-
-OOONS = XMLNamespace({
-    "http://openoffice.org/2000/office": "office",
-    "http://openoffice.org/2000/table": "table",
-    "http://openoffice.org/2000/style": "style",
-    "http://openoffice.org/2000/text": "text",
-    "http://openoffice.org/2000/meta": "meta",
-    "http://openoffice.org/2000/script": "script",
-    "http://openoffice.org/2000/drawing": "drawing",
-    "http://openoffice.org/2000/chart": "chart",
-    "http://openoffice.org/2000/number": "number",
-    "http://openoffice.org/2000/datastyle": "datastyle",
-    "http://openoffice.org/2000/dr3d": "dr3d",
-    "http://openoffice.org/2000/form": "form",
-    "http://openoffice.org/2000/config": "config",
-    "http://www.w3.org/1999/XSL/Format": "fo",
-    "http://www.w3.org/1999/xlink": "xlink",
-    "http://www.w3.org/2000/svg": "svg",
-    "http://www.w3.org/1998/Math/MathML": "math",
-})
 
 def open(filename):
     def get_mimetype(zipobj):
