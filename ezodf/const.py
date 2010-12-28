@@ -6,6 +6,9 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+VERSION = "0.1.0"
+PACKAGENAME = "ezodf"
+
 MIMETYPES = {
     'odt': "application/vnd.oasis.opendocument.text",
     'ott': "application/vnd.oasis.opendocument.text-template",

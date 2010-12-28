@@ -39,16 +39,19 @@ class Document:
         self.content = None
         self.styles = None
         self.meta = None
-        self.processed = None # list to store filenames of processed files
+        self._processed = None # list to store filenames of processed files
         # Setup Document with .setup() or .fromzip()
 
     def setup(self):
         """ Setup new Document from scratch. """
         self.manifest = Manifest()
+        self.meta = Meta()
+        self.manifest.add('meta.xml', 'text/xml')
 
     def fromzip(self, zipobj):
         """ Setup with content from zipfile 'zipobj'. """
         self.manifest = Manifest.fromzip(zipobj)
+        self.meta = Meta.fromzip(zipobj)
 
     def save(self):
         if self.filename is None:
@@ -77,25 +80,27 @@ class Document:
         self.save()
 
     def tozip(self, zipobj):
-        self.processed = ['mimetype']
+        self._processed = ['mimetype']
         zipobj.writestr('mimetype', self.mimetype.encode('utf-8'))
-        self.write_xml(zipobj, 'META-INF/manifest.xml', self.manifest)
-        self.write_xml(zipobj, 'meta.xml', self.meta)
-        self.write_xml(zipobj, 'styles.xml', self.styles)
-        self.write_xml(zipobj, 'content.xml', self.content)
-        self.write_new_pictures(zipobj)
-        self.copy_unprocessed_files(zipobj)
-        self.processed = None
+        self._write_xml(zipobj, 'META-INF/manifest.xml', self.manifest)
+        self.meta.touch() # set modification date to now
+        self._write_xml(zipobj, 'meta.xml', self.meta)
+        self._write_xml(zipobj, 'styles.xml', self.styles)
+        self._write_xml(zipobj, 'content.xml', self.content)
+        self._write_new_pictures(zipobj)
+        self._copy_files(zipobj)
+        self._processed = None
 
-    def write_xml(self, zipobj, filename, xmlobj):
+    def _write_xml(self, zipobj, filename, xmlobj):
         content = '<?xml version="1.0" encoding="UTF-8"?>' + xmlobj.tostring()
         zipobj.writestr(filename, content.encode('utf-8'))
-        self.processed.append(filename)
+        self._processed.append(filename)
 
-    def write_new_pictures(self, zipobj):
+    def _write_new_pictures(self, zipobj):
         pass
 
-    def copy_unprocessed_files(self, zipobj):
+    def _copy_files(self, zipobj):
+        """ Copy all unprocessed files like pictures and settings. """
         def copyfiles(filenames, fromzip, tozip):
             for name in filenames:
                 tozip.writestr(name, fromzip.read(name))
@@ -103,7 +108,7 @@ class Document:
         if self.origfilename is not None:
             origzip = zipfile.ZipFile(self.origfilename)
             try:
-                names = (name for name in origzip.namelist() if name not in self.processed)
+                names = (name for name in origzip.namelist() if name not in self._processed)
                 copyfiles(names, origzip, zipobj)
             finally:
                 origzip.close()
