@@ -52,14 +52,15 @@ class XMLNamespaces:
                 self._etree.register_namespace(prefix, uri)
 
     def parse(self, source):
-        """ Parses an XML section into an element tree. source is a filename or
-        file object containing XML data and also collects the namespaces
-        defined by xmlns attributes. Namespaces treated as global valid namespaces
-        so local redefined namespaces override previouse defined namespaces.
-
-        This is not a valid implementation of XML namespaces treazment but to
-        repect local redefined namespaces it would be necessary to store for
-        every node the actual valid namespaces, this is to much overhead.
+        """ Parses an XML section into an element tree. 'source' is a filename
+        or file object containing XML data, and it also collects the namespaces
+        defined by xmlns attributes. Prefixes treated as global valid
+        prefixes, so local redefined prefixes override previouse defined
+        prefixes. This is not a valid implementation of XML prefix treatment,
+        but to respect local redefined prefixes it would be necessary to
+        store the actual valid namespaces for every node, this is to much
+        efford and I think all prefixes used in ODF have always the same
+        namespace assigned.
 
         :returns: root XML object created by the etree.Element() factory.
         """
@@ -118,5 +119,3 @@ class XMLNamespaces:
             return (uri[1:], local)
         else:
             raise ValueError("clark-notation required '{uri}local': %s" % tag)
-
-

@@ -1,124 +1,109 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman --<mozman@gmx.at>
-# Purpose: document classes
+# Purpose: ODF Document class
 # Created: 27.12.2010
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+import os
 import zipfile
+import tempfile
 
 from .manifest import Manifest
-
-mimetypes = {
-    'odt': "application/vnd.oasis.opendocument.text",
-    'ott': "application/vnd.oasis.opendocument.text-template",
-    'odg': "application/vnd.oasis.opendocument.graphics",
-    'otg': "application/vnd.oasis.opendocument.graphics-template",
-    'odp': "application/vnd.oasis.opendocument.presentation",
-    'otp': "application/vnd.oasis.opendocument.presentation-template",
-    'ods': "application/vnd.oasis.opendocument.spreadsheet",
-    'ots': "application/vnd.oasis.opendocument.spreadsheet-template",
-    'odc': "application/vnd.oasis.opendocument.chart",
-    'otc': "application/vnd.oasis.opendocument.chart-template",
-    'odi': "application/vnd.oasis.opendocument.image",
-    'oti': "application/vnd.oasis.opendocument.image-template",
-    'odf': "application/vnd.oasis.opendocument.formula",
-    'otf': "application/vnd.oasis.opendocument.formula-template",
-    'odm': "application/vnd.oasis.opendocument.text-master",
-    'oth': "application/vnd.oasis.opendocument.text-web",
-}
-
-file_ext = { mimetype:ext for ext, mimetype in mimetypes.items() }
+from .meta import Meta
+from .styles import Styles
+from .content import Content
 
 def open(filename):
     def get_mimetype(zipobj):
         return str(zipobj.read('mimetype'), 'utf-8').strip()
 
-    def open_zipobj(zipobj):
-        mimetype = get_mimetype(zipobj)
-        return open_document(zipobj, mimetype)
-
-    def open_document(zipobj, mimetype):
-        if mimetype.endswith('opendocument.spreadsheet'):
-            return document.ODS(zipobj)
-        elif mimetype.endswith('opendocument.text'):
-            return document.ODT(zipobj)
-        elif mimetype.endswith('opendocument.graphics'):
-            return document.ODG(zipobj)
-        elif mimetype.endswith('opendocument.presentation'):
-            return document.ODP(zipobj)
-        else:
-            raise ValueError('Unsupported mimetype: {0}'.format(mimetype))
-
-    if hasattr(filename, 'infolist'):
-        # if filename contains a ZipFile object pass it through
-        return open_zipobj(zipobj=filename)
-    else:
-        zipobj = zipfile.ZipFile(filename, mode='r')
-        document = open_zipobj(zipobj)
+    if zipfile.is_zipfile(filename):
+        zipobj = zipfile(filename, mode='r')
+        doc = Document(mimetype=get_mimetype(zipobj), filename=filename)
+        doc.origfilename = filename
+        doc.fromzip(zipobj)
         zipobj.close()
-        return document
+        return doc
+    else:
+        raise IOError('File does not exist or it is not an ODF file: %s' % filename)
 
-class ODFBase:
-    """ OpenDocumentFormat BaseClass"""
-    def __init__(self, fromzip=None):
-        self.xmlroot = None
-        self.manifest = None
-        self.filename = None
-
-        if fromzip is None:
-            # create a new document
-            self.setup()
-        else:
-            # load the document from zipobj
-            self.load(fromzip)
-
-    @property
-    def file_ext(self):
-        return self.__class__.__name__.lower()
-
-    @property
-    def mimetype(self):
-        return mimetypes[self.file_ext]
+class Document:
+    """ OpenDocumentFormat BaseClass """
+    def __init__(self, mimetype, filename=None):
+        self.filename = filename
+        self.origfilename = None # filename of existing document
+        self.mimetype = mimetype
+        self.manifest = None # META-INF/manifest.xml
+        self.content = None
+        self.styles = None
+        self.meta = None
+        self.processed = None # list to store filenames of processed files
+        # Setup Document with .setup() or .fromzip()
 
     def setup(self):
+        """ Setup new Document from scratch. """
         self.manifest = Manifest()
 
-    def load(self, fromzip):
-        self.manifest = Manifest.from_zipfile(fromzip)
+    def fromzip(self, zipobj):
+        """ Setup with content from zipfile 'zipobj'. """
+        self.manifest = Manifest.fromzip(zipobj)
 
     def save(self):
-        zipobj = zipfile.ZipFile(self.filename, 'w')
-        self.savetozipobj(zipobj)
+        if self.filename is None:
+            raise ValueError('No filename specified!')
+
+        folder = os.path.dirname(self.filename)
+        tmpfilename = tempfile.mkstemp('tmp', dir=folder)
+        zipobj = zipfile.ZipFile(tmpfilename, 'w', zipfile.ZIP_DEFLATED)
+        self.tozip(zipobj)
         zipobj.close()
+        if os.path.exists(self.filename):
+            bakfilename = self.filename+'.bak'
+            if os.path.exists(bakfilename):
+                os.remove(bakfilename)
+            os.rename(self.filename, bakfilename)
+
+        os.rename(tmpfilename, self.filename)
+
+        # preserve filename for the case of saveas(newfilename)
+        # because on save() some data has to be copied from the old file to
+        # the new file like pictures and settings.
+        self.origfilename = self.filename
 
     def saveas(self, filename):
         self.filename = filename
         self.save()
 
-    def savetozipobj(self, zipobj):
-        self.write_manifest(zipobj)
-        self.write_mimetype(zipobj)
-        self.write_meta(zipobj)
-        self.write_settings(zipobj)
-        self.write_styles(zipobj)
-        self.write_content(zipobj)
-        self.write_Pictures(zipobj)
-        self.copy_unprocessed(zipobj)
+    def tozip(self, zipobj):
+        self.processed = ['mimetype']
+        zipobj.writestr('mimetype', self.mimetype.encode('utf-8'))
+        self.write_xml(zipobj, 'META-INF/manifest.xml', self.manifest)
+        self.write_xml(zipobj, 'meta.xml', self.meta)
+        self.write_xml(zipobj, 'styles.xml', self.styles)
+        self.write_xml(zipobj, 'content.xml', self.content)
+        self.write_new_pictures(zipobj)
+        self.copy_unprocessed_files(zipobj)
+        self.processed = None
 
-class ODS(ODFBase):
-    """ OpenDocumentSpreadsheet """
-    pass
+    def write_xml(self, zipobj, filename, xmlobj):
+        content = '<?xml version="1.0" encoding="UTF-8"?>' + xmlobj.tostring()
+        zipobj.writestr(filename, content.encode('utf-8'))
+        self.processed.append(filename)
 
-class ODT(ODFBase):
-    """ OpenDocumentText """
-    pass
+    def write_new_pictures(self, zipobj):
+        pass
 
-class ODG(ODFBase):
-    """ OpenDocumentGraphic """
-    pass
+    def copy_unprocessed_files(self, zipobj):
+        def copyfiles(filenames, fromzip, tozip):
+            for name in filenames:
+                tozip.writestr(name, fromzip.read(name))
 
-class ODP(ODFBase):
-    """ OpenDocumentPresentation """
-    pass
+        if self.origfilename is not None:
+            origzip = zipfile.ZipFile(self.origfilename)
+            try:
+                names = (name for name in origzip.namelist() if name not in self.processed)
+                copyfiles(names, origzip, zipobj)
+            finally:
+                origzip.close()

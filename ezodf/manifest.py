@@ -9,8 +9,7 @@
 from xml.etree import ElementTree
 
 from .xmlns import XMLNamespaces
-
-MANIFEST_NS = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+from .const import ODFNS
 
 class Manifest:
     def __init__(self, content=None):
@@ -19,14 +18,14 @@ class Manifest:
             # set namespace prefixes to 'manifest' like LibreOffice
             # self.CN: XMLNamespace object to create Clark Notations for XML node
             # names and attribute names
-            self.CN = xmlns.register("manifest", MANIFEST_NS)
+            self.CN = xmlns.register("manifest", ODFNS['manifest'])
             self.xmlroot = ElementTree.Element(self.CN('manifest'))
         else:
             self.xmlroot = xmlns.fromstring(content)
-            self.CN = xmlns.get(MANIFEST_NS)
+            self.CN = xmlns.get(ODFNS['manifest'])
 
     @staticmethod
-    def from_zipfile(zipfile):
+    def fromzip(zipfile):
         content = str(zipfile.read('META-INF/manifest.xml'), 'utf-8')
         return Manifest(content)
 
@@ -43,7 +42,7 @@ class Manifest:
     def remove(self, full_path):
         file_entry = self.find(full_path)
         if file_entry is not None:
-            xlmtree.remove(file_entry)
+            self.xmlroot.remove(file_entry)
 
     def find(self, full_path):
         for node in self.xmlroot.getchildren():
@@ -51,5 +50,5 @@ class Manifest:
                 return node
         return None
 
-    def toxml(self):
+    def tostring(self):
         return ElementTree.tostring(self.xmlroot)
