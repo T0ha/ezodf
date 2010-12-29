@@ -30,7 +30,7 @@ MIMETYPES = {
 
 FILE_EXT_FOR_MIMETYPE = { mimetype:ext for ext, mimetype in MIMETYPES.items() }
 
-ODFNS = {
+LibreOfficeNSMAP = {
     'anim': "urn:oasis:names:tc:opendocument:xmlns:animation:1.0",
     'db': "urn:oasis:names:tc:opendocument:xmlns:database:1.0",
     'chart': "urn:oasis:names:tc:opendocument:xmlns:chart:1.0",
@@ -38,7 +38,7 @@ ODFNS = {
     'dc': "http://purl.org/dc/elements/1.1/",
     'dom': "http://www.w3.org/2001/xml-events",
     'dr3d': "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0",
-    'draw': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
+    'drawing': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
     'fo': "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0",
     'form': "urn:oasis:names:tc:opendocument:xmlns:form:1.0",
     'koffice': "http://www.koffice.org/2005/",

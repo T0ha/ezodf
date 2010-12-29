@@ -7,28 +7,17 @@
 # License: GPLv3
 
 import unittest
+from xml.etree import ElementTree
 
-from ezodf.xmlns import XMLNamespaces
+from ezodf.xmlns import _XMLNamespaces
 
-OOONS = XMLNamespaces({
-    "office": "http://openoffice.org/2000/office",
-    "table": "http://openoffice.org/2000/table",
-    "style": "http://openoffice.org/2000/style",
-    "text": "http://openoffice.org/2000/text",
-    "meta": "http://openoffice.org/2000/meta",
-    "script": "http://openoffice.org/2000/script",
-    "drawing": "http://openoffice.org/2000/drawing",
-    "chart": "http://openoffice.org/2000/chart",
-    "number": "http://openoffice.org/2000/number",
-    "datastyle": "http://openoffice.org/2000/datastyle",
-    "dr3d": "http://openoffice.org/2000/dr3d",
-    "http://openoffice.org/2000/form": "form",
-    "config": "http://openoffice.org/2000/config",
-    "fo": "http://www.w3.org/1999/XSL/Format",
-    "xlink": "http://www.w3.org/1999/xlink",
-    "svg": "http://www.w3.org/2000/svg",
-    "math": "http://www.w3.org/1998/Math/MathML",
-})
+LibreOfficeNSMAP = {
+    'drawing': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
+    'office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
+    'manifest': "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0",
+}
+
+LibONS = _XMLNamespaces(LibreOfficeNSMAP, ElementTree)
 
 class etree12module:
     _namespace_map = {}
@@ -43,73 +32,38 @@ class etree13module:
         return self._result_map
 
 
-class TestXMLNamespace(unittest.TestCase):
-    def test_clark(self):
-        ns = OOONS.register("office", "http://openoffice.org/2000/office")
-        self.assertEqual(ns.CN('p'), "{http://openoffice.org/2000/office}p")
-        # or call namespace object
-        self.assertEqual(ns('p'), "{http://openoffice.org/2000/office}p")
-
-    def test_prefix(self):
-        ns = OOONS.register("office", "http://openoffice.org/2000/office")
-        self.assertEqual(ns.prefix('p'), "office:p")
-
 class TestXMLNamespaces(unittest.TestCase):
-    def test_split_clark(self):
-        clark, tag = OOONS.split_clark("{http://openoffice.org/2000/office}p")
-        self.assertEqual(clark, 'http://openoffice.org/2000/office')
-        self.assertEqual(tag, 'p')
-
-    def test_split_clark_error(self):
-        self.assertRaises(ValueError, OOONS.split_clark, 'office:p')
-        self.assertRaises(ValueError, OOONS.split_clark, '{officep')
-
     def test_split_prefix(self):
-        prefix, tag = OOONS.split_prefix("office:p")
+        prefix, tag = LibONS.split_prefix("office:p")
         self.assertEqual(prefix, 'office')
         self.assertEqual(tag, 'p')
 
     def test_split_prefix_error(self):
-        self.assertRaises(ValueError, OOONS.split_prefix, 'officep')
-        self.assertRaises(ValueError, OOONS.split_prefix, 'of:fice:p')
+        self.assertRaises(ValueError, LibONS.split_prefix, 'officep')
+        self.assertRaises(ValueError, LibONS.split_prefix, 'of:fice:p')
 
     def test_prefix2clark(self):
-        clark = OOONS.prefix2clark("office:p")
-        self.assertEqual(clark, "{http://openoffice.org/2000/office}p")
+        clark = LibONS.prefix2clark("office:p")
+        self.assertEqual(clark, "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
 
-    def test_clark2prefix(self):
-        prefix = OOONS.clark2prefix("{http://openoffice.org/2000/office}p")
-        self.assertEqual(prefix, "office:p")
+    def test_call(self):
+        self.assertEqual(LibONS('drawing:p'), "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p")
+        self.assertEqual(LibONS('office:p'), "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
 
-    def test_symmetry1(self):
-        prefix = OOONS.clark2prefix("{http://openoffice.org/2000/drawing}p")
-        self.assertEqual('drawing:p', prefix)
-
-    def test_symmetry2(self):
-        clark = OOONS.prefix2clark("text:p")
-        self.assertEqual('{http://openoffice.org/2000/text}p', clark)
-
-    def test_get_namespace_by_uri(self):
-        ns = OOONS.get("http://openoffice.org/2000/drawing")
-        self.assertEqual(ns.prefix('p'), "drawing:p")
-
-    def test_get_namespace_by_uri_error(self):
-        self.assertRaises(KeyError, OOONS.get, "http://openoffice.org/2000/xyz")
-
-    def test_get_namespace_by_prefix(self):
-        ns = OOONS.get("drawing")
-        self.assertEqual(ns.prefix('p'), "drawing:p")
+    def test_short_prefix2clark_pass_through(self):
+        tag = "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p"
+        self.assertEqual(LibONS(tag), tag)
 
     def test_etree12(self):
         etree12 = etree12module()
-        ns = XMLNamespaces(etree=etree12)
+        ns = _XMLNamespaces(LibreOfficeNSMAP, etree=etree12)
         ns.register('office', 'test:ns:office')
         result = etree12.get_result()
         self.assertEqual(result['test:ns:office'], 'office')
 
     def test_etree13(self):
         etree13 = etree13module()
-        ns = XMLNamespaces(etree=etree13)
+        ns = _XMLNamespaces(LibreOfficeNSMAP, etree=etree13)
         ns.register('office', 'test:ns:office')
         result = etree13.get_result()
         self.assertEqual(result['test:ns:office'], 'office')
@@ -139,44 +93,25 @@ testdata = """<?xml version="1.0" encoding="UTF-8"?>
 </manifest:manifest>
 """
 
-from xml.etree import ElementTree
-
 class TestNSParsing(unittest.TestCase):
-    ns = XMLNamespaces(etree=ElementTree)
-    def setUp(self):
-        mfstns = self.ns.register('manifest', 'undefined')
-
-    def test_reset_namespace(self):
-        mfstns = self.ns.get('manifest')
-        self.assertEqual(mfstns._uri, 'undefined')
-
-    def test_parse_xmlns(self):
-        xmltree = self.ns.fromstring(testdata)
-        mfstns = self.ns.get('manifest')
-        self.assertEqual(mfstns._uri, "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0")
-
     def test_parse_and_count_file_entry_elements(self):
-        xmltree = self.ns.fromstring(testdata)
-        manifest_ns = self.ns.get("urn:oasis:names:tc:opendocument:xmlns:manifest:1.0")
-        file_entry_name = manifest_ns.CN('file-entry')
+        xmltree = LibONS.etree.fromstring(testdata)
+        file_entry_name = LibONS('manifest:file-entry')
         result = list(xmltree.findall(file_entry_name))
         self.assertEqual(len(result), 20)
 
     def test_parse_and_count_file_entry_attributes(self):
-        xmltree = self.ns.fromstring(testdata)
-        manifest_ns = self.ns.get("urn:oasis:names:tc:opendocument:xmlns:manifest:1.0")
-
+        xmltree = LibONS.etree.fromstring(testdata)
         first_entry = xmltree[0]
-        attrib = first_entry.get(manifest_ns.CN('media-type'))
+        attrib = first_entry.get(LibONS('manifest:media-type'))
         self.assertEqual(attrib, "application/vnd.oasis.opendocument.text")
-        attrib = first_entry.get(manifest_ns.CN('version'))
+        attrib = first_entry.get(LibONS('manifest:version'))
         self.assertEqual(attrib, "1.2")
-        attrib = first_entry.get(manifest_ns.CN('full-path'))
+        attrib = first_entry.get(LibONS('manifest:full-path'))
         self.assertEqual(attrib, "/")
 
     def test_tostring_elements(self):
-        xmltree = self.ns.fromstring(testdata)
-        manifest_ns = self.ns.get("urn:oasis:names:tc:opendocument:xmlns:manifest:1.0")
+        xmltree = LibONS.etree.fromstring(testdata)
         result = ElementTree.tostring(xmltree[0])
         self.assertTrue('<manifest:file-entry' in result)
         self.assertTrue('manifest:media-type="application/vnd.oasis.opendocument.text"' in result)

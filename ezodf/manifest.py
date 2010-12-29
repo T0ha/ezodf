@@ -6,23 +6,14 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
-from xml.etree import ElementTree
-
-from .xmlns import XMLNamespaces
-from .const import ODFNS
+from .xmlns import LibONS
 
 class Manifest:
     def __init__(self, content=None):
-        xmlns = XMLNamespaces(etree=ElementTree)
         if content is None:
-            # set namespace prefixes to 'manifest' like LibreOffice
-            # self.CN: XMLNamespace object to create Clark Notations for XML node
-            # names and attribute names
-            self.CN = xmlns.register("manifest", ODFNS['manifest'])
-            self.xmlroot = ElementTree.Element(self.CN('manifest'))
+            self.xmlroot = LibONS.etree.Element(LibONS('manifest:manifest'))
         else:
-            self.xmlroot = xmlns.fromstring(content)
-            self.CN = xmlns.get(ODFNS['manifest'])
+            self.xmlroot = LibONS.etree.fromstring(content)
 
     @staticmethod
     def fromzip(zipfile):
@@ -32,12 +23,12 @@ class Manifest:
     def add(self, full_path, media_type="", version=None):
         file_entry = self.find(full_path)
         if file_entry is None:
-            file_entry = ElementTree.SubElement(self.xmlroot, self.CN('file-entry'))
-            file_entry.set(self.CN('full-path'), full_path)
+            file_entry = LibONS.etree.SubElement(self.xmlroot, LibONS('manifest:file-entry'))
+            file_entry.set(LibONS('manifest:full-path'), full_path)
 
-        file_entry.set(self.CN('media-type'), media_type)
+        file_entry.set(LibONS('manifest:media-type'), media_type)
         if version is not None:
-            file_entry.set(self.CN('version'), version)
+            file_entry.set(LibONS('manifest:version'), version)
 
     def remove(self, full_path):
         file_entry = self.find(full_path)
@@ -46,9 +37,9 @@ class Manifest:
 
     def find(self, full_path):
         for node in self.xmlroot.getchildren():
-            if node.get(self.CN('full-path')) == full_path:
+            if node.get(LibONS('manifest:full-path')) == full_path:
                 return node
         return None
 
     def tostring(self):
-        return ElementTree.tostring(self.xmlroot)
+        return LibONS.etree.tostring(self.xmlroot)

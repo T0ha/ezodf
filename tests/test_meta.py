@@ -20,7 +20,7 @@ class TestMeta(unittest.TestCase):
         odt = ZipFile(os.path.join(testdatapath, "empty.odt"))
         meta = Meta.fromzip(odt)
         odt.close()
-        self.assertEqual(meta['initial-creator'], "Manfred Moitzi")
+        self.assertEqual(meta['meta:initial-creator'], "Manfred Moitzi")
 
 if __name__=='__main__':
     unittest.main()

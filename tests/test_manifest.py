@@ -64,11 +64,12 @@ class TestManifest(unittest.TestCase):
             '</manifest:manifest>')
 
     def test_query_file(self):
+        NS = '{urn:oasis:names:tc:opendocument:xmlns:manifest:1.0}'
         manifest = Manifest(testdata)
         rootfile = manifest.find('/')
-        self.assertEqual(rootfile.get(manifest.CN('media-type')), 'application/vnd.oasis.opendocument.text')
+        self.assertEqual(rootfile.get(NS+'media-type'), 'application/vnd.oasis.opendocument.text')
         rdf = manifest.find('manifest.rdf')
-        self.assertEqual(rdf.get(manifest.CN('media-type')), 'application/rdf+xml')
+        self.assertEqual(rdf.get(NS+'media-type'), 'application/rdf+xml')
 
     def test_query_file_not_found(self):
         manifest = Manifest(testdata)

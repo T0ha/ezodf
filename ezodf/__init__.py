@@ -6,4 +6,4 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
-from .document import open
+#from .document import open
