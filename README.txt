@@ -19,7 +19,7 @@ for more examples see: /examples folder
 Dependencies
 ============
 
-No dependencies beyond the Python Standard Library.
+* lxml <http://codespeak.net/lxml/> (painless serialisation of prefixes)
 
 The target platform is Python 3.1+, no Python 2 support at this time.
 

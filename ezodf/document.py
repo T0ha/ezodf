@@ -84,6 +84,7 @@ class Document:
         zipobj.writestr('mimetype', self.mimetype.encode('utf-8'))
         self._write_xml(zipobj, 'META-INF/manifest.xml', self.manifest)
         self.meta.touch() # set modification date to now
+        self.meta.inc_editing_cycles()
         self._write_xml(zipobj, 'meta.xml', self.meta)
         self._write_xml(zipobj, 'styles.xml', self.styles)
         self._write_xml(zipobj, 'content.xml', self.content)

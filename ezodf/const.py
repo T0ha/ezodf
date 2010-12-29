@@ -6,8 +6,10 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+import sys
+
 VERSION = "0.1.0"
-PACKAGENAME = "ezodf"
+GENERATOR = "http://pypi.python.org/pypi/ezodf/%s$Python%s" % (VERSION, sys.version_info)
 
 MIMETYPES = {
     'odt': "application/vnd.oasis.opendocument.text",
@@ -41,6 +43,7 @@ LibreOfficeNSMAP = {
     'drawing': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
     'fo': "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0",
     'form': "urn:oasis:names:tc:opendocument:xmlns:form:1.0",
+    'grddl': "http://www.w3.org/2003/g/data-view#",
     'koffice': "http://www.koffice.org/2005/",
     'manifest': "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0",
     'math': "http://www.w3.org/1998/Math/MathML",

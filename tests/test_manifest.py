@@ -6,7 +6,6 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
-import sys
 import os
 import unittest
 from zipfile import ZipFile
@@ -15,7 +14,7 @@ from ezodf.manifest import Manifest
 
 testdatapath = os.path.join(os.path.dirname(__file__), "data")
 
-testdata = """<?xml version="1.0" encoding="UTF-8"?>
+testdata = b"""<?xml version="1.0" encoding="UTF-8"?>
 <manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
  <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text" manifest:version="1.2" manifest:full-path="/"/>
  <manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/statusbar/"/>
@@ -50,18 +49,18 @@ class TestManifest(unittest.TestCase):
     def test_new_manifest(self):
         manifest = Manifest()
         result = manifest.tostring()
-        self.assertEqual(result, '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" />')
+        self.assertEqual(result, b'<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"/>')
 
     def test_add_file(self):
         manifest = Manifest()
         manifest.add('test.xml', 'text/xml')
         result = manifest.tostring()
         self.assertEqual(result,
-            '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">'\
-                '<manifest:file-entry '\
-                'manifest:full-path="test.xml" '\
-                'manifest:media-type="text/xml" />'\
-            '</manifest:manifest>')
+            b'<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">'\
+                b'<manifest:file-entry '\
+                b'manifest:full-path="test.xml" '\
+                b'manifest:media-type="text/xml"/>'\
+            b'</manifest:manifest>')
 
     def test_query_file(self):
         NS = '{urn:oasis:names:tc:opendocument:xmlns:manifest:1.0}'
