@@ -17,8 +17,8 @@ class Meta:
     def __init__(self, content=None):
         if content is None:
             # namespace prefixes like LibreOffice: 'office', 'dc' and 'meta'
-            self.xmlroot = etree.Element(LibONS('office:document-meta'))
-            self.meta = etree.SubElement(self.xmlroot, LibONS('office:meta'))
+            self.xmlroot = LibONS.etree.Element(LibONS('office:document-meta'))
+            self.meta = LibONS.etree.SubElement(self.xmlroot, LibONS('office:meta'))
             self.setup()
         else:
             self.xmlroot = LibONS.etree.fromstring(content)
@@ -29,7 +29,10 @@ class Meta:
         self.__setitem__('meta:creation-date', datetime.now().isoformat())
 
     def __setitem__(self, key, value):
-        element = etree.SubElement(self.meta, LibONS(key))
+        cnkey = LibONS(key)
+        element = self.meta.find(cnkey)
+        if element is None:
+            element = LibONS.etree.SubElement(self.meta, cnkey)
         element.text = value
 
     def __getitem__(self, key):

@@ -3,7 +3,7 @@ Abstract
 ========
 
 'ezodf' is a Python package to create new or open existing OpenDocumentFormat files
-and extract, add, modify or delete document data.
+to extract, add, modify or delete document data.
 
 a simple example::
 
@@ -21,9 +21,7 @@ Dependencies
 
 No dependencies beyond the Python Standard Library.
 
-The main target platform is Python 3.1+, perhaps I will integrate Python 2.6+
-support, if there is no great effort to achieve this goal.
-
+The target platform is Python 3.1+, no Python 2 support at this time.
 
 Installation
 ============
