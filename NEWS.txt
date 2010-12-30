@@ -4,4 +4,4 @@ NEWS
 
 Version 0.1.0 - 00 Januar 2011
 
-  * alpha version
+  * Pre-Alpha version

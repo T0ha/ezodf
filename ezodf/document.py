@@ -47,11 +47,17 @@ class Document:
         self.manifest = Manifest()
         self.meta = Meta()
         self.manifest.add('meta.xml', 'text/xml')
+        self.styles = Styles()
+        self.manifest.add('styles.xml', 'text/xml')
+        self.content = Content(self.mimetype)
+        self.manifest.add('content.xml', 'text/xml')
 
     def fromzip(self, zipobj):
         """ Setup with content from zipfile 'zipobj'. """
         self.manifest = Manifest.fromzip(zipobj)
         self.meta = Meta.fromzip(zipobj)
+        self.styles = Styles.fromzip(zipobj)
+        self.content = Content.fromzip(self.mimetype, zipobj)
 
     def save(self):
         if self.filename is None:

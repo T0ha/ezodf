@@ -182,3 +182,13 @@ ALL_NSMAP.update(TEXT_NSMAP)
 ALL_NSMAP.update(SPREADSHEET_NSMAP)
 ALL_NSMAP.update(PRESENTATION_NSMAP)
 ALL_NSMAP.update(GRAPHICS_NSMAP)
+
+MIMETYPE_NSMAP = {
+    "application/vnd.oasis.opendocument.text" : TEXT_NSMAP,
+    "application/vnd.oasis.opendocument.graphics" : GRAPHICS_NSMAP,
+    "application/vnd.oasis.opendocument.presentation" : PRESENTATION_NSMAP,
+    "application/vnd.oasis.opendocument.spreadsheet": SPREADSHEET_NSMAP,
+    "application/vnd.oasis.opendocument.chart" : GRAPHICS_NSMAP,
+    "application/vnd.oasis.opendocument.image" : GRAPHICS_NSMAP,
+    "application/vnd.oasis.opendocument.formula" : GRAPHICS_NSMAP,
+}

@@ -52,7 +52,7 @@ TAGS = ['generator',
         'creator',
         'creation-date',
         'date',
-        'edtiting-cycles',
+        'editing-cycles',
         ]
 
 class TestMeta(unittest.TestCase):
@@ -99,6 +99,14 @@ class TestMeta(unittest.TestCase):
         for tag in TAGS:
             meta[tag] = data
             self.assertEqual(meta[tag], data)
+
+    def test_editing_cycles(self):
+        meta = Meta()
+        self.assertRaises(KeyError, meta.__getitem__, 'editing-cycles')
+        meta.inc_editing_cycles()
+        self.assertEqual(meta['editing-cycles'], '1')
+        meta.inc_editing_cycles()
+        self.assertEqual(meta['editing-cycles'], '2')
 
 class TestKeywords(unittest.TestCase):
     def test_keyword_in_xml_serialisation(self):
@@ -164,12 +172,12 @@ class TestUsertags(unittest.TestCase):
         NAME = 'TAG1'
         meta.usertags[NAME] = 'VALUE1'
         self.assertTrue(NAME in meta.usertags)
-        meta.usertags.remove(NAME)
+        del meta.usertags[NAME]
         self.assertFalse(NAME in meta.usertags)
 
     def test_remove_error(self):
         meta = Meta()
-        self.assertRaises(KeyError, meta.usertags.remove, 'XXX')
+        self.assertRaises(KeyError, meta.usertags.__delitem__, 'XXX')
 
     def test_iter(self):
         meta = Meta()

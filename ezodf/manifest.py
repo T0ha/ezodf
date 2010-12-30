@@ -18,8 +18,7 @@ class Manifest:
 
     @staticmethod
     def fromzip(zipfile):
-        content = zipfile.read('META-INF/manifest.xml')
-        return Manifest(content)
+        return Manifest(zipfile.read('META-INF/manifest.xml'))
 
     def add(self, full_path, media_type="", version=None):
         file_entry = self.find(full_path)

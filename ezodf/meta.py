@@ -9,8 +9,7 @@
 from datetime import datetime
 
 from .xmlns import XML
-from .const import META_NSMAP
-from .const import GENERATOR
+from .const import META_NSMAP, GENERATOR
 
 TAGS = {
     'generator': 'meta:generator',
@@ -21,7 +20,7 @@ TAGS = {
     'creator': 'dc:creator',
     'creation-date': 'meta:creation-date',
     'date': 'dc:date',
-    'edtiting-cycles': 'meta:editing-cycles',
+    'editing-cycles': 'meta:editing-cycles',
 }
 
 # Set/Get Meta Tags by __setitem__/__getitem__ interface:
@@ -49,9 +48,7 @@ TAGS = {
 #                   the document is saved.
 
 class Meta:
-    # using the default namespace prefixes like LibreOffice: 'office', 'dc'
-    # and 'meta'
-    generator = GENERATOR # used for meta:generator field
+    generator = GENERATOR
 
     def __init__(self, content=None):
         if content is None:
@@ -59,13 +56,8 @@ class Meta:
             self.meta = XML.etree.SubElement(self.xmlroot, XML('office:meta'))
             self.setup()
         else:
-            # test if content is a string containing the XML data
             if isinstance(content, bytes):
                 self.xmlroot = XML.etree.fromstring(content)
-            # test if content is an ElementTree like node and the node is the
-            # root element of the meta document, tag name has to be in clark
-            # notation! '{METANAMESPACE}document-meta'
-            # raises AttribError if content has no .tag attribute
             elif content.tag == XML('office:document-meta'):
                 self.xmlroot = content
             else:
@@ -82,6 +74,10 @@ class Meta:
         self['creation-date'] = datetime.now().isoformat()
         self.touch()
 
+    def touch(self):
+        self['date'] = datetime.now().isoformat()
+        self['generator'] = Meta.generator
+
     def __setitem__(self, key, value):
         cnkey = XML(TAGS[key]) # key in clark notation
         element = self.meta.find(cnkey)
@@ -96,16 +92,11 @@ class Meta:
         else:
             raise KeyError(key)
 
-    def touch(self):
-        self['date'] = datetime.now().isoformat()
-        self['generator'] = Meta.generator
-
     def inc_editing_cycles(self):
         try:
             count = self['editing-cycles']
             try:
-                count = int(count)
-                count += 1
+                count = int(count) + 1
             except ValueError:
                 count = 1
         except KeyError:
@@ -184,26 +175,20 @@ class Usertags:
         if value_type is not None:
             tag.set(XML('meta:value-type'), value_type)
 
-    def __setitem__(self, key, value):
-        self.set(key, value)
+    def __setitem__(self, name, value):
+        self.set(name, value)
 
-    def __getitem__(self, key):
+    def __getitem__(self, name):
         """ Get value of user-defined metatag 'name'.
 
         Raises KeyError, if 'name' not exist.
         """
-        tag = self._find(key)
+        tag = self._find(name)
         if tag is not None:
             return tag.text
-        raise KeyError(key)
+        raise KeyError(name)
 
-    def typeof(self, key):
-        tag = self._find(key)
-        if tag is not None:
-            return tag.get(XML('meta:value-type'), 'string')
-        raise KeyError(key)
-
-    def remove(self, name):
+    def __delitem__(self, name):
         """ Remove user defined metatag 'name'.
 
         Raises KeyError, if 'name' not exist.
@@ -213,6 +198,12 @@ class Usertags:
             self.meta.remove(tag)
         else:
             raise KeyError(name)
+
+    def typeof(self, key):
+        tag = self._find(key)
+        if tag is not None:
+            return tag.get(XML('meta:value-type'), 'string')
+        raise KeyError(key)
 
     def _find(self, name):
         for tag in self.meta.findall(XML('meta:user-defined')):
