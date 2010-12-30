@@ -53,5 +53,4 @@ class _XMLNamespaces:
             raise ValueError("prefix-notation required 'prefix:local': %s" % tag)
 
 # global ODF Namespaces with OASIS prefixes
-# NS = OASIS NameSpace
-NS = _XMLNamespaces(ALL_NSMAP, etree)
+XML = _XMLNamespaces(ALL_NSMAP, etree)

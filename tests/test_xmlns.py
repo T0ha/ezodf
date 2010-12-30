@@ -8,29 +8,31 @@
 
 import unittest
 
-from ezodf.xmlns import NS
+from mytesttools import in_XML
+
+from ezodf.xmlns import XML
 
 class TestXMLNamespaces(unittest.TestCase):
     def test_split_prefix(self):
-        prefix, tag = NS._split_prefix("office:p")
+        prefix, tag = XML._split_prefix("office:p")
         self.assertEqual(prefix, 'office')
         self.assertEqual(tag, 'p')
 
     def test_split_prefix_error(self):
-        self.assertRaises(ValueError, NS._split_prefix, 'officep')
-        self.assertRaises(ValueError, NS._split_prefix, 'of:fice:p')
+        self.assertRaises(ValueError, XML._split_prefix, 'officep')
+        self.assertRaises(ValueError, XML._split_prefix, 'of:fice:p')
 
     def test_prefix2clark(self):
-        clark = NS._prefix2clark("office:p")
+        clark = XML._prefix2clark("office:p")
         self.assertEqual(clark, "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
 
     def test_call(self):
-        self.assertEqual(NS('draw:p'), "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p")
-        self.assertEqual(NS('office:p'), "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
+        self.assertEqual(XML('draw:p'), "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p")
+        self.assertEqual(XML('office:p'), "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
 
     def test_short_prefix2clark_pass_through(self):
         tag = "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p"
-        self.assertEqual(NS(tag), tag)
+        self.assertEqual(XML(tag), tag)
 
 testdata = """<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
  <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text" manifest:version="1.2" manifest:full-path="/"/>
@@ -56,31 +58,25 @@ testdata = """<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument
 </manifest:manifest>
 """
 
-def in_XML(source, target):
-    for element in source.strip().split():
-        if element not in target:
-            return False
-    return True
-
 class TestNSParsing(unittest.TestCase):
     def test_parse_and_count_file_entry_elements(self):
-        xmltree = NS.etree.fromstring(testdata)
-        result = list(xmltree.findall(NS('manifest:file-entry')))
+        xmltree = XML.etree.fromstring(testdata)
+        result = list(xmltree.findall(XML('manifest:file-entry')))
         self.assertEqual(len(result), 20)
 
     def test_parse_and_count_file_entry_attributes(self):
-        xmltree = NS.etree.fromstring(testdata)
+        xmltree = XML.etree.fromstring(testdata)
         first_entry = xmltree[0]
-        attrib = first_entry.get(NS('manifest:media-type'))
+        attrib = first_entry.get(XML('manifest:media-type'))
         self.assertEqual(attrib, "application/vnd.oasis.opendocument.text")
-        attrib = first_entry.get(NS('manifest:version'))
+        attrib = first_entry.get(XML('manifest:version'))
         self.assertEqual(attrib, "1.2")
-        attrib = first_entry.get(NS('manifest:full-path'))
+        attrib = first_entry.get(XML('manifest:full-path'))
         self.assertEqual(attrib, "/")
 
     def test_tostring_subelements(self):
-        xmltree = NS.etree.fromstring(testdata)
-        result = NS.etree.tostring(xmltree[0], encoding=str).strip()
+        xmltree = XML.etree.fromstring(testdata)
+        result = XML.etree.tostring(xmltree[0], encoding=str).strip()
         self.assertTrue(in_XML('<manifest:file-entry '\
                                'manifest:media-type="application/vnd.oasis.opendocument.text" '\
                                'manifest:version="1.2" '\
