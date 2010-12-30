@@ -10,7 +10,7 @@ import os
 import unittest
 from zipfile import ZipFile
 
-from ezodf.xmlns import LibONS
+from ezodf.xmlns import NS
 from ezodf.meta import Meta
 
 testdatapath = os.path.join(os.path.dirname(__file__), "data")
@@ -68,13 +68,13 @@ class TestMeta(unittest.TestCase):
         self.assertEqual(meta['meta:initial-creator'], "Manfred Moitzi")
 
     def test_open_from_ElementTree(self):
-        xmltree = LibONS.fromstring(testdata)
+        xmltree = NS.etree.fromstring(testdata)
         meta = Meta(xmltree)
         self.assertEqual(meta['meta:initial-creator'], "Manfred Moitzi")
 
-    def test_tostring_without_manipulation(self):
+    def test_tobytes_without_manipulation(self):
         meta = Meta(testdata)
-        result = str(meta.tostring(), 'utf-8')
+        result = str(meta.tobytes(), 'utf-8')
         for string in CHECKSTRINGS:
             self.assertTrue(string in result, 'missing: '+string)
 

@@ -9,7 +9,7 @@ a simple example::
 
     import ezodf
 
-    ods = ezodf.ods('testspreadsheet.ods')
+    ods = ezodf.ODS('testspreadsheet.ods')
 	sheet = ezodf.Spreadsheet(ods, 'SHEET')
 	sheet[0, 0] = ezodf.Cell("Textcell")
     ods.save()
@@ -19,9 +19,11 @@ for more examples see: /examples folder
 Dependencies
 ============
 
-* lxml <http://codespeak.net/lxml/> (painless serialisation of prefixes)
+* lxml <http://codespeak.net/lxml/> for painless serialisation with prefixe
+  declaration (xlmns:prefix="global:namespace:specifier") in the root element,
+  and declarations for unused prefixes are also possible.
 
-The target platform is Python 3.1+, no Python 2 support at this time.
+The target platform is Python 3.1+, no Python 2 support planned at this time.
 
 Installation
 ============

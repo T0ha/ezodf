@@ -8,18 +8,9 @@
 
 from datetime import datetime
 
-from .xmlns import LibONS
+from .xmlns import NS
+from .const import META_NSMAP
 from .const import GENERATOR
-
-METADEFS = {
-    'xmlns:office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
-    'xmlns:xlink' : "http://www.w3.org/1999/xlink",
-    'xmlns:dc' : "http://purl.org/dc/elements/1.1/",
-    'xmlns:meta' : "urn:oasis:names:tc:opendocument:xmlns:meta:1.0",
-    'xmlns:ooo' : "http://openoffice.org/2004/office",
-    'xmlns:grddl' : "http://www.w3.org/2003/g/data-view#",
-    'grddl:transformation' : "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl",
-}
 
 VALID_TAGS = frozenset(
     ['meta:generator', 'dc:title', 'dc:description', 'dc:subject',
@@ -49,44 +40,43 @@ class Meta:
 
     def __init__(self, content=None):
         if content is None:
-            self.xmlroot = LibONS.etree.Element(LibONS('office:document-meta'))
-            self.meta = LibONS.etree.SubElement(self.xmlroot, LibONS('office:meta'))
+            self.xmlroot = NS.etree.Element(NS('office:document-meta'), nsmap=META_NSMAP)
+            self.meta = NS.etree.SubElement(self.xmlroot, NS('office:meta'))
             self.setup()
         else:
             # test if content is a string containing the XML data
             if isinstance(content, bytes):
-                self.xmlroot = LibONS.etree.fromstring(content)
+                self.xmlroot = NS.etree.fromstring(content)
             # test if content is an ElementTree like node and the node is the
             # root element of the meta document, tag name has to be in clark
             # notation! '{METANAMESPACE}document-meta'
             # raises AttribError if content has no .tag attribute
-            elif content.tag == LibONS('office:document-meta'):
+            elif content.tag == NS('office:document-meta'):
                 self.xmlroot = content
             else:
                 raise ValueError("Unexpected root node: %s" % content.tag)
-            self.meta = self.xmlroot.find(LibONS('office:meta'))
-
-    def _set_xmlroot_attribs(self):
-        for key, item in METADEFS.items():
-            self.xmlroot.set(key, item)
+            self.meta = self.xmlroot.find(NS('office:meta'))
 
     def setup(self):
+        # don't know for what this is good for
+        self.xmlroot.set(NS('grddl:transformation'), "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
+
         self.__setitem__('meta:creation-date', datetime.now().isoformat())
         self.touch()
 
     def __setitem__(self, key, value):
         if key not in VALID_TAGS:
             raise KeyError(key)
-        cnkey = LibONS(key) # key in clark notation
+        cnkey = NS(key) # key in clark notation
         element = self.meta.find(cnkey)
         if element is None:
-            element = LibONS.etree.SubElement(self.meta, cnkey)
+            element = NS.etree.SubElement(self.meta, cnkey)
         element.text = value
 
     def __getitem__(self, key):
         if key not in VALID_TAGS:
             raise KeyError(key)
-        element = self.meta.find(LibONS(key))
+        element = self.meta.find(NS(key))
         if element is not None:
             return element.text
         else:
@@ -110,16 +100,21 @@ class Meta:
 
     @staticmethod
     def fromzip(zipfile):
-        content = zipfile.read('meta.xml')
-        return Meta(content)
+        return Meta(zipfile.read('meta.xml'))
 
-    def tostring(self):
-        #self._set_xmlroot_attribs()
-        return LibONS.tostring(self.xmlroot)
+    def tobytes(self, xml_declaration=None, pretty_print=False):
+        """ Returns the XML representation as bytes in 'UTF-8' encoding.
+
+        :param bool xml_declaration: create XML declaration
+        :param bool pretty-print: enables formatted XML
+        """
+        return NS.etree.tostring(self.xmlroot, encoding='UTF-8',
+                                 xml_declaration=xml_declaration,
+                                 pretty_print=pretty_print)
 
     def keywords(self):
         """ Iterate over all keywords. """
-        for keyword in self.meta.findall(LibONS('meta:keyword')):
+        for keyword in self.meta.findall(NS('meta:keyword')):
             yield keyword.text
 
     def has_keyword(self, keyword):
@@ -130,7 +125,7 @@ class Meta:
         """ Add 'keyword' to meta data. """
         tag = self._find_keyword(keyword)
         if tag is None:
-            tag = LibONS.etree.SubElement(LibONS('meta:keyword'))
+            tag = NS.etree.SubElement(NS('meta:keyword'))
             tag.text = keyword
 
     def remove_keyword(self, keyword):
@@ -140,7 +135,7 @@ class Meta:
             self.meta.remove(tag)
 
     def _find_keyword(self, keyword):
-        for tag in self.meta.findall(LibONS('meta:keyword')):
+        for tag in self.meta.findall(NS('meta:keyword')):
             if  keyword == tag.text:
                 return tag
         return None
@@ -150,19 +145,19 @@ class Meta:
 
         :returns: (name, value)
         """
-        for metatag in self.meta.findall(LibONS('meta:user-defined')):
-            yield (metatag.get(LibONS('meta:name')), metatag.text)
+        for metatag in self.meta.findall(NS('meta:user-defined')):
+            yield (metatag.get(NS('meta:name')), metatag.text)
 
     def add_usertag(self, name, value, value_type=None):
         """ Add user-defined metatag. Replaces existing user tags.
         """
         tag = self._find_usertag(name)
         if tag is None:
-            tag = LibONS.etree.SubElement(self.meta, LibONS('meta:user-defined'))
-            tag.set(LibONS('meta:name'), name)
+            tag = NS.etree.SubElement(self.meta, NS('meta:user-defined'))
+            tag.set(NS('meta:name'), name)
         tag.text = str(value)
         if value_type is not None:
-            tag.set(LibONS('meta:value-type'), value_type)
+            tag.set(NS('meta:value-type'), value_type)
 
     def get_usertag(self, name):
         """ Get value of user-defined metatag 'name'.
@@ -186,7 +181,7 @@ class Meta:
             raise KeyError(name)
 
     def _find_usertag(self, name):
-        for tag in self.meta.findall(LibONS('meta:user-defined')):
-            if name == tag.get(LibONS('meta:name')):
+        for tag in self.meta.findall(NS('meta:user-defined')):
+            if name == tag.get(NS('meta:name')):
                 return tag
         return None

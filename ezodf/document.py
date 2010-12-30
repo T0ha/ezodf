@@ -92,9 +92,8 @@ class Document:
         self._copy_files(zipobj)
         self._processed = None
 
-    def _write_xml(self, zipobj, filename, xmlobj):
-        content = '<?xml version="1.0" encoding="UTF-8"?>' + xmlobj.tostring()
-        zipobj.writestr(filename, content.encode('utf-8'))
+    def _write_xml(self, zipobj, filename, odfobj):
+        zipobj.writestr(filename, odfobj.tostring(xml_declaration=True))
         self._processed.append(filename)
 
     def _write_new_pictures(self, zipobj):

@@ -32,36 +32,153 @@ MIMETYPES = {
 
 FILE_EXT_FOR_MIMETYPE = { mimetype:ext for ext, mimetype in MIMETYPES.items() }
 
-LibreOfficeNSMAP = {
-    'anim': "urn:oasis:names:tc:opendocument:xmlns:animation:1.0",
-    'db': "urn:oasis:names:tc:opendocument:xmlns:database:1.0",
-    'chart': "urn:oasis:names:tc:opendocument:xmlns:chart:1.0",
-    'config': "urn:oasis:names:tc:opendocument:xmlns:config:1.0",
-    'dc': "http://purl.org/dc/elements/1.1/",
-    'dom': "http://www.w3.org/2001/xml-events",
-    'dr3d': "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0",
-    'drawing': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
-    'fo': "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0",
-    'form': "urn:oasis:names:tc:opendocument:xmlns:form:1.0",
-    'grddl': "http://www.w3.org/2003/g/data-view#",
-    'koffice': "http://www.koffice.org/2005/",
-    'manifest': "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0",
-    'math': "http://www.w3.org/1998/Math/MathML",
-    'meta': "urn:oasis:names:tc:opendocument:xmlns:meta:1.0",
-    'numbers': "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0",
-    'office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
-    'ooo': "http://openoffice.org/2004/office",
-    'ooow': "http://openoffice.org/2004/writer",
-    'oooc': "http://openoffice.org/2004/calc",
-    'presentations': "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0",
-    'rdfa': "http://docs.oasis-open.org/opendocument/meta/rdfa#",
-    'script': "urn:oasis:names:tc:opendocument:xmlns:script:1.0",
-    'smil': "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0",
-    'style': "urn:oasis:names:tc:opendocument:xmlns:style:1.0",
-    'svg': "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0",
-    'table': "urn:oasis:names:tc:opendocument:xmlns:table:1.0",
-    'text': "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
-    'xforms': "http://www.w3.org/2002/xforms",
-    'xlinks': "http://www.w3.org/1999/xlink",
-    'xml': "http://www.w3.org/XML/1998/namespace",
+ANIM_NS ="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"
+DB_NS = "urn:oasis:names:tc:opendocument:xmlns:database:1.0"
+CHART_NS = "urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
+CONFIG_NS = "urn:oasis:names:tc:opendocument:xmlns:config:1.0"
+CSS3T_NS = "http://www.w3.org/TR/css3-text/"
+DC_NS = "http://purl.org/dc/elements/1.1/"
+DOM_NS = "http://www.w3.org/2001/xml-events"
+DR3D_NS = "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0"
+DRAW_NS = "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+DRAWOOO_NS = "http://openoffice.org/2010/draw"
+FIELD_NS = "urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0"
+FO_NS = "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+FORM_NS = "urn:oasis:names:tc:opendocument:xmlns:form:1.0"
+FORMX_NS = "urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0"
+GRDDL_NS = "http://www.w3.org/2003/g/data-view#"
+KOFFICE_NS = "http://www.koffice.org/2005/"
+MANIFEST_NS = "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+MATH_NS = "http://www.w3.org/1998/Math/MathML"
+META_NS = "urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+NUMBERS_NS = "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+OFFICE_NS = "urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+OFFICEOOO_NS = "http://openoffice.org/2009/office"
+OF_NS = "urn:oasis:names:tc:opendocument:xmlns:of:1.2"
+OOO_NS = "http://openoffice.org/2004/office"
+OOOW_NS = "http://openoffice.org/2004/writer"
+OOOC_NS = "http://openoffice.org/2004/calc"
+PRESENTATION_NS = "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
+RDFA_NS = "http://docs.oasis-open.org/opendocument/meta/rdfa#"
+RPT_NS = "http://openoffice.org/2005/report"
+SCRIPT_NS = "urn:oasis:names:tc:opendocument:xmlns:script:1.0"
+SMIL_NS = "urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0"
+STYLE_NS = "urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+SVG_NS = "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+TABLE_NS = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+TABLEOOO_NS = "http://openoffice.org/2009/table"
+TEXT_NS = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+XFORMS_NS = "http://www.w3.org/2002/xforms"
+XHTML_NS = "http://www.w3.org/1999/xhtml"
+XLINKS_NS = "http://www.w3.org/1999/xlink"
+XML_NS = "http://www.w3.org/XML/1998/namespace"
+XSD_NS = "http://www.w3.org/2001/XMLSchema"
+XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
+
+META_NSMAP = {
+    'office': OFFICE_NS,
+    'xlink': XLINKS_NS,
+    'dc': DC_NS,
+    'meta': META_NS,
+    'ooo': OOO_NS,
+    'grddl': GRDDL_NS,
 }
+
+MANIFEST_NSMAP = {
+    'manifest': MANIFEST_NS,
+}
+
+STYLES_NSMAP = {
+    'style': STYLE_NS,
+    'text': TEXT_NS,
+    'table': TABLE_NS,
+    'draw': DRAW_NS,
+    'fo': FO_NS,
+    'xlink': XLINKS_NS,
+    'dc': DC_NS,
+    'meta': META_NS,
+    'number': NUMBERS_NS,
+    'svg': SVG_NS,
+    'chart': CHART_NS,
+    'dr3d': DR3D_NS,
+    'math': MATH_NS,
+    'form': FORM_NS,
+    'script': SCRIPT_NS,
+    'ooo': OOO_NS,
+    'ooow': OOOW_NS,
+    'oooc': OOOC_NS,
+    'dom': DOM_NS,
+    'rpt': RPT_NS,
+    'of': OF_NS,
+    'xhtml': XHTML_NS,
+    'grddl': GRDDL_NS,
+    'tableooo': TABLEOOO_NS,
+    'css3t': CSS3T_NS,
+}
+
+SETTINGS_NSMAP = {
+    'office': OFFICE_NS,
+    'xlink': XLINKS_NS,
+    'config': CONFIG_NS,
+    'ooo': OOO_NS,
+}
+
+TEXT_NSMAP = {
+    'office': OFFICE_NS,
+    'style': STYLE_NS,
+    'text': TEXT_NS,
+    'table': TABLE_NS,
+    'draw': DRAW_NS,
+    'fo': FO_NS,
+    'xlink': XLINKS_NS,
+    'dc': DC_NS,
+    'meta': META_NS,
+    'number': NUMBERS_NS,
+    'presentation': PRESENTATION_NS,
+    'svg': SVG_NS,
+    'chart': CHART_NS,
+    'dr3d': DR3D_NS,
+    'math': MATH_NS,
+    'form': FORM_NS,
+    'script': SCRIPT_NS,
+    'ooo': OOO_NS,
+    'ooow': OOOW_NS,
+    'oooc': OOOC_NS,
+    'dom': DOM_NS,
+    'xforms': XFORMS_NS,
+    'xsd': XSD_NS,
+    'xsi': XSI_NS,
+    'rpt': RPT_NS,
+    'of': OF_NS,
+    'xhtml': XHTML_NS,
+    'grddl': GRDDL_NS,
+    'field': FIELD_NS,
+    'formx': FORMX_NS,
+    'tableooo': TABLEOOO_NS,
+    'css3t': CSS3T_NS,
+}
+
+SPREADSHEET_NSMAP = {
+    'presentation': PRESENTATION_NS,
+}
+SPREADSHEET_NSMAP.update(TEXT_NSMAP)
+
+PRESENTATION_NSMAP = {
+    'smil': SMIL_NS,
+    'anim': ANIM_NS,
+    'officeooo': OFFICEOOO_NS,
+    'drawooo': DRAWOOO_NS,
+}
+PRESENTATION_NSMAP.update(SPREADSHEET_NSMAP)
+
+GRAPHICS_NSMAP = PRESENTATION_NSMAP
+
+ALL_NSMAP = {}
+ALL_NSMAP.update(META_NSMAP)
+ALL_NSMAP.update(MANIFEST_NSMAP)
+ALL_NSMAP.update(STYLES_NSMAP)
+ALL_NSMAP.update(SETTINGS_NSMAP)
+ALL_NSMAP.update(TEXT_NSMAP)
+ALL_NSMAP.update(SPREADSHEET_NSMAP)
+ALL_NSMAP.update(PRESENTATION_NSMAP)
+ALL_NSMAP.update(GRAPHICS_NSMAP)

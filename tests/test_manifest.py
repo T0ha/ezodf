@@ -48,13 +48,13 @@ class TestManifest(unittest.TestCase):
 
     def test_new_manifest(self):
         manifest = Manifest()
-        result = manifest.tostring()
+        result = manifest.tobytes()
         self.assertEqual(result, b'<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"/>')
 
     def test_add_file(self):
         manifest = Manifest()
         manifest.add('test.xml', 'text/xml')
-        result = manifest.tostring()
+        result = manifest.tobytes()
         self.assertEqual(result,
             b'<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">'\
                 b'<manifest:file-entry '\

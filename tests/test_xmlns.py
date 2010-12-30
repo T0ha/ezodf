@@ -8,42 +8,31 @@
 
 import unittest
 
-from xml.etree import ElementTree
-
-from ezodf.xmlns import _XMLNamespaces
-
-LibreOfficeNSMAP = {
-    'drawing': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
-    'office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
-    'manifest': "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0",
-}
-
-LibONS = _XMLNamespaces(LibreOfficeNSMAP, ElementTree)
+from ezodf.xmlns import NS
 
 class TestXMLNamespaces(unittest.TestCase):
     def test_split_prefix(self):
-        prefix, tag = LibONS._split_prefix("office:p")
+        prefix, tag = NS._split_prefix("office:p")
         self.assertEqual(prefix, 'office')
         self.assertEqual(tag, 'p')
 
     def test_split_prefix_error(self):
-        self.assertRaises(ValueError, LibONS._split_prefix, 'officep')
-        self.assertRaises(ValueError, LibONS._split_prefix, 'of:fice:p')
+        self.assertRaises(ValueError, NS._split_prefix, 'officep')
+        self.assertRaises(ValueError, NS._split_prefix, 'of:fice:p')
 
     def test_prefix2clark(self):
-        clark = LibONS._prefix2clark("office:p")
+        clark = NS._prefix2clark("office:p")
         self.assertEqual(clark, "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
 
     def test_call(self):
-        self.assertEqual(LibONS('drawing:p'), "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p")
-        self.assertEqual(LibONS('office:p'), "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
+        self.assertEqual(NS('draw:p'), "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p")
+        self.assertEqual(NS('office:p'), "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
 
     def test_short_prefix2clark_pass_through(self):
         tag = "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p"
-        self.assertEqual(LibONS(tag), tag)
+        self.assertEqual(NS(tag), tag)
 
-testdata = """<?xml version="1.0" encoding="UTF-8"?>
-<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
+testdata = """<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
  <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text" manifest:version="1.2" manifest:full-path="/"/>
  <manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/statusbar/"/>
  <manifest:file-entry manifest:media-type="" manifest:full-path="Configurations2/accelerator/current.xml"/>
@@ -67,33 +56,35 @@ testdata = """<?xml version="1.0" encoding="UTF-8"?>
 </manifest:manifest>
 """
 
+def in_XML(source, target):
+    for element in source.strip().split():
+        if element not in target:
+            return False
+    return True
+
 class TestNSParsing(unittest.TestCase):
     def test_parse_and_count_file_entry_elements(self):
-        xmltree = LibONS.etree.fromstring(testdata)
-        file_entry_name = LibONS('manifest:file-entry')
-        result = list(xmltree.findall(file_entry_name))
+        xmltree = NS.etree.fromstring(testdata)
+        result = list(xmltree.findall(NS('manifest:file-entry')))
         self.assertEqual(len(result), 20)
 
     def test_parse_and_count_file_entry_attributes(self):
-        xmltree = LibONS.etree.fromstring(testdata)
+        xmltree = NS.etree.fromstring(testdata)
         first_entry = xmltree[0]
-        attrib = first_entry.get(LibONS('manifest:media-type'))
+        attrib = first_entry.get(NS('manifest:media-type'))
         self.assertEqual(attrib, "application/vnd.oasis.opendocument.text")
-        attrib = first_entry.get(LibONS('manifest:version'))
+        attrib = first_entry.get(NS('manifest:version'))
         self.assertEqual(attrib, "1.2")
-        attrib = first_entry.get(LibONS('manifest:full-path'))
+        attrib = first_entry.get(NS('manifest:full-path'))
         self.assertEqual(attrib, "/")
 
-    def test_tostring_elements(self):
-        xmltree = LibONS.fromstring(testdata)
-        node = xmltree[0]
-        node.nsmap = {'manifest': "urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"}
-        result = LibONS.tostring(node)
-        self.assertTrue('<ns0:file-entry' in result)
-        self.assertTrue('ns0:media-type="application/vnd.oasis.opendocument.text"' in result)
-        self.assertTrue('ns0:version="1.2"' in result)
-        self.assertTrue('ns0:full-path="/"' in result)
-        self.assertTrue('xmlns:ns0="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"' in result)
+    def test_tostring_subelements(self):
+        xmltree = NS.etree.fromstring(testdata)
+        result = NS.etree.tostring(xmltree[0], encoding=str).strip()
+        self.assertTrue(in_XML('<manifest:file-entry '\
+                               'manifest:media-type="application/vnd.oasis.opendocument.text" '\
+                               'manifest:version="1.2" '\
+                               'manifest:full-path="/" />', result))
 
 if __name__=='__main__':
     unittest.main()

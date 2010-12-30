@@ -8,7 +8,7 @@
 
 from lxml import etree
 
-from .const import LibreOfficeNSMAP
+from .const import ALL_NSMAP
 
 class _XMLNamespaces:
     def __init__(self, namespaces, etree):
@@ -21,11 +21,11 @@ class _XMLNamespaces:
     def update(self, namespaces):
         for prefix, uri in namespaces.items():
             self.register(prefix, uri)
-        self._cache.clear()
 
     def register(self, prefix, uri):
         self.prefix2uri[prefix] = uri
         self.uri2prefix[uri] = prefix
+        self._cache.clear()
 
     def __call__(self, tag):
         """ Convert tag in prefix notation into clark notation. """
@@ -52,23 +52,6 @@ class _XMLNamespaces:
         else:
             raise ValueError("prefix-notation required 'prefix:local': %s" % tag)
 
-    def parse(self, source):
-        xmlroot = self.etree.parse(soure)
-        return xmlroot
-
-    def fromstring(self, text):
-        xmlroot = self.etree.fromstring(text)
-        return xmlroot
-
-    def tostring(self, xmlroot):
-        return self.etree.tostring(xmlroot)
-
-    def Element(self, tag, nsmap):
-        return self.etree.Element(tag, nsmap=nsmap)
-
-    def SubElement(self, parent, tag):
-        return self.etree.SubElement(parent, tag)
-
-# global ODF Namespaces with LibreOffice prefixes
-# LibONS = LibreOfficeNameSpace
-LibONS = _XMLNamespaces(LibreOfficeNSMAP, etree)
+# global ODF Namespaces with OASIS prefixes
+# NS = OASIS NameSpace
+NS = _XMLNamespaces(ALL_NSMAP, etree)
