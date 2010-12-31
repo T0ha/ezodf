@@ -56,12 +56,6 @@ TAGS = ['generator',
         ]
 
 class TestMeta(unittest.TestCase):
-    def test_open_from_zip(self):
-        odt = ZipFile(os.path.join(testdatapath, "empty.odt"))
-        meta = Meta.fromzip(odt)
-        odt.close()
-        self.assertEqual(meta['initial-creator'], "Manfred Moitzi")
-
     def test_open_from_text(self):
         meta = Meta(testdata)
         self.assertEqual(meta['initial-creator'], "Manfred Moitzi")

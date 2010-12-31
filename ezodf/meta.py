@@ -53,8 +53,6 @@ class Meta:
     def __init__(self, content=None):
         if content is None:
             self.xmlroot = XML.etree.Element(XML('office:document-meta'), nsmap=META_NSMAP)
-            self.meta = XML.etree.SubElement(self.xmlroot, XML('office:meta'))
-            self.setup()
         else:
             if isinstance(content, bytes):
                 self.xmlroot = XML.etree.fromstring(content)
@@ -62,17 +60,18 @@ class Meta:
                 self.xmlroot = content
             else:
                 raise ValueError("Unexpected root node: %s" % content.tag)
-            self.meta = self.xmlroot.find(XML('office:meta'))
 
+        self._setup()
         self.keywords = Keywords(self.meta)
         self.usertags = Usertags(self.meta)
 
-    def setup(self):
-        # don't know for what this is good for
-        self.xmlroot.set(XML('grddl:transformation'), "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
-
-        self['creation-date'] = datetime.now().isoformat()
-        self.touch()
+    def _setup(self):
+        self.meta = self.xmlroot.find(XML('office:meta'))
+        if self.meta is None: # this is a new document
+            self.meta = XML.etree.SubElement(self.xmlroot, XML('office:meta'))
+            self.xmlroot.set(XML('grddl:transformation'), "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
+            self['creation-date'] = datetime.now().isoformat()
+            self.touch()
 
     def touch(self):
         self['date'] = datetime.now().isoformat()
@@ -102,10 +101,6 @@ class Meta:
         except KeyError:
             count = 1
         self['editing-cycles'] = str(count)
-
-    @staticmethod
-    def fromzip(zipfile):
-        return Meta(zipfile.read('meta.xml'))
 
     def tobytes(self, xml_declaration=None, pretty_print=False):
         """ Returns the XML representation as bytes in 'UTF-8' encoding.

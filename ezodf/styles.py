@@ -25,7 +25,3 @@ class Styles:
 
     def setup(self):
         pass
-
-    @staticmethod
-    def fromzip(zipfile):
-        return Styles(zipfile.read('styles.xml'))

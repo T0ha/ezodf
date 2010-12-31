@@ -40,12 +40,6 @@ testdata = b"""<?xml version="1.0" encoding="UTF-8"?>
 """
 
 class TestManifest(unittest.TestCase):
-    def test_open_odt(self):
-        odt = ZipFile(os.path.join(testdatapath, "empty.odt"))
-        manifest = Manifest.fromzip(odt)
-        odt.close()
-        self.assertTrue(manifest.xmlroot is not None)
-
     def test_new_manifest(self):
         manifest = Manifest()
         result = manifest.tobytes()

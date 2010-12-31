@@ -11,13 +11,12 @@ from .xmlns import XML
 
 class Content:
     def __init__(self, mimetype, content=None):
+
         if content is None:
             self.xmlroot = XML.etree.Element(XML('office:document-content'),
                                              nsmap=MIMETYPE_NSMAP[mimetype])
-            self.automatic_styles = XML.etree.SubElement(self.xmlroot,
-                                                         XML('office:automatic-styles'))
-            self.body = XML.etree.SubElement(self.xmlroot, XML('office:body'))
-            self.setup(mimetype)
+            self.xmlroot.set(XML('grddl:transformation'),
+                             "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
         else:
             if isinstance(content, bytes):
                 self.xmlroot = XML.etree.fromstring(content)
@@ -25,13 +24,14 @@ class Content:
                 self.xmlroot = content
             else:
                 raise ValueError("Unexpected root node: %s" % content.tag)
-            self.automatic_styles = self.xmlroot.find(XML('office:automatic-styles'))
-            self.body = self.xmlroot.find(XML('office:body'))
+
+        self.setup(mimetype)
 
     def setup(self, mimetype):
-        self.xmlroot.set(XML('grddl:transformation'),
-                         "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
-
-    @staticmethod
-    def fromzip(mimetype, zipfile):
-        return Content(mimetype, zipfile.read('content.xml'))
+        self.automatic_styles = self.xmlroot.find(XML('office:automatic-styles'))
+        if self.automatic_styles is None:
+            self.automatic_styles = XML.etree.SubElement(self.xmlroot,
+                                                         XML('office:automatic-styles'))
+        self.body = self.xmlroot.find(XML('office:body'))
+        if self.body is None:
+            self.body = XML.etree.SubElement(self.xmlroot, XML('office:body'))
