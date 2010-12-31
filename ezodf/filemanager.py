@@ -11,15 +11,8 @@ import zipfile
 import tempfile
 
 from datetime import datetime
-from collections import OrderedDict
 
 from .manifest import Manifest
-
-class MimeType:
-    def __init__(self, mimetype):
-        self.mimetype = mimetype
-    def tobytes(self):
-        return self.mimetype.encode('UTF-8')
 
 class FileObject:
     __slots__ = ['element', 'media_type', 'zipinfo']
@@ -29,8 +22,16 @@ class FileObject:
         self.media_type = media_type
         now = datetime.now().timetuple()
         self.zipinfo = zipfile.ZipInfo(name, now[:6])
-        if name != 'mimetype': # ensure 'mimetype' is not compressed
-            self.zipinfo.compress_type = zipfile.ZIP_DEFLATED
+        self.zipinfo.compress_type = zipfile.ZIP_DEFLATED
+
+    def tobytes(self):
+        if hasattr(self.element, 'tobytes'):
+            if self.media_type == 'text/xml':
+                return self.element.tobytes(xml_declaration=True)
+            else:
+                return self.element.tobytes()
+        else:
+            return self.element.encode('utf-8')
 
     @property
     def filename(self):
@@ -40,13 +41,9 @@ class FileManager:
     __slots__ = ['directory', 'manifest', 'zipname']
 
     def __init__(self, zipname=None):
-        self.directory = OrderedDict()
+        self.directory = dict()
         self.zipname = zipname
         self.manifest = Manifest(self.get_text('META-INF/manifest.xml'))
-
-        # dummy entry to reserve the first entry for 'mimetype'
-        # 'mimetype' SHOULD be the first entry in the zipfile and uncompressed
-        self.register('mimetype', MimeType('dummy'))
         self.register('META-INF/manifest.xml', self.manifest, 'text/xml')
 
     def has_zip(self):
@@ -63,10 +60,7 @@ class FileManager:
         self.manifest.add(name, media_type)
 
     def save(self, filename):
-        if self.directory['mimetype'].element.mimetype == 'dummy':
-            raise ValueError('incorrect mimetype: dummy')
-
-        # alwasy create a new zipfile
+        # always create a new zipfile
         tmpfilename = self.tmpfilename(filename)
         zippo = zipfile.ZipFile(tmpfilename, 'w', zipfile.ZIP_DEFLATED)
         self._tozip(zippo)
@@ -105,18 +99,23 @@ class FileManager:
             return default
 
     def _tozip(self, zippo):
-        processed = []
+        # write mimetype as first file
+        mimetype = self.directory.pop('mimetype')
+        # mimetype file should be uncompressed
+        mimetype.zipinfo.compress_type = zipfile.ZIP_STORED
+        zippo.writestr(mimetype.zipinfo, mimetype.tobytes())
+        # mimetype done.
+        processed = [mimetype.filename]
+
         for file in self.directory.values():
-            if file.media_type == 'text/xml':
-                stream = file.element.tobytes(xml_declaration=True)
-            else:
-                stream = file.element.tobytes()
-            zippo.writestr(file.zipinfo, stream)
+            zippo.writestr(file.zipinfo, file.tobytes())
             processed.append(file.filename)
 
-        self._copy_files(zipobj, processed)
+        # push mimetype back to directory
+        self.directory['mimetype'] = mimetype
+        self._copy_files(zippo, processed)
 
-    def _copy_files(self, zipobj, ignore):
+    def _copy_files(self, zippo, ignore):
         """ Copy all files like pictures and settings except the files in 'ignore'.
         """
         def copyfiles(filenames, fromzip, tozip):
@@ -131,7 +130,6 @@ class FileManager:
         origzip = zipfile.ZipFile(self.zipname)
         try:
             names = (name for name in origzip.namelist() if name not in ignore)
-            copyfiles(names, origzip, zipobj)
+            copyfiles(names, origzip, zippo)
         finally:
             origzip.close()
-

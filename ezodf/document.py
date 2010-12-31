@@ -6,42 +6,59 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
-import os
 import zipfile
 
 from .const import MIMETYPES
-from .filemanager import FileManager, MimeType
+from .filemanager import FileManager
 from .meta import Meta
 from .styles import Styles
 from .content import Content
 
+DOCUMENTCLASS = {
+    MIMETYPES['odt']: ODT,
+    MIMETYPES['ods']: ODS,
+    MIMETYPES['odg']: ODG,
+    MIMETYPES['odp']: ODP,
+}
+
 def open(filename):
+    if not isinstance(filename, str):
+        raise TypeError("Invalid filename type: %s" % str(type(filename)))
+
     if zipfile.is_zipfile(filename):
-        return Document(filename=filename)
+        fm = FileManager(filename)
+        mimetype = fm.get_text('mimetype').strip()
+        if mimetype not in list(MIMETYPES.values()):
+            raise IOError('Unknown or unsupported mimetype: %s' % mimetype)
+        try:
+            return DOCUMENTCLASS[mimetype](filemanager=fm)
+        except KeyError:
+            # just the basics for: chart, image, formula, templates
+            return Document(filemanager=fm, mimetype=mimetype)
     else:
-        raise IOError('File does not exist or it is not an ODF file: %s' % filename)
+        raise IOError('File does not exist or it is not a zipfile: %s' % filename)
 
 class Document:
     """ OpenDocumentFormat BaseClass """
-    def __init__(self, filename=None, mimetype=MIMETYPES['odt']):
-        self.docname = filename
-        self.filemanager = fm = FileManager(filename)
+    def __init__(self, filemanager, mimetype):
+        self.filemanager = FileManager() if filemanager is None else filemanager
+        self.docname = filemanager.zipname
 
-        self.mimetype = fm.get_text('mimetype', default=mimetype)
-        fm.register('mimetype', MimeType(self.mimetype))
+        self.mimetype = mimetype
+        filemanager.register('mimetype', self.mimetype)
 
-        self.meta = Meta(fm.get_text('meta.xml'))
-        fm.register('meta.xml', self.meta, 'text/xml')
+        self.meta = Meta(filemanager.get_text('meta.xml'))
+        filemanager.register('meta.xml', self.meta, 'text/xml')
 
-        self.styles = Styles(fm.get_text('styles.xml'))
-        fm.register('styles.xml', self.styles, 'text/xml')
+        self.styles = Styles(filemanager.get_text('styles.xml'))
+        filemanager.register('styles.xml', self.styles, 'text/xml')
 
-        self.content = Content(self.mimetype, fm.get_text('content.xml'))
-        fm.register('content.xml', self.content, 'text/xml')
+        self.content = Content(mimetype, filemanager.get_text('content.xml'))
+        filemanager.register('content.xml', self.content, 'text/xml')
 
     def save(self):
         if self.docname is None:
-            raise ValueError('No filename specified!')
+            raise IOError('No filename specified!')
         self.meta.touch() # set modification date to now
         self.meta.inc_editing_cycles()
         self.filemanager.save(self.docname)
@@ -49,3 +66,23 @@ class Document:
     def saveas(self, filename):
         self.docname = filename
         self.save()
+
+class ODT(Document):
+    def __init__(self, filename=None, filemanager=None):
+        super(ODT, self).__init__(filemanager, MIMETYPES['odt'])
+        self.docname = filename
+
+class ODS(Document):
+    def __init__(self, filename=None, filemanager=None):
+        super(ODS, self).__init__(filemanager, MIMETYPES['ods'])
+        self.docname = filename
+
+class ODP(Document):
+    def __init__(self, filename=None, filemanager=None):
+        super(ODP, self).__init__(filemanager, MIMETYPES['odp'])
+        self.docname = filename
+
+class ODG(Document):
+    def __init__(self, filename=None, filemanager=None):
+        super(ODG, self).__init__(filemanager, MIMETYPES['odg'])
+        self.docname = filename
