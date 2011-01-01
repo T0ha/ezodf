@@ -8,11 +8,13 @@
 
 import os
 import zipfile
-import tempfile
+import random
 
 from datetime import datetime
 
 from .manifest import Manifest
+
+FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
 class FileObject:
     __slots__ = ['element', 'media_type', 'zipinfo']
@@ -31,7 +33,12 @@ class FileObject:
             else:
                 return self.element.tobytes()
         else:
-            return self.element.encode('utf-8')
+            if isinstance(self.element, str):
+                return self.element.encode('utf-8')
+            elif isinstance(self.element, bytes):
+                return self.element
+            else:
+                raise TypeError('Unsupported type: %s' % str(type(self.element)))
 
     @property
     def filename(self):
@@ -43,7 +50,7 @@ class FileManager:
     def __init__(self, zipname=None):
         self.directory = dict()
         self.zipname = zipname
-        self.manifest = Manifest(self.get_text('META-INF/manifest.xml'))
+        self.manifest = Manifest(self.get_bytes('META-INF/manifest.xml'))
         self.register('META-INF/manifest.xml', self.manifest, 'text/xml')
 
     def has_zip(self):
@@ -51,28 +58,38 @@ class FileManager:
             return zipfile.is_zipfile(self.zipname)
         return False
 
-    def tmpfilename(self, filename=None):
-        folder = "" if filename is None else os.path.dirname(filename)
-        return tempfile.mkstemp('tmp', dir=folder)
+    def tmpfilename(self, basefile=None):
+        def randomname(count):
+            return ''.join(random.sample(FNCHARS, count))
+
+        folder = "" if basefile is None else os.path.dirname(basefile)
+        while True:
+            filename = os.path.abspath(os.path.join(folder, randomname(8)+'.tmp'))
+            if not os.path.exists(filename):
+                return filename
 
     def register(self, name, element, media_type=""):
         self.directory[name] = FileObject(name, element, media_type)
         self.manifest.add(name, media_type)
 
-    def save(self, filename):
+    def save(self, filename, backup=True):
         # always create a new zipfile
         tmpfilename = self.tmpfilename(filename)
         zippo = zipfile.ZipFile(tmpfilename, 'w', zipfile.ZIP_DEFLATED)
         self._tozip(zippo)
         zippo.close()
 
-        # existing document becomes the backup file
         if os.path.exists(filename):
-            bakfilename = filename+'.bak'
-            # remove existing backupfile
-            if os.path.exists(bakfilename):
-                os.remove(bakfilename)
-            os.rename(filename, bakfilename)
+            if backup:
+                # existing document becomes the backup file
+                bakfilename = filename+'.bak'
+                # remove existing backupfile
+                if os.path.exists(bakfilename):
+                    os.remove(bakfilename)
+                os.rename(filename, bakfilename)
+            else:
+                # just remove the existing document
+                os.remove(filename)
 
         # rename the new created document
         os.rename(tmpfilename, filename)
@@ -113,14 +130,15 @@ class FileManager:
 
         # push mimetype back to directory
         self.directory['mimetype'] = mimetype
-        self._copy_files(zippo, processed)
+        self._copy_zip_to(zippo, processed)
 
-    def _copy_files(self, zippo, ignore):
+    def _copy_zip_to(self, newzip, ignore=[]):
         """ Copy all files like pictures and settings except the files in 'ignore'.
         """
-        def copyfiles(filenames, fromzip, tozip):
-            for name in filenames:
-                tozip.writestr(name, fromzip.read(name))
+        def copyzip(fromzip, tozip):
+            for zipinfo in fromzip.filelist:
+                if zipinfo.filename not in ignore:
+                    tozip.writestr(zipinfo, fromzip.read(zipinfo.filename))
 
         if self.zipname is None:
             return # nothing to copy
@@ -129,7 +147,31 @@ class FileManager:
 
         origzip = zipfile.ZipFile(self.zipname)
         try:
-            names = (name for name in origzip.namelist() if name not in ignore)
-            copyfiles(names, origzip, zippo)
+            copyzip(origzip, newzip)
         finally:
             origzip.close()
+
+def check_zipfile_for_oasis_validity(filename, mimetype):
+    """ Checks the zipfile structure and least necessary content, but not the
+    XML validity of the document.
+    """
+    if not zipfile.is_zipfile(filename):
+        return False
+    # The first file in an OpenDocumentFormat zipfile should be the uncompressed
+    # mimetype file, in a regular zipfile this file starts at byte position 30.
+    # see also OASIS OpenDocument Specs. Chapter 17.4
+    # LibreOffice ignore this requirement and opens all documents with
+    # valid content (META-INF/manifest.xml, content.xml).
+    with open(filename, 'rb') as f:
+        buffer = f.read(38 + len(mimetype))
+    if buffer[30:] != b'mimetype'+mimetype:
+        return False
+    zf = zipfile.ZipFile(filename)
+    names = zf.namelist()
+    zf.close()
+    # meta.xml and styles.xml are not required, but I think they should
+    for filename in ['META-INF/manifest.xml', 'content.xml', 'meta.xml',
+                     'styles.xml', 'mimetype']:
+        if filename not in names:
+            return False
+    return True

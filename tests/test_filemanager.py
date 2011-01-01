@@ -6,10 +6,15 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+import os
 import sys
 import unittest
+import zipfile
+
+from mytesttools import testdatafile
 
 from ezodf import filemanager
+from ezodf.filemanager import check_zipfile_for_oasis_validity
 
 class TestFileObject(unittest.TestCase):
     def test_constructor(self):
@@ -22,6 +27,10 @@ class TestFileObject(unittest.TestCase):
 
     def test_serialisation_string(self):
         fo = filemanager.FileObject('futurama/bender', 'Bender', 'text/xml')
+        self.assertEqual(b'Bender', fo.tobytes())
+
+    def test_serialisation_bytes(self):
+        fo = filemanager.FileObject('futurama/bender', b'Bender')
         self.assertEqual(b'Bender', fo.tobytes())
 
     def test_serialisation_xmlelement(self):
@@ -44,7 +53,7 @@ class TestFileObject(unittest.TestCase):
 
     def test_serialisation_error(self):
         fo = filemanager.FileObject('futurama/bender', 1000, 'text/xml')
-        self.assertRaises(AttributeError, fo.tobytes)
+        self.assertRaises(TypeError, fo.tobytes)
 
 class ZipMock:
     writtenfiles = []
@@ -65,6 +74,45 @@ class TestFileManager(unittest.TestCase):
         fm._tozip(zippo)
         self.assertEqual(zippo.writtenfiles[0],
                          'mimetype', "file 'mimetype' SHOULD be the first written file")
+
+    def test_copy_zip_to(self):
+        def copy_file(from_, to_):
+            fm = filemanager.FileManager(from_)
+            zf = zipfile.ZipFile(to_, 'w', compression=zipfile.ZIP_DEFLATED)
+            fm._copy_zip_to(zf)
+            zf.close()
+
+        NEWSPEC = testdatafile('newspecs.odt')
+        OLDSPEC = testdatafile('specs.odt')
+
+        specs = zipfile.ZipFile(OLDSPEC)
+        expectednames = specs.namelist()
+        specs.close()
+
+        copy_file(OLDSPEC, NEWSPEC)
+
+        newspecs = zipfile.ZipFile(NEWSPEC)
+        resultnames = newspecs.namelist()
+        newspecs.close()
+
+        self.assertSequenceEqual(expectednames, resultnames)
+        self.assertTrue(check_zipfile_for_oasis_validity(NEWSPEC,
+                                                         b"application/vnd.oasis.opendocument.text"))
+        os.remove(NEWSPEC)
+
+    def test_oasis_validity(self):
+        self.assertTrue(check_zipfile_for_oasis_validity(testdatafile('specs.odt'),
+                                                         b"application/vnd.oasis.opendocument.text"))
+
+    def test_save(self):
+        SAVENAME = testdatafile('specs.save.odt')
+        fm = filemanager.FileManager(testdatafile('specs.odt'))
+        # to use save you have to register at least the mimetype file
+        mimetype = fm.get_bytes('mimetype')
+        fm.register('mimetype', mimetype)
+        fm.save(SAVENAME, backup=False)
+        self.assertTrue(check_zipfile_for_oasis_validity(SAVENAME, mimetype))
+        os.remove(SAVENAME)
 
 if __name__=='__main__':
     unittest.main()

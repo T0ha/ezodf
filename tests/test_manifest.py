@@ -12,8 +12,6 @@ from zipfile import ZipFile
 
 from ezodf.manifest import Manifest
 
-testdatapath = os.path.join(os.path.dirname(__file__), "data")
-
 testdata = b"""<?xml version="1.0" encoding="UTF-8"?>
 <manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
  <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text" manifest:version="1.2" manifest:full-path="/"/>

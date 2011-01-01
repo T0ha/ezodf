@@ -16,8 +16,6 @@ from ezodf.const import GENERATOR
 from ezodf.xmlns import XML
 from ezodf.meta import Meta
 
-testdatapath = os.path.join(os.path.dirname(__file__), "data")
-
 testdata = b"""<?xml version="1.0" encoding="UTF-8"?>
 <office:document-meta
 xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -36,8 +34,8 @@ grddl:transformation="http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl">
 <dc:creator>Manfred Moitzi</dc:creator>
 <meta:generator>LibreOffice/3.3$Win32 LibreOffice_project/330m17$Build-3</meta:generator>
 <meta:document-statistic meta:table-count="0" meta:image-count="0" meta:object-count="0"
-meta:page-count="1" meta:paragraph-count="1" meta:word-count="4"
-meta:character-count="18"/>
+meta:page-count="3" meta:paragraph-count="10" meta:word-count="99"
+meta:character-count="999"/>
 <meta:user-defined meta:name="Zeit" meta:value-type="date">2010-12-29</meta:user-defined>
 <meta:user-defined meta:name="mozman">derWert</meta:user-defined>
 </office:meta>
@@ -202,6 +200,31 @@ class TestUsertags(unittest.TestCase):
     def test_typeof_error(self):
         meta = Meta()
         self.assertRaises(KeyError, meta.usertags.typeof, 'Nelson')
+
+class TestStatistic(unittest.TestCase):
+    def test_get(self):
+        meta = Meta(testdata)
+        self.assertEqual(meta.count['word'], 99)
+        self.assertEqual(meta.count['character'], 999)
+        self.assertEqual(meta.count['paragraph'], 10)
+        self.assertEqual(meta.count['page'], 3)
+        self.assertEqual(meta.count['table'], 0)
+        self.assertEqual(meta.count['sentence'], 0)
+
+    def test_get_keyerror(self):
+        meta = Meta(testdata)
+        self.assertRaises(KeyError, meta.count.__getitem__, 'xxx')
+
+    def test_set(self):
+        meta = Meta(testdata)
+        self.assertEqual(meta.count['word'], 99)
+        meta.count['word'] = 17
+        self.assertEqual(meta.count['word'], 17)
+
+    def test_set_keyerror(self):
+        meta = Meta(testdata)
+        self.assertRaises(KeyError, meta.count.__setitem__, 'xxx', 777)
+
 
 if __name__=='__main__':
     unittest.main()

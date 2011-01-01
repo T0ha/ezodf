@@ -9,7 +9,7 @@
 from datetime import datetime
 
 from .xmlns import XML
-from .const import META_NSMAP, GENERATOR
+from .const import META_NSMAP, GENERATOR, META_NS
 
 TAGS = {
     'generator': 'meta:generator',
@@ -21,6 +21,7 @@ TAGS = {
     'creation-date': 'meta:creation-date',
     'date': 'dc:date',
     'editing-cycles': 'meta:editing-cycles',
+    'language': 'dc:language',
 }
 
 # Set/Get Meta Tags by __setitem__/__getitem__ interface:
@@ -64,6 +65,11 @@ class Meta:
         self._setup()
         self.keywords = Keywords(self.meta)
         self.usertags = Usertags(self.meta)
+
+        stats = self.meta.find(XML('meta:document-statistic'))
+        if stats is None:
+            stats = XML.etree.SubElement(self.meta, XML('meta:document-statistic'))
+        self.count = Statistic(stats)
 
     def _setup(self):
         self.meta = self.xmlroot.find(XML('office:meta'))
@@ -205,3 +211,31 @@ class Usertags:
             if name == tag.get(XML('meta:name')):
                 return tag
         return None
+
+class Statistic:
+    TYPES = frozenset(['page', 'table', 'draw', 'image', 'object',
+                       'ole-object', 'paragraph', 'word', 'character',
+                       'row', 'frame', 'sentence', 'syllable',
+                       'non-whitespace-character', 'cell'])
+    NS = '{' + META_NS + '}%s-count'
+
+    def __init__(self, stats):
+        self.stats = stats
+
+    def __getitem__(self, key):
+        if key in Statistic.TYPES:
+            val = self.stats.get(Statistic.NS % key)
+            try:
+                return int(val)
+            except ValueError:
+                return 0
+            except TypeError:
+                return 0
+        else:
+            raise KeyError(key)
+
+    def __setitem__(self, key, value):
+        if key in Statistic.TYPES:
+            self.stats.set(Statistic.NS % key, str(value))
+        else:
+            raise KeyError(key)
