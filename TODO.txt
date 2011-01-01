@@ -8,43 +8,50 @@ Version 0.1.0
   * Pre-Alpha
   * open/rewrite odf files, no data manipulation like add, delete or modify
   * basic docs http://packages.python.org/ezodf/
-  * modify odf metadata
+  * basic style management
+  * modify metadata
 
 Version 0.2.0
 -------------
 
   * Alpha
   * ods - application/vnd.oasis.opendocument.spreadsheet
+  * check style management for spreadsheet
 
 Version 0.2.1
 -------------
 
   * Alpha
   * odt - application/vnd.oasis.opendocument.text
+  * check style management for text
 
 Version 0.2.2
 -------------
 
   * Alpha
   * odp - application/vnd.oasis.opendocument.presentation
+  * check style management for presentation
 
 Version 0.2.3
 -------------
 
   * Alpha
   * odg - application/vnd.oasis.opendocument.graphics
+  * check style management for graphics
 
 Version 0.2.4
 -------------
 
   * Alpha
   * odc - application/vnd.oasis.opendocument.chart
+  * check style management for charts
 
 Version 0.2.5
 -------------
 
   * Alpha
   * odf - application/vnd.oasis.opendocument.formula
+  * check style management for formulas
 
 Version 0.3.0
 -------------

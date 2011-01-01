@@ -38,7 +38,7 @@ class FileObject:
             elif isinstance(self.element, bytes):
                 return self.element
             else:
-                raise TypeError('Unsupported type: %s' % str(type(self.element)))
+                raise TypeError('Unsupported type: %s' % type(self.element))
 
     @property
     def filename(self):
