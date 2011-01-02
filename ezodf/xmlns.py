@@ -52,5 +52,16 @@ class _XMLNamespaces:
         else:
             raise ValueError("prefix-notation required 'prefix:local': %s" % tag)
 
+class XMLMixin:
+    def tobytes(self, xml_declaration=None, pretty_print=False):
+        """ Returns the XML representation as bytes in 'UTF-8' encoding.
+
+        :param bool xml_declaration: create XML declaration
+        :param bool pretty-print: enables formatted XML
+        """
+        return XML.etree.tostring(self.xmlroot, encoding='UTF-8',
+                                  xml_declaration=xml_declaration,
+                                  pretty_print=pretty_print)
+
 # global ODF Namespaces with OASIS prefixes
 XML = _XMLNamespaces(ALL_NSMAP, etree)

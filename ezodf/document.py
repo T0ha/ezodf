@@ -14,13 +14,6 @@ from .meta import Meta
 from .styles import Styles
 from .content import Content
 
-DOCUMENTCLASS = {
-    MIMETYPES['odt']: ODT,
-    MIMETYPES['ods']: ODS,
-    MIMETYPES['odg']: ODG,
-    MIMETYPES['odp']: ODP,
-}
-
 def open(filename):
     if not isinstance(filename, str):
         raise TypeError("Invalid filename type: %s" % str(type(filename)))
@@ -47,13 +40,13 @@ class Document:
         self.mimetype = mimetype
         filemanager.register('mimetype', self.mimetype)
 
-        self.meta = Meta(filemanager.get_text('meta.xml'))
+        self.meta = Meta(filemanager.get_bytes('meta.xml'))
         filemanager.register('meta.xml', self.meta, 'text/xml')
 
-        self.styles = Styles(filemanager.get_text('styles.xml'))
+        self.styles = Styles(filemanager.get_bytes('styles.xml'))
         filemanager.register('styles.xml', self.styles, 'text/xml')
 
-        self.content = Content(mimetype, filemanager.get_text('content.xml'))
+        self.content = Content(mimetype, filemanager.get_bytes('content.xml'))
         filemanager.register('content.xml', self.content, 'text/xml')
 
     def save(self):
@@ -86,3 +79,10 @@ class ODG(Document):
     def __init__(self, filename=None, filemanager=None):
         super(ODG, self).__init__(filemanager, MIMETYPES['odg'])
         self.docname = filename
+
+DOCUMENTCLASS = {
+    MIMETYPES['odt']: ODT,
+    MIMETYPES['ods']: ODS,
+    MIMETYPES['odg']: ODG,
+    MIMETYPES['odp']: ODP,
+}

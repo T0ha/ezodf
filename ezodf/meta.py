@@ -8,7 +8,7 @@
 
 from datetime import datetime
 
-from .xmlns import XML
+from .xmlns import XML, XMLMixin
 from .const import META_NSMAP, GENERATOR, META_NS
 
 TAGS = {
@@ -48,7 +48,7 @@ TAGS = {
 #                   The value of this element is incremented every time
 #                   the document is saved.
 
-class Meta:
+class Meta(XMLMixin):
     generator = GENERATOR
 
     def __init__(self, content=None):
@@ -107,16 +107,6 @@ class Meta:
         except KeyError:
             count = 1
         self['editing-cycles'] = str(count)
-
-    def tobytes(self, xml_declaration=None, pretty_print=False):
-        """ Returns the XML representation as bytes in 'UTF-8' encoding.
-
-        :param bool xml_declaration: create XML declaration
-        :param bool pretty-print: enables formatted XML
-        """
-        return XML.etree.tostring(self.xmlroot, encoding='UTF-8',
-                                  xml_declaration=xml_declaration,
-                                  pretty_print=pretty_print)
 
 class Keywords:
     def __init__(self, meta):
