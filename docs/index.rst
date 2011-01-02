@@ -9,12 +9,12 @@ Welcome to ezodf's documentation!
 **ezodf** is a Python package to create new or open existing OpenDocumentFormat
 files to extract, add, modify or delete document data.
 
-To open an existing document, just use the :func:`ezodf.open` function::
+To open an existing document, just use the `ezodf.open()` function::
 
     doc = ezodf.open('documentname.ext')
 
-You don't have to care about the document type on open, to check the type of
-the document you got, use the **mimetype** attribute::
+You don't have to care about the document type at the open function, to check
+the type of the document you got, use the **mimetype** attribute::
 
     if doc.mimetype == ezodf.const.MIMETYPES['odt']:
         # this is a text document

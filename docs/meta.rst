@@ -56,21 +56,92 @@ Attributes
 
 .. attribute:: keywords
 
-   Attribute of the `Meta` class, got you access to the documents
+   Attribute of the `Meta` class, gives you access to the documents
    keywords by the :ref:`Keywords class`.
 
 .. attribute:: usertags
 
-   Attribute of the `Meta` class, got you access to the documents
-   user defined tags by the :ref:`Keywords class`.
+   Attribute of the `Meta` class, gives you access to the documents
+   user defined tags by the :ref:`Usertags class`.
 
 .. _Keywords class:
 
 Keywords class
 --------------
 
-.. _Usertags class:
+The `Keywords` class manages the `<meta:keyword>` elements.
+
+Methods
+~~~~~~~
+
+.. method:: add(keyword)
+
+   Add `keyword` to the document meta data.
+
+.. method:: remove(keyword)
+
+   remove `keyword` from the document meta data.
+
+.. method:: __iter__()
+
+   Iterate over all `keywords`::
+
+       for keyword in document.meta.keywords:
+          pass # or do something
+
+.. method:: __contains__(keyword)
+
+   `True` if `keyword` is in the meta data else `False`.
+
+   This method is used by the **in** operator::
+
+       if 'text' in document.meta.keywords:
+           pass # or do something
 
 Usertags class
 --------------
 
+.. _Usertags class:
+
+The `Usertags` class manages the `<meta:user-defined>` elements.
+
+Methods
+~~~~~~~
+
+.. method:: set(name, value, value_type=None)
+
+   Set the usertag `name` the `value` and the type to `value_type`.
+
+.. method:: __setitem__(name, value)
+
+   Set usertag `name` to `value`, type is ``'string'``.
+
+.. method:: __getitem__(name)
+
+   Get usertag `name`.
+
+.. method:: __delitem__(name)
+
+   Delete usertag `name`.
+
+   usage::
+
+       document.meta.usertags['mytag'] = 'text'
+       value = document.meta.usertags['mytag']
+       del document.meta.usertags['mytag']
+
+.. method:: __iter__()
+
+   Iterate over all `usertags`, returns 2-tuple (tagname, tagvalue)::
+
+       for name, value in document.meta.usertags:
+          pass # or do something
+
+.. method:: __contains__(name)
+
+   `True` if the document has a usertag `name` else `False`.
+
+   This method is used by the **in** operator::
+
+       if 'mytag' in document.meta.usertags:
+           pass # or do something

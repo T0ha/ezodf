@@ -2,6 +2,9 @@
 NEWS
 ====
 
-Version 0.1.0 - 00 Januar 2011
+Version 0.1.0 - 02 Januar 2011
 
   * Pre-Alpha version
+  * open/saveas ODF documents
+  * modify meta data
+

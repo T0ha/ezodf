@@ -24,30 +24,6 @@ TAGS = {
     'language': 'dc:language',
 }
 
-# Set/Get Meta Tags by __setitem__/__getitem__ interface:
-# -------------------------------------------------------
-# generator :: application or tool that was used to create or last modify
-#              the XML document.
-#
-# title :: title of the document
-#
-# description :: brief description of the document
-#
-# subject :: subject of the document
-#
-# initial-creator :: name of the person who created the document initially
-#
-# creator :: name of the person who last modified the document
-#
-# creation-date :: date and time when the document was created initially
-#                  ISO format  YYYY-MM-DDThh:mm:ss
-#
-# date :: date and time when the document was last modified (ISO format)
-#
-# editing-cycles :: number of editing cycles the document has been through.
-#                   The value of this element is incremented every time
-#                   the document is saved.
-
 class Meta(XMLMixin):
     generator = GENERATOR
 
