@@ -16,3 +16,6 @@ def in_XML(source, target):
 
 def testdatafile(filename):
     return os.path.join(os.path.dirname(__file__), "data", filename)
+
+SPECFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, 'specs', 'OpenDocument-v1.1.odt'))
+SPECFILE_EXISTS = os.path.exists(SPECFILE)

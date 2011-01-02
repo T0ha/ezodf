@@ -79,11 +79,13 @@ class TestMeta(unittest.TestCase):
 
     def test_get_metadata_error(self):
         meta = Meta(testdata)
-        self.assertRaises(KeyError, meta.__getitem__, 'Terminator')
+        with self.assertRaises(KeyError):
+            meta['Terminator']
 
     def test_set_metadata_error(self):
         meta = Meta(testdata)
-        self.assertRaises(KeyError, meta.__setitem__, 'Terminator', 'Arnold Schwarzenegger')
+        with self.assertRaises(KeyError):
+            meta['Terminator'] = 'Arnold Schwarzenegger'
 
     def test_all_tags(self):
         meta = Meta()
@@ -157,7 +159,8 @@ class TestUsertags(unittest.TestCase):
 
     def test_get_error(self):
         meta = Meta()
-        self.assertRaises(KeyError, meta.usertags.__getitem__, 'XXX')
+        with self.assertRaises(KeyError):
+            meta['XXX']
 
     def test_remove_and_in_operator(self):
         meta = Meta()
@@ -169,7 +172,8 @@ class TestUsertags(unittest.TestCase):
 
     def test_remove_error(self):
         meta = Meta()
-        self.assertRaises(KeyError, meta.usertags.__delitem__, 'XXX')
+        with self.assertRaises(KeyError):
+            del meta.usertags['XXX']
 
     def test_iter(self):
         meta = Meta()
@@ -199,7 +203,8 @@ class TestUsertags(unittest.TestCase):
 
     def test_typeof_error(self):
         meta = Meta()
-        self.assertRaises(KeyError, meta.usertags.typeof, 'Nelson')
+        with self.assertRaises(KeyError):
+            meta.usertags.typeof('Nelson')
 
 class TestStatistic(unittest.TestCase):
     def test_get(self):
@@ -213,7 +218,8 @@ class TestStatistic(unittest.TestCase):
 
     def test_get_keyerror(self):
         meta = Meta(testdata)
-        self.assertRaises(KeyError, meta.count.__getitem__, 'xxx')
+        with self.assertRaises(KeyError):
+            meta.count['xxx']
 
     def test_set(self):
         meta = Meta(testdata)
@@ -223,7 +229,8 @@ class TestStatistic(unittest.TestCase):
 
     def test_set_keyerror(self):
         meta = Meta(testdata)
-        self.assertRaises(KeyError, meta.count.__setitem__, 'xxx', 777)
+        with self.assertRaises(KeyError):
+            meta.count['xxx'] = 777
 
 
 if __name__=='__main__':

@@ -11,7 +11,7 @@ import sys
 import unittest
 import zipfile
 
-from mytesttools import testdatafile
+from mytesttools import testdatafile, SPECFILE, SPECFILE_EXISTS
 
 from ezodf import filemanager
 from ezodf.filemanager import check_zipfile_for_oasis_validity
@@ -53,7 +53,8 @@ class TestFileObject(unittest.TestCase):
 
     def test_serialisation_error(self):
         fo = filemanager.FileObject('futurama/bender', 1000, 'text/xml')
-        self.assertRaises(TypeError, fo.tobytes)
+        with self.assertRaises(TypeError):
+            fo.tobytes()
 
 class ZipMock:
     writtenfiles = []
@@ -75,6 +76,7 @@ class TestFileManager(unittest.TestCase):
         self.assertEqual(zippo.writtenfiles[0],
                          'mimetype', "file 'mimetype' SHOULD be the first written file")
 
+    @unittest.skipUnless(SPECFILE_EXISTS, SPECFILE+" not found.")
     def test_copy_zip_to(self):
         def copy_file(from_, to_):
             fm = filemanager.FileManager(from_)
@@ -83,13 +85,12 @@ class TestFileManager(unittest.TestCase):
             zf.close()
 
         NEWSPEC = testdatafile('newspecs.odt')
-        OLDSPEC = testdatafile('specs.odt')
 
-        specs = zipfile.ZipFile(OLDSPEC)
+        specs = zipfile.ZipFile(SPECFILE)
         expectednames = specs.namelist()
         specs.close()
 
-        copy_file(OLDSPEC, NEWSPEC)
+        copy_file(SPECFILE, NEWSPEC)
 
         newspecs = zipfile.ZipFile(NEWSPEC)
         resultnames = newspecs.namelist()
@@ -100,13 +101,15 @@ class TestFileManager(unittest.TestCase):
                                                          b"application/vnd.oasis.opendocument.text"))
         os.remove(NEWSPEC)
 
+    @unittest.skipUnless(SPECFILE_EXISTS, SPECFILE+" not found.")
     def test_oasis_validity(self):
-        self.assertTrue(check_zipfile_for_oasis_validity(testdatafile('specs.odt'),
+        self.assertTrue(check_zipfile_for_oasis_validity(SPECFILE,
                                                          b"application/vnd.oasis.opendocument.text"))
 
+    @unittest.skipUnless(SPECFILE_EXISTS, SPECFILE+" not found.")
     def test_save(self):
         SAVENAME = testdatafile('specs.save.odt')
-        fm = filemanager.FileManager(testdatafile('specs.odt'))
+        fm = filemanager.FileManager(SPECFILE)
         # to use save you have to register at least the mimetype file
         mimetype = fm.get_bytes('mimetype')
         fm.register('mimetype', mimetype)
