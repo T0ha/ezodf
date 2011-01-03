@@ -102,6 +102,16 @@ class TestMeta(unittest.TestCase):
         meta.inc_editing_cycles()
         self.assertEqual(meta['editing-cycles'], '2')
 
+    def test_clear(self):
+        meta = Meta(testdata)
+        meta.clear()
+        with self.assertRaises(KeyError):
+            meta['generator']
+        self.assertEqual(len(list(meta.keywords)), 0)
+        self.assertEqual(len(dict(meta.usertags)), 0)
+        self.assertEqual(len(dict(meta.count)), 0)
+
+
 class TestKeywords(unittest.TestCase):
     def test_keyword_in_xml_serialisation(self):
         meta = Meta()

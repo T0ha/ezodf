@@ -62,6 +62,10 @@ editing-cycles   number of editing cycles the document has been through.
 language         the document language like ``'en-US'`` or ``'de-AT'``
 ================ ============================================================
 
+.. method:: clear()
+
+   Delete all metatags, keywords, user-defined tags and statistics.
+
 Attributes
 ~~~~~~~~~~
 

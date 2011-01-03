@@ -55,6 +55,11 @@ class Meta(XMLMixin):
             self['creation-date'] = datetime.now().isoformat()
             self.touch()
 
+    def clear(self):
+        """ Delete all metatags. """
+        self.meta.clear()
+        self.count.stats = XML.etree.SubElement(self.meta, XML('meta:document-statistic'))
+
     def touch(self):
         self['date'] = datetime.now().isoformat()
         self['generator'] = Meta.generator
@@ -111,10 +116,12 @@ class Keywords:
             self.meta.remove(tag)
 
     def clear(self):
+        """ Delete all keywords. """
         for tag in self.meta.findall(XML('meta:keyword')):
             self.meta.remove(tag)
 
     def _find(self, keyword):
+        """ Find XML element for `keyword`. """
         for tag in self.meta.findall(XML('meta:keyword')):
             if  keyword == tag.text:
                 return tag
@@ -127,7 +134,7 @@ class Usertags:
     def __iter__(self):
         """ Iterate over all user-defined metatags.
 
-        :returns: (name, value)
+        :returns: (name, value) tuples
         """
         for metatag in self.meta.findall(XML('meta:user-defined')):
             yield (metatag.get(XML('meta:name')), metatag.text)
@@ -171,16 +178,19 @@ class Usertags:
             raise KeyError(name)
 
     def typeof(self, name):
+        """ Get type of user defined tag `name`. """
         tag = self._find(name)
         if tag is not None:
             return tag.get(XML('meta:value-type'), 'string')
         raise KeyError(name)
 
     def update(self, d):
+        """ Set user defined tags from dict `d`. """
         for key, value in d.items():
             self.__setitem__(key, value)
 
     def clear(self):
+        """ Delete all user defined tags. """
         for tag in self.meta.findall(XML('meta:user-defined')):
             self.meta.remove(tag)
 
@@ -219,13 +229,19 @@ class Statistic:
             raise KeyError(key)
 
     def __iter__(self):
+        """ Iterate over all statistics.
+
+        :returns: (name, value) tulples
+        """
         prefix = len(META_NS) + 2
         for key, value in self.stats.items():
             yield (key[prefix:-6], int(value))
 
     def update(self, d):
+        """ Set statistics from dict `d`. """
         for key, value in d.items():
             self.__setitem__(key, value)
 
     def clear(self):
+        """ Clear all statistics. """
         self.stats.clear()

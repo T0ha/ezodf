@@ -16,16 +16,28 @@ class _XMLNamespaces:
         self.uri2prefix = {}
         self.etree = etree
         self._cache = {}
+        self.classmap = {}
         self.update(namespaces)
 
     def update(self, namespaces):
         for prefix, uri in namespaces.items():
-            self.register(prefix, uri)
+            self.register_namespace(prefix, uri)
 
-    def register(self, prefix, uri):
+    def register_namespace(self, prefix, uri):
         self.prefix2uri[prefix] = uri
         self.uri2prefix[uri] = prefix
         self._cache.clear()
+
+    def register_class(self, cls):
+        self.classmap[cls.XMLELEMENT] = cls
+
+    def to_object(self, element):
+        """ Wrap element into a Python object. """
+        try:
+            cls = self.classmap[element.tag]
+        except KeyError: # wrap it into the BaseClass
+            cls = self.classmap['BaseClass']
+        return cls(xmlroot=element)
 
     def __call__(self, tag):
         """ Convert tag in prefix notation into clark notation. """
