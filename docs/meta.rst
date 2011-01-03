@@ -6,9 +6,10 @@ meta module
 In the `meta` module contains all classes to access the documents
 meta data, keywords and user defined tags.
 
-- `Meta` class gives you access to the simple meta data
-- `Keywords` class gives you access to the document keywords
-- `Usertags` class gives you access to the user defined tags
+- :ref:`Meta class` gives you access to the simple meta data
+- :ref:`Keywords class` gives you access to the document keywords
+- :ref:`Usertags class` gives you access to the user defined tags
+- :ref:`Statistic class` gives you access to the document statistics
 
 Every ODF document class has an attribute called `meta` which is an instance
 of `Meta` class.
@@ -18,8 +19,18 @@ of `Meta` class.
 Meta class
 ----------
 
-- you always get/set strings
-- also for date and time values
+You always get/set strings, also for date and time values.
+
+Methods
+~~~~~~~
+
+.. method:: __setitem__(key, value)
+
+   Set metatag `name` to `value`.
+
+.. method:: __getitem__(name)
+
+   Get metatag `name`.
 
 You got access to the documents metatags by the [ ] operator::
 
@@ -64,6 +75,11 @@ Attributes
    Attribute of the `Meta` class, gives you access to the documents
    user defined tags by the :ref:`Usertags class`.
 
+.. attribute:: count
+
+   Attribute  of the `Meta` class, gives you access to the documents
+   statistics by the :ref:`Statistic class`.
+
 .. _Keywords class:
 
 Keywords class
@@ -98,10 +114,14 @@ Methods
        if 'text' in document.meta.keywords:
            pass # or do something
 
-Usertags class
---------------
+.. method:: clear()
+
+   Delete all keywords.
 
 .. _Usertags class:
+
+Usertags class
+--------------
 
 The `Usertags` class manages the `<meta:user-defined>` elements.
 
@@ -110,7 +130,9 @@ Methods
 
 .. method:: set(name, value, value_type=None)
 
-   Set the usertag `name` the `value` and the type to `value_type`.
+   Set the usertag `name` the `value` and the type to `value_type`. The
+   allowed meta types are ``'float'``, ``'date'``, ``'time'``, ``'boolean'``
+   and ``'string'``.
 
 .. method:: __setitem__(name, value)
 
@@ -130,12 +152,10 @@ Methods
        value = document.meta.usertags['mytag']
        del document.meta.usertags['mytag']
 
-.. method:: __iter__()
+.. method:: typeof(name)
 
-   Iterate over all `usertags`, returns 2-tuple (tagname, tagvalue)::
-
-       for name, value in document.meta.usertags:
-          pass # or do something
+   Get type of user defined tag `name`. The allowed meta types are ``'float'``,
+   ``'date'``, ``'time'``, ``'boolean'`` and ``'string'``.
 
 .. method:: __contains__(name)
 
@@ -145,3 +165,97 @@ Methods
 
        if 'mytag' in document.meta.usertags:
            pass # or do something
+
+.. method:: __iter__()
+
+   Iterate over all `usertags`, returns 2-tuple (tagname, tagvalue)::
+
+       for name, value in document.meta.usertags:
+          pass # or do something
+
+       # create a dict of user defined tags
+       d = dict(document.meta.usertags)
+
+.. method:: update(d)
+
+   Set user defined tags from dict `d`.
+
+.. method:: clear()
+
+   Delete all user defined tags.
+
+.. _Statistic class:
+
+Statistic class
+---------------
+
+The `Statistic` class manages the `<meta:document-statistic>` element.
+
+Methods
+~~~~~~~
+
+.. method:: __getitem__(key)
+
+   Get count of statistic element `key` as `int`, if `key` is not defined
+   for the document the result is ``0``.
+
+.. method:: __setitem__(key, value)
+
+   Set count of statistic element `key` to `value`.
+
+   usage::
+
+      if document.meta.count['page'] > 3:
+          pass # or do something
+      # or set values
+      document.meta.count['character'] = 4711
+
+.. method:: __iter__()
+
+   Iterate over all statistics, returns 2-tuple (element, value).
+
+   create a dict of all statistic values::
+
+      d = dict(document.meta.count)
+
+.. method:: update(d)
+
+   Set statistics from dict `d`.
+
+.. method:: clear()
+
+   Clear all statistics.
+
+======================== ====================================================
+Element                  Description
+======================== ====================================================
+page                     Number of pages in a word processing document. This
+                         must be greater than zero. This attribute is not
+                         used in spreadsheets. The page-count for a
+                         spreadsheet is a calculated value that tells how
+                         many sheets have filled cells on them, and this can
+                         be zero for a totally empty spreadsheet.
+table                    Number of tables in a word processing document, or
+                         number of sheets in a spreadsheet document.
+draw                     Apparently unused in OpenOffice.org2.0
+image                    Number of images in a word processing document.
+object                   Number of objects in a document. This attribute is
+                         used in drawing and presentation documents, but it
+                         does not bear any simple relationship to the number
+                         of items you see on the screen.
+ole-object               Apparently unused in OpenOffice.org2.0
+paragraph                Number of paragraphs in a word processing document.
+word                     Number of words in a word processing document.
+character                Number of characters in a word processing document.
+row                      Apparently unused in OpenOffice.org2.0
+frame                    unknown
+sentence                 Number of sentences in a word processing document.
+syllable                 Number of syllables in a word processing document.
+non-whitespace-character Number of non-whitespace-characters in a word
+                         processing document.
+cell                     none empty cells in a spreadsheet document.
+======================== ====================================================
+
+Table from the online book `OASIS OpenDocument Essentials`_.
+
+.. _OASIS OpenDocument Essentials: http://books.evc-cit.info/

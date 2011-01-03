@@ -17,13 +17,14 @@ You don't have to care about the document type at the open function, to check
 the type of the document you got, use the **mimetype** attribute::
 
     if doc.mimetype == ezodf.const.MIMETYPES['odt']:
+        pass
         # this is a text document
         # and so on for 'ods', 'odg' or 'odg'
 
 To change the meta data of the document use the **meta** attribute,
 which is an instance of the :ref:`Meta class`::
 
-   document_titel = doc.meta['title']
+   document_title = doc.meta['title']
    # or set meta attributes
    doc.meta['description'] = 'set a new description'
 

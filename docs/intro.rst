@@ -4,12 +4,13 @@ Introduction
 ============
 
 The main intention of the **ezodf** package is to **easy** read, write and
-modify OpenDocumentFormat files but without the goal to support all possibilities
-that the OASIS OpenDocument Standard provides.
+modify OpenDocument (ODF) files but without the goal to support all
+possibilities that the OASIS OpenDocument Standard provides.
 
-To be clear, it is safe to open and rewrite ODF files with unsupported features,
-thanks to the documented container format (PKZIP format) and the XML technology
-nothing get lost, even non-standard data in the container file is copied.
+To be clear, it is safe to open and rewrite ODF files which contains
+unsupported features, thanks to the documented container format
+(PKZIP format) and the XML technology nothing get lost, even non-standard
+data in the container file will preserved.
 
 OpenDocument (ODF)
 ------------------

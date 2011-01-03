@@ -129,6 +129,14 @@ class TestKeywords(unittest.TestCase):
         result = list(meta.keywords)
         self.assertSequenceEqual(KW, result)
 
+    def test_clear(self):
+        meta = Meta()
+        meta.keywords.add('KEYWORD1')
+        meta.keywords.add('KEYWORD2')
+        meta.keywords.clear()
+        self.assertFalse('KEYWORD1' in meta.keywords)
+        self.assertFalse('KEYWORD2' in meta.keywords)
+
 class TestUsertags(unittest.TestCase):
     def test_usertag_in_xml_serialisation(self):
         meta = Meta()
@@ -183,6 +191,26 @@ class TestUsertags(unittest.TestCase):
         result = list(meta.usertags)
         self.assertSequenceEqual(TAGS, result)
 
+    def test_update(self):
+        d = {
+            'TEST1': 'VALUE1',
+            'TEST2': 'VALUE2',
+        }
+        meta = Meta()
+        meta.usertags.update(d)
+        self.assertEqual(meta.usertags['TEST1'], 'VALUE1')
+        self.assertEqual(meta.usertags['TEST2'], 'VALUE2')
+
+    def test_clear(self):
+        meta = Meta()
+        meta.usertags.update({
+            'TEST1': 'VALUE1',
+            'TEST2': 'VALUE2',
+        })
+        meta.usertags.clear()
+        self.assertFalse('TEST1' in meta.usertags)
+        self.assertFalse('TEST2' in meta.usertags)
+
     def test_usertags_to_dict(self):
         meta = Meta()
         TAGS = dict([('TAG1', 'VALUE1'), ('TAG2', 'KEYWORD2')])
@@ -232,6 +260,33 @@ class TestStatistic(unittest.TestCase):
         with self.assertRaises(KeyError):
             meta.count['xxx'] = 777
 
+    def test__iter__(self):
+        meta = Meta(testdata)
+        d = dict(meta.count)
+        self.assertSequenceEqual(sorted(d.keys()),
+                                 sorted(['character','paragraph', 'image', 'word',
+                                         'table', 'page', 'object',]))
+    def test_update(self):
+        d = {
+            'character': 1,
+            'paragraph': 2,
+            'image': 3,
+            'word': 4,
+            'table': 5,
+            'page':6,
+            'object': 7,
+        }
+        meta = Meta(testdata)
+        meta.count.update(d)
+
+        for key, value in d.items():
+            self.assertEqual(meta.count[key], value, 'count fails on %s' % key)
+
+    def test_clear(self):
+        meta = Meta(testdata)
+        meta.count.clear()
+        d = dict(meta.count)
+        self.assertEqual(len(d), 0)
 
 if __name__=='__main__':
     unittest.main()

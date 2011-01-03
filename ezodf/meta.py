@@ -110,6 +110,10 @@ class Keywords:
         if tag is not None:
             self.meta.remove(tag)
 
+    def clear(self):
+        for tag in self.meta.findall(XML('meta:keyword')):
+            self.meta.remove(tag)
+
     def _find(self, keyword):
         for tag in self.meta.findall(XML('meta:keyword')):
             if  keyword == tag.text:
@@ -166,11 +170,19 @@ class Usertags:
         else:
             raise KeyError(name)
 
-    def typeof(self, key):
-        tag = self._find(key)
+    def typeof(self, name):
+        tag = self._find(name)
         if tag is not None:
             return tag.get(XML('meta:value-type'), 'string')
-        raise KeyError(key)
+        raise KeyError(name)
+
+    def update(self, d):
+        for key, value in d.items():
+            self.__setitem__(key, value)
+
+    def clear(self):
+        for tag in self.meta.findall(XML('meta:user-defined')):
+            self.meta.remove(tag)
 
     def _find(self, name):
         for tag in self.meta.findall(XML('meta:user-defined')):
@@ -205,3 +217,15 @@ class Statistic:
             self.stats.set(Statistic.NS % key, str(value))
         else:
             raise KeyError(key)
+
+    def __iter__(self):
+        prefix = len(META_NS) + 2
+        for key, value in self.stats.items():
+            yield (key[prefix:-6], int(value))
+
+    def update(self, d):
+        for key, value in d.items():
+            self.__setitem__(key, value)
+
+    def clear(self):
+        self.stats.clear()
