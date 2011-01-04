@@ -29,15 +29,19 @@ class Content(XMLMixin):
 
     def setup(self, mimetype):
         # these elements are common to all document types
-        self.scripts = subelement(self.xmlroot, XML('office:scripts'))
+        # The element office:scripts always exists but is always empty
+        # so I dont't keep a reference to it
+        subelement(self.xmlroot, XML('office:scripts'))
         self.automatic_styles = subelement(self.xmlroot, XML('office:automatic-styles'))
-        self.body = subelement(self.xmlroot, XML('office:body'))
 
 class _AbstractBody:
     def __init__(self, parent, tag):
         # parent type should be etree.Element
-        assert parent.tag == XML('office:body')
-        self.xmlroot = subelement(parent, tag)
+        assert parent.tag == XML('office:document-content')
+        # The office:body element is just frame element for the real document content:
+        # office:text, office:spreadsheet, office:presentation, office:drawing
+        body = subelement(parent, XML('office:body'))
+        self.xmlroot = subelement(body, tag)
 
 class TextBody(_AbstractBody):
     def __init__(self, parent):

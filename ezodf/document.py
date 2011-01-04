@@ -68,7 +68,7 @@ class ODT(Document):
         super(ODT, self).__init__(filemanager, MIMETYPES['odt'])
         assert self.mimetype == MIMETYPES['odt']
         self.docname = filename
-        self.body = TextBody(self.content.body)
+        self.body = TextBody(self.content.xmlroot)
         font_face_decls = subelement(self.content.xmlroot, XML('office:font-face-decls'))
         self.fonts = FontFaceDecls(font_face_decls)
 
@@ -77,7 +77,7 @@ class ODS(Document):
         super(ODS, self).__init__(filemanager, MIMETYPES['ods'])
         assert self.mimetype == MIMETYPES['ods']
         self.docname = filename
-        self.body = SpreadsheetBody(self.content.body)
+        self.body = SpreadsheetBody(self.content.xmlroot)
         font_face_decls = subelement(self.content.xmlroot, XML('office:font-face-decls'))
         self.fonts = FontFaceDecls(font_face_decls)
 
@@ -86,14 +86,14 @@ class ODP(Document):
         super(ODP, self).__init__(filemanager, MIMETYPES['odp'])
         assert self.mimetype == MIMETYPES['odp']
         self.docname = filename
-        self.body = PresentationBody(self.content.body)
+        self.body = PresentationBody(self.content.xmlroot)
 
 class ODG(Document):
     def __init__(self, filename=None, filemanager=None):
         super(ODG, self).__init__(filemanager, MIMETYPES['odg'])
         assert self.mimetype == MIMETYPES['odg']
         self.docname = filename
-        self.body = DrawingBody(self.content.body)
+        self.body = DrawingBody(self.content.xmlroot)
 
 DOCUMENTCLASS = {
     MIMETYPES['odt']: ODT,
