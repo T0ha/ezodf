@@ -9,10 +9,13 @@
 import zipfile
 
 from .const import MIMETYPES
+from .xmlns import XML, subelement
 from .filemanager import FileManager
 from .meta import Meta
 from .styles import Styles
+from .styles import FontFaceDecls
 from .content import Content
+from .content import TextBody, SpreadsheetBody, PresentationBody, DrawingBody
 
 def open(filename):
     if not isinstance(filename, str):
@@ -34,20 +37,20 @@ def open(filename):
 class Document:
     """ OpenDocumentFormat BaseClass """
     def __init__(self, filemanager, mimetype):
-        self.filemanager = FileManager() if filemanager is None else filemanager
-        self.docname = filemanager.zipname
+        self.filemanager = fm = FileManager() if filemanager is None else filemanager
+        self.docname = fm.zipname
 
         self.mimetype = mimetype
-        filemanager.register('mimetype', self.mimetype)
+        fm.register('mimetype', self.mimetype)
 
-        self.meta = Meta(filemanager.get_bytes('meta.xml'))
-        filemanager.register('meta.xml', self.meta, 'text/xml')
+        self.meta = Meta(fm.get_bytes('meta.xml'))
+        fm.register('meta.xml', self.meta, 'text/xml')
 
-        self.styles = Styles(filemanager.get_bytes('styles.xml'))
-        filemanager.register('styles.xml', self.styles, 'text/xml')
+        self.styles = Styles(fm.get_bytes('styles.xml'))
+        fm.register('styles.xml', self.styles, 'text/xml')
 
-        self.content = Content(mimetype, filemanager.get_bytes('content.xml'))
-        filemanager.register('content.xml', self.content, 'text/xml')
+        self.content = Content(mimetype, fm.get_bytes('content.xml'))
+        fm.register('content.xml', self.content, 'text/xml')
 
     def save(self):
         if self.docname is None:
@@ -63,22 +66,34 @@ class Document:
 class ODT(Document):
     def __init__(self, filename=None, filemanager=None):
         super(ODT, self).__init__(filemanager, MIMETYPES['odt'])
+        assert self.mimetype == MIMETYPES['odt']
         self.docname = filename
+        self.body = TextBody(self.content.body)
+        font_face_decls = subelement(self.content.xmlroot, XML('office:font-face-decls'))
+        self.fonts = FontFaceDecls(font_face_decls)
 
 class ODS(Document):
     def __init__(self, filename=None, filemanager=None):
         super(ODS, self).__init__(filemanager, MIMETYPES['ods'])
+        assert self.mimetype == MIMETYPES['ods']
         self.docname = filename
+        self.body = SpreadsheetBody(self.content.body)
+        font_face_decls = subelement(self.content.xmlroot, XML('office:font-face-decls'))
+        self.fonts = FontFaceDecls(font_face_decls)
 
 class ODP(Document):
     def __init__(self, filename=None, filemanager=None):
         super(ODP, self).__init__(filemanager, MIMETYPES['odp'])
+        assert self.mimetype == MIMETYPES['odp']
         self.docname = filename
+        self.body = PresentationBody(self.content.body)
 
 class ODG(Document):
     def __init__(self, filename=None, filemanager=None):
         super(ODG, self).__init__(filemanager, MIMETYPES['odg'])
+        assert self.mimetype == MIMETYPES['odg']
         self.docname = filename
+        self.body = DrawingBody(self.content.body)
 
 DOCUMENTCLASS = {
     MIMETYPES['odt']: ODT,

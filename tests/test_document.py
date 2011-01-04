@@ -12,7 +12,7 @@ import zipfile
 
 from mytesttools import testdatafile
 
-from ezodf import document
+from ezodf import document, const
 
 def get_zip_names(zipname):
     z = zipfile.ZipFile(zipname)
@@ -35,6 +35,48 @@ class TestDocumentCopy(unittest.TestCase):
         for filename in ['empty.odt', 'empty.ods', 'empty.odg', 'empty.odp']:
             self.open_and_saveas(filename, "open and saveas faild on '%s'" % filename)
 
+class TestNewDocument(unittest.TestCase):
+    def test_new_odt(self):
+        doc = document.ODT(filename='new.odt')
+        self.assertEqual(doc.mimetype, const.MIMETYPES['odt'])
+        self.assertEqual(doc.docname, 'new.odt')
+        self.assertIsNotNone(doc.meta)
+        self.assertIsNotNone(doc.styles)
+        self.assertIsNotNone(doc.content)
+        self.assertIsNotNone(doc.body)
+        self.assertIsNotNone(doc.fonts)
+
+    def test_new_ods(self):
+        doc = document.ODS(filename='new.ods')
+        self.assertEqual(doc.mimetype, const.MIMETYPES['ods'])
+        self.assertEqual(doc.docname, 'new.ods')
+        self.assertIsNotNone(doc.meta)
+        self.assertIsNotNone(doc.styles)
+        self.assertIsNotNone(doc.content)
+        self.assertIsNotNone(doc.body)
+        self.assertIsNotNone(doc.fonts)
+
+    def test_new_odp(self):
+        doc = document.ODP(filename='new.odp')
+        self.assertEqual(doc.mimetype, const.MIMETYPES['odp'])
+        self.assertEqual(doc.docname, 'new.odp')
+        self.assertIsNotNone(doc.meta)
+        self.assertIsNotNone(doc.styles)
+        self.assertIsNotNone(doc.content)
+        self.assertIsNotNone(doc.body)
+        with self.assertRaises(AttributeError):
+            doc.fonts
+
+    def test_new_odg(self):
+        doc = document.ODG(filename='new.odg')
+        self.assertEqual(doc.mimetype, const.MIMETYPES['odg'])
+        self.assertEqual(doc.docname, 'new.odg')
+        self.assertIsNotNone(doc.meta)
+        self.assertIsNotNone(doc.styles)
+        self.assertIsNotNone(doc.content)
+        self.assertIsNotNone(doc.body)
+        with self.assertRaises(AttributeError):
+            doc.fonts
 
 if __name__=='__main__':
     unittest.main()

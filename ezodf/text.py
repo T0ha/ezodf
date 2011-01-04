@@ -10,12 +10,12 @@ from .xmlns import XML
 from .base import BaseClass
 
 class Span(BaseClass):
-    XMLELEMENT = XML('text:span')
+    TAG = XML('text:span')
 
 XML.register_class(Span)
 
 class Paragraph(BaseClass):
-    XMLELEMENT = XML('text:p')
+    TAG = XML('text:p')
 
     def appendtext(self, text, style=None):
         pass
@@ -23,16 +23,16 @@ class Paragraph(BaseClass):
 XML.register_class(Paragraph)
 
 class Heading(Paragraph):
-    XMLELEMENT = XML('text:h')
+    TAG = XML('text:h')
 
 XML.register_class(Heading)
 
 class Section(BaseClass):
-    XMLELEMENT = XML('text:section')
+    TAG = XML('text:section')
 
 XML.register_class(Section)
 
 class List(BaseClass):
-    XMLELEMENT = XML('text:list')
+    TAG = XML('text:list')
 
 XML.register_class(List)

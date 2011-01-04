@@ -9,13 +9,13 @@
 from .xmlns import XML
 
 class BaseClass:
-    XMLELEMENT = 'BaseClass'
+    TAG = 'BaseClass'
 
     def __init__(self, parent=None, xmlroot=None):
         if xmlroot is not None:
             self.xmlroot = xmlroot
         else:
-            self.xmlroot = XML.etree.Element(XML(self.XMLELEMENT))
+            self.xmlroot = XML.etree.Element(XML(self.TAG))
             if parent is not None:
                 parent.append(self.xmlroot)
 

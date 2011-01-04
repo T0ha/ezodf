@@ -29,7 +29,7 @@ class _XMLNamespaces:
         self._cache.clear()
 
     def register_class(self, cls):
-        self.classmap[cls.XMLELEMENT] = cls
+        self.classmap[cls.TAG] = cls
 
     def to_object(self, element):
         """ Wrap element into a Python object. """
@@ -77,3 +77,11 @@ class XMLMixin:
 
 # global ODF Namespaces with OASIS prefixes
 XML = _XMLNamespaces(ALL_NSMAP, etree)
+
+def subelement(parent, tag, new=True):
+    """ Find/create SubElement `tag` in parent node.
+    """
+    element = parent.find(tag)
+    if (element is None) and (new is True):
+        element = XML.etree.SubElement(parent, tag)
+    return element

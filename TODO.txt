@@ -15,15 +15,15 @@ Version 0.2.0
 -------------
 
   * Alpha
-  * ods - application/vnd.oasis.opendocument.spreadsheet
-  * check style management for spreadsheet
+  * odt - application/vnd.oasis.opendocument.text
+  * check style management for text
 
 Version 0.2.1
 -------------
 
   * Alpha
-  * odt - application/vnd.oasis.opendocument.text
-  * check style management for text
+  * ods - application/vnd.oasis.opendocument.spreadsheet
+  * check style management for spreadsheet
 
 Version 0.2.2
 -------------

@@ -7,7 +7,7 @@
 # License: GPLv3
 
 from .const import MIMETYPE_NSMAP
-from .xmlns import XML, XMLMixin
+from .xmlns import XML, XMLMixin, subelement
 
 class Content(XMLMixin):
     def __init__(self, mimetype, content=None):
@@ -28,10 +28,29 @@ class Content(XMLMixin):
         self.setup(mimetype)
 
     def setup(self, mimetype):
-        self.automatic_styles = self.xmlroot.find(XML('office:automatic-styles'))
-        if self.automatic_styles is None:
-            self.automatic_styles = XML.etree.SubElement(self.xmlroot,
-                                                         XML('office:automatic-styles'))
-        self.body = self.xmlroot.find(XML('office:body'))
-        if self.body is None:
-            self.body = XML.etree.SubElement(self.xmlroot, XML('office:body'))
+        # these elements are common to all document types
+        self.scripts = subelement(self.xmlroot, XML('office:scripts'))
+        self.automatic_styles = subelement(self.xmlroot, XML('office:automatic-styles'))
+        self.body = subelement(self.xmlroot, XML('office:body'))
+
+class _AbstractBody:
+    def __init__(self, parent, tag):
+        # parent type should be etree.Element
+        assert parent.tag == XML('office:body')
+        self.xmlroot = subelement(parent, tag)
+
+class TextBody(_AbstractBody):
+    def __init__(self, parent):
+        super (TextBody, self).__init__(parent, tag=XML('office:text'))
+
+class SpreadsheetBody(_AbstractBody):
+    def __init__(self, parent):
+        super (SpreadsheetBody, self).__init__(parent, tag=XML('office:spreadsheet'))
+
+class PresentationBody(_AbstractBody):
+    def __init__(self, parent):
+        super (PresentationBody, self).__init__(parent, tag=XML('office:presentation'))
+
+class DrawingBody(_AbstractBody):
+    def __init__(self, parent):
+        super (DrawingBody, self).__init__(parent, tag=XML('office:drawing'))
