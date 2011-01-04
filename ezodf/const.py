@@ -9,7 +9,7 @@
 import sys
 
 VERSION = "0.1.0"
-GENERATOR = "http://pypi.python.org/pypi/ezodf/%s$Python%s" % (VERSION, sys.version_info)
+GENERATOR = "http://pypi.python.org/pypi/ezodf/%s$Python%s" % (VERSION, sys.version)
 
 MIMETYPES = {
     'odt': "application/vnd.oasis.opendocument.text",
@@ -107,6 +107,7 @@ STYLES_NSMAP = {
     'ooo': OOO_NS,
     'ooow': OOOW_NS,
     'oooc': OOOC_NS,
+    'office': OFFICE_NS,
     'dom': DOM_NS,
     'rpt': RPT_NS,
     'of': OF_NS,
