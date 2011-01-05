@@ -21,3 +21,5 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .document import open
+from .document import ODT, ODS, ODP, ODG
+from .text import Paragraph, Heading, Span, List, Section

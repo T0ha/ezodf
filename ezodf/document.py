@@ -39,6 +39,10 @@ class Document:
     def __init__(self, filemanager, mimetype):
         self.filemanager = fm = FileManager() if filemanager is None else filemanager
         self.docname = fm.zipname
+        self.backup = True
+
+        # add doctype to manifest
+        self.filemanager.manifest.add('/', mimetype)
 
         self.mimetype = mimetype
         fm.register('mimetype', self.mimetype)
@@ -57,7 +61,7 @@ class Document:
             raise IOError('No filename specified!')
         self.meta.touch() # set modification date to now
         self.meta.inc_editing_cycles()
-        self.filemanager.save(self.docname)
+        self.filemanager.save(self.docname, backup=self.backup)
 
     def saveas(self, filename):
         self.docname = filename

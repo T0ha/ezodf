@@ -9,9 +9,9 @@
 import os
 import zipfile
 import random
-
 from datetime import datetime
 
+from .xmlns import XML
 from .manifest import Manifest
 
 FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -70,6 +70,10 @@ class FileManager:
 
     def register(self, name, element, media_type=""):
         self.directory[name] = FileObject(name, element, media_type)
+        # 'mimetype' need not to be in the manifest.xml file, but it seems
+        # not to break the vadility of the manifest file:
+        # if name != 'mimetype:
+        #     self.manifest.add(name, media_type)
         self.manifest.add(name, media_type)
 
     def save(self, filename, backup=True):
@@ -155,6 +159,14 @@ def check_zipfile_for_oasis_validity(filename, mimetype):
     """ Checks the zipfile structure and least necessary content, but not the
     XML validity of the document.
     """
+    def check_manifest(stream):
+        xmltree = XML.etree.XML(stream)
+        fullnames = [e.get(XML('manifest:full-path')) for e in xmltree.findall(XML('manifest:file-entry'))]
+        for name in ('content.xml', 'meta.xml', 'styles.xml', '/'):
+            if name not in fullnames:
+                return False
+        return True
+
     if not zipfile.is_zipfile(filename):
         return False
     # The first file in an OpenDocumentFormat zipfile should be the uncompressed
@@ -168,10 +180,17 @@ def check_zipfile_for_oasis_validity(filename, mimetype):
         return False
     zf = zipfile.ZipFile(filename)
     names = zf.namelist()
+    if 'META-INF/manifest.xml' in names:
+        manifest = zf.read('META-INF/manifest.xml')
+    else:
+        manifest = None
     zf.close()
+
+    if manifest is None:
+        return False
     # meta.xml and styles.xml are not required, but I think they should
-    for filename in ['META-INF/manifest.xml', 'content.xml', 'meta.xml',
-                     'styles.xml', 'mimetype']:
+    for filename in ['content.xml', 'meta.xml', 'styles.xml', 'mimetype']:
         if filename not in names:
             return False
-    return True
+    result = check_manifest(manifest)
+    return result

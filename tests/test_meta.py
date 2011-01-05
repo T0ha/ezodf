@@ -6,14 +6,17 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+# Standard Library
 import os
 import unittest
 from zipfile import ZipFile
 
+# trusted or separately tested modules
 from mytesttools import in_XML
-
 from ezodf.const import GENERATOR
 from ezodf.xmlns import XML
+
+# objects to test
 from ezodf.meta import Meta
 
 testdata = b"""<?xml version="1.0" encoding="UTF-8"?>

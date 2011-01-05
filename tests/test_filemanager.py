@@ -6,13 +6,16 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+# Standard Library
 import os
 import sys
 import unittest
 import zipfile
 
+# trusted or separately tested modules
 from mytesttools import testdatafile, SPECFILE, SPECFILE_EXISTS
 
+# objects to test
 from ezodf import filemanager
 from ezodf.filemanager import check_zipfile_for_oasis_validity
 

@@ -6,10 +6,13 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+# Standard Library
 import unittest
 
+# trusted or separately tested modules
 from mytesttools import in_XML
 
+# objects to test
 from ezodf.xmlns import XML
 
 class TestXMLNamespaces(unittest.TestCase):

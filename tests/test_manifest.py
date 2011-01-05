@@ -6,10 +6,12 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+# Standard Library
 import os
 import unittest
 from zipfile import ZipFile
 
+# objects to test
 from ezodf.manifest import Manifest
 
 testdata = b"""<?xml version="1.0" encoding="UTF-8"?>

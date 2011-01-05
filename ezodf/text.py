@@ -11,14 +11,16 @@ from .base import BaseClass
 
 class Span(BaseClass):
     TAG = XML('text:span')
+    # Span(xmlroot=node)
+    def __init__(self, text="", style=None, xmlroot=None):
+        super(Span, self).__init__(xmlroot)
 
 XML.register_class(Span)
 
 class Paragraph(BaseClass):
     TAG = XML('text:p')
-
-    def appendtext(self, text, style=None):
-        pass
+    def __init__(self, text="", style=None, xmlroot=None):
+        super(Paragraph, self).__init__(xmlroot)
 
 XML.register_class(Paragraph)
 

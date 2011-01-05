@@ -2,17 +2,26 @@
 Abstract
 ========
 
-**ezodf** is a Python package to create new or open existing OpenDocument 
+**ezodf** is a Python package to create new or open existing OpenDocument
 (ODF) files to extract, add, modify or delete document data.
 
 a simple example::
 
     import ezodf
 
-    ods = ezodf.ODS('testspreadsheet.ods')
-    sheet = ezodf.Spreadsheet(ods, 'SHEET')
-    sheet[0, 0] = ezodf.Cell("Textcell")
+    ods = ezodf.ODS('spreadsheet.ods')
+    # document content resides in the body object
+    sheet = ods.body.add(ezodf.Spreadsheet('SHEET'))
+    sheet[0, 0] = ezodf.Paragraph("Textcell")
     ods.save()
+
+    odt = ezodf.ODT('text.odt')
+    paragraph = ezodf.Paragraph("This is a paragraph.")
+    # document content resides in the body object
+    odt.body.add(paragraph)
+    paragraph.add(ezodf.Span("This is another sentence."))
+    odt.body.add(ezodf.Heading("Chapter 1"), insertbefore=paragraph)
+    odt.save()
 
 for more examples see: /examples folder
 

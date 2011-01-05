@@ -6,12 +6,16 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+# Standard Library
 import os
 import unittest
 import zipfile
 
+# trusted or separately tested modules
 from mytesttools import testdatafile
+from ezodf.filemanager import check_zipfile_for_oasis_validity
 
+# objects to test
 from ezodf import document, const
 
 def get_zip_names(zipname):
@@ -37,29 +41,44 @@ class TestDocumentCopy(unittest.TestCase):
 
 class TestNewDocument(unittest.TestCase):
     def test_new_odt(self):
-        doc = document.ODT(filename='new.odt')
+        docname = testdatafile('new.odt')
+        doc = document.ODT(filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odt'])
-        self.assertEqual(doc.docname, 'new.odt')
+        self.assertEqual(doc.docname, docname)
         self.assertIsNotNone(doc.meta)
         self.assertIsNotNone(doc.styles)
         self.assertIsNotNone(doc.content)
         self.assertIsNotNone(doc.body)
         self.assertIsNotNone(doc.fonts)
+
+        doc.backup=False
+        doc.save()
+        self.assertTrue(os.path.exists(docname))
+        self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.text"))
+        os.remove(docname)
 
     def test_new_ods(self):
-        doc = document.ODS(filename='new.ods')
+        docname = testdatafile('new.ods')
+        doc = document.ODS(filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['ods'])
-        self.assertEqual(doc.docname, 'new.ods')
+        self.assertEqual(doc.docname, docname)
         self.assertIsNotNone(doc.meta)
         self.assertIsNotNone(doc.styles)
         self.assertIsNotNone(doc.content)
         self.assertIsNotNone(doc.body)
         self.assertIsNotNone(doc.fonts)
 
+        doc.backup=False
+        doc.save()
+        self.assertTrue(os.path.exists(docname))
+        self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.spreadsheet"))
+        os.remove(docname)
+
     def test_new_odp(self):
-        doc = document.ODP(filename='new.odp')
+        docname = testdatafile('new.odp')
+        doc = document.ODP(filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odp'])
-        self.assertEqual(doc.docname, 'new.odp')
+        self.assertEqual(doc.docname, docname)
         self.assertIsNotNone(doc.meta)
         self.assertIsNotNone(doc.styles)
         self.assertIsNotNone(doc.content)
@@ -67,16 +86,29 @@ class TestNewDocument(unittest.TestCase):
         with self.assertRaises(AttributeError):
             doc.fonts
 
+        doc.backup=False
+        doc.save()
+        self.assertTrue(os.path.exists(docname))
+        self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.presentation"))
+        os.remove(docname)
+
     def test_new_odg(self):
-        doc = document.ODG(filename='new.odg')
+        docname = testdatafile('new.odg')
+        doc = document.ODG(filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odg'])
-        self.assertEqual(doc.docname, 'new.odg')
+        self.assertEqual(doc.docname, docname)
         self.assertIsNotNone(doc.meta)
         self.assertIsNotNone(doc.styles)
         self.assertIsNotNone(doc.content)
         self.assertIsNotNone(doc.body)
         with self.assertRaises(AttributeError):
             doc.fonts
+
+        doc.backup=False
+        doc.save()
+        self.assertTrue(os.path.exists(docname))
+        self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.graphics"))
+        os.remove(docname)
 
 if __name__=='__main__':
     unittest.main()
