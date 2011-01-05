@@ -13,7 +13,7 @@ import unittest
 from mytesttools import in_XML
 
 # objects to test
-from ezodf.xmlns import XML
+from ezodf.xmlns import XML, CN, etree
 
 class TestXMLNamespaces(unittest.TestCase):
     def test_split_prefix(self):
@@ -30,12 +30,12 @@ class TestXMLNamespaces(unittest.TestCase):
         self.assertEqual(clark, "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
 
     def test_call(self):
-        self.assertEqual(XML('draw:p'), "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p")
-        self.assertEqual(XML('office:p'), "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
+        self.assertEqual(CN('draw:p'), "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p")
+        self.assertEqual(CN('office:p'), "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}p")
 
     def test_short_prefix2clark_pass_through(self):
         tag = "{urn:oasis:names:tc:opendocument:xmlns:drawing:1.0}p"
-        self.assertEqual(XML(tag), tag)
+        self.assertEqual(CN(tag), tag)
 
 testdata = """<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
  <manifest:file-entry manifest:media-type="application/vnd.oasis.opendocument.text" manifest:version="1.2" manifest:full-path="/"/>
@@ -63,23 +63,23 @@ testdata = """<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument
 
 class TestNSParsing(unittest.TestCase):
     def test_parse_and_count_file_entry_elements(self):
-        xmltree = XML.etree.fromstring(testdata)
-        result = list(xmltree.findall(XML('manifest:file-entry')))
+        xmltree = etree.fromstring(testdata)
+        result = list(xmltree.findall(CN('manifest:file-entry')))
         self.assertEqual(len(result), 20)
 
     def test_parse_and_count_file_entry_attributes(self):
-        xmltree = XML.etree.fromstring(testdata)
+        xmltree = etree.fromstring(testdata)
         first_entry = xmltree[0]
-        attrib = first_entry.get(XML('manifest:media-type'))
+        attrib = first_entry.get(CN('manifest:media-type'))
         self.assertEqual(attrib, "application/vnd.oasis.opendocument.text")
-        attrib = first_entry.get(XML('manifest:version'))
+        attrib = first_entry.get(CN('manifest:version'))
         self.assertEqual(attrib, "1.2")
-        attrib = first_entry.get(XML('manifest:full-path'))
+        attrib = first_entry.get(CN('manifest:full-path'))
         self.assertEqual(attrib, "/")
 
     def test_tostring_subelements(self):
-        xmltree = XML.etree.fromstring(testdata)
-        result = XML.etree.tostring(xmltree[0], encoding=str).strip()
+        xmltree = etree.fromstring(testdata)
+        result = etree.tostring(xmltree[0], encoding=str).strip()
         self.assertTrue(in_XML('<manifest:file-entry '\
                                'manifest:media-type="application/vnd.oasis.opendocument.text" '\
                                'manifest:version="1.2" '\

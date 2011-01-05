@@ -14,7 +14,7 @@ from zipfile import ZipFile
 # trusted or separately tested modules
 from mytesttools import in_XML
 from ezodf.const import GENERATOR
-from ezodf.xmlns import XML
+from ezodf.xmlns import XML, etree
 
 # objects to test
 from ezodf.meta import Meta
@@ -62,7 +62,7 @@ class TestMeta(unittest.TestCase):
         self.assertEqual(meta['initial-creator'], "Manfred Moitzi")
 
     def test_open_from_ElementTree(self):
-        xmltree = XML.etree.fromstring(testdata)
+        xmltree = etree.fromstring(testdata)
         meta = Meta(xmltree)
         self.assertEqual(meta['initial-creator'], "Manfred Moitzi")
 

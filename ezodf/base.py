@@ -3,10 +3,10 @@
 # Author:  mozman --<mozman@gmx.at>
 # Purpose: BaseClass for ODF content objects
 # Created: 03.01.2011
-# Copyright (C) 2010, Manfred Moitzi
+# Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-from .xmlns import XML
+from .xmlns import XML, etree
 
 class BaseClass:
     TAG = 'BaseClass'
@@ -15,10 +15,11 @@ class BaseClass:
         if xmlroot is not None:
             self.xmlroot = xmlroot
         else:
-            self.xmlroot = XML.etree.Element(self.TAG)
+            self.xmlroot = etree.Element(self.TAG)
 
     def __iter__(self):
-        return ( XML.to_object(element) for element in self.xmlroot.iter() )
+        for element in self.xmlroot.iterchildren():
+            yield XML.to_object(element)
 
     def __len__(self):
         """ Get count of children """
@@ -30,7 +31,10 @@ class BaseClass:
         return self.get(index)
 
     def __setitem__(self, index, element):
-        self.insert(index, element)
+        assert isinstance(index, int)
+        assert hasattr(element, 'xmlroot')
+        found = self.xmlroot[index]
+        self.xmlroot.replace(found, element.xmlroot)
 
     def __delitem__(self, index):
         assert isinstance(index, int)
@@ -38,13 +42,13 @@ class BaseClass:
 
     def index(self, child):
         """ Get numeric index of `child`. """
-        assert isinstance(child, BaseClass)
+        assert hasattr(child, 'xmlroot')
         return self.xmlroot.index(child.xmlroot)
 
     def insert(self, index, child):
         """ Insert child at position `index`. """
         assert isinstance(index, int)
-        assert isinstance(child, BaseClass)
+        assert hasattr(child, 'xmlroot')
         self.xmlroot.insert(index, child.xmlroot)
         return child # pass through
 
@@ -54,6 +58,15 @@ class BaseClass:
         xmlelement = self.xmlroot[index]
         return XML.to_object(xmlelement)
 
+    def getattr(self, key, default=None):
+        value = self.xmlroot.get(key)
+        if value is None:
+            value = default
+        return value
+
+    def setattr(self, key, value):
+        self.xmlroot.set(key, value)
+
     ## list operations
 
     def add(self, child, insertbefore=None):
@@ -62,13 +75,13 @@ class BaseClass:
             position = self.index(insertbefore)
             self.insert(position, child)
         else:
-            assert isinstance(child, BaseClass)
+            assert hasattr(child, 'xmlroot')
             self.xmlroot.append(child.xmlroot)
         return child # pass through
 
     def remove(self, child):
         """ Remove `child` object from node. """
-        assert isinstance(child, BaseClass)
+        assert hasattr(child, 'xmlroot')
         self.xmlroot.remove(child.xmlroot)
 
     def clear(self):

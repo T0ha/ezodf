@@ -9,7 +9,7 @@
 import zipfile
 
 from .const import MIMETYPES
-from .xmlns import XML, subelement
+from .xmlns import subelement, CN
 from .filemanager import FileManager
 from .meta import Meta
 from .styles import Styles
@@ -73,7 +73,7 @@ class ODT(Document):
         assert self.mimetype == MIMETYPES['odt']
         self.docname = filename
         self.body = TextBody(self.content.xmlroot)
-        font_face_decls = subelement(self.content.xmlroot, XML('office:font-face-decls'))
+        font_face_decls = subelement(self.content.xmlroot, CN('office:font-face-decls'))
         self.fonts = FontFaceDecls(font_face_decls)
 
 class ODS(Document):
@@ -82,7 +82,7 @@ class ODS(Document):
         assert self.mimetype == MIMETYPES['ods']
         self.docname = filename
         self.body = SpreadsheetBody(self.content.xmlroot)
-        font_face_decls = subelement(self.content.xmlroot, XML('office:font-face-decls'))
+        font_face_decls = subelement(self.content.xmlroot, CN('office:font-face-decls'))
         self.fonts = FontFaceDecls(font_face_decls)
 
 class ODP(Document):

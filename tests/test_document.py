@@ -24,6 +24,10 @@ def get_zip_names(zipname):
     z.close()
     return names
 
+def remove(filename):
+    """ Delete `filename`. """
+    os.remove(filename)
+
 class TestDocumentCopy(unittest.TestCase):
     def open_and_saveas(self, filename, msg=""):
         infile = testdatafile(filename)
@@ -32,7 +36,7 @@ class TestDocumentCopy(unittest.TestCase):
         odt = document.open(infile)
         odt.saveas(outfile)
         names2 = get_zip_names(outfile)
-        os.remove(outfile)
+        remove(outfile)
         self.assertSequenceEqual(sorted(names1), sorted(names2), msg)
 
     def test_open_and_saveas_all(self):
@@ -55,7 +59,7 @@ class TestNewDocument(unittest.TestCase):
         doc.save()
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.text"))
-        os.remove(docname)
+        remove(docname)
 
     def test_new_ods(self):
         docname = testdatafile('new.ods')
@@ -72,7 +76,7 @@ class TestNewDocument(unittest.TestCase):
         doc.save()
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.spreadsheet"))
-        os.remove(docname)
+        remove(docname)
 
     def test_new_odp(self):
         docname = testdatafile('new.odp')
@@ -90,7 +94,7 @@ class TestNewDocument(unittest.TestCase):
         doc.save()
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.presentation"))
-        os.remove(docname)
+        remove(docname)
 
     def test_new_odg(self):
         docname = testdatafile('new.odg')
@@ -108,7 +112,7 @@ class TestNewDocument(unittest.TestCase):
         doc.save()
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.graphics"))
-        os.remove(docname)
+        remove(docname)
 
 if __name__=='__main__':
     unittest.main()

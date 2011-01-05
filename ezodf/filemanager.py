@@ -11,7 +11,7 @@ import zipfile
 import random
 from datetime import datetime
 
-from .xmlns import XML
+from .xmlns import etree, CN
 from .manifest import Manifest
 
 FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -160,8 +160,8 @@ def check_zipfile_for_oasis_validity(filename, mimetype):
     XML validity of the document.
     """
     def check_manifest(stream):
-        xmltree = XML.etree.XML(stream)
-        fullnames = [e.get(XML('manifest:full-path')) for e in xmltree.findall(XML('manifest:file-entry'))]
+        xmltree = etree.XML(stream)
+        fullnames = [e.get(CN('manifest:full-path')) for e in xmltree.findall(CN('manifest:file-entry'))]
         for name in ('content.xml', 'meta.xml', 'styles.xml', '/'):
             if name not in fullnames:
                 return False

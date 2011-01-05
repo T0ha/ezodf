@@ -8,7 +8,7 @@
 
 from datetime import datetime
 
-from .xmlns import XML, XMLMixin
+from .xmlns import XMLMixin, CN, subelement, etree
 from .const import META_NSMAP, GENERATOR, META_NS
 
 TAGS = {
@@ -29,11 +29,11 @@ class Meta(XMLMixin):
 
     def __init__(self, content=None):
         if content is None:
-            self.xmlroot = XML.etree.Element(XML('office:document-meta'), nsmap=META_NSMAP)
+            self.xmlroot = etree.Element(CN('office:document-meta'), nsmap=META_NSMAP)
         else:
             if isinstance(content, bytes):
-                self.xmlroot = XML.etree.fromstring(content)
-            elif content.tag == XML('office:document-meta'):
+                self.xmlroot = etree.fromstring(content)
+            elif content.tag == CN('office:document-meta'):
                 self.xmlroot = content
             else:
                 raise ValueError("Unexpected root node: %s" % content.tag)
@@ -42,37 +42,35 @@ class Meta(XMLMixin):
         self.keywords = Keywords(self.meta)
         self.usertags = Usertags(self.meta)
 
-        stats = self.meta.find(XML('meta:document-statistic'))
+        stats = self.meta.find(CN('meta:document-statistic'))
         if stats is None:
-            stats = XML.etree.SubElement(self.meta, XML('meta:document-statistic'))
+            stats = etree.SubElement(self.meta, CN('meta:document-statistic'))
         self.count = Statistic(stats)
 
     def _setup(self):
-        self.meta = self.xmlroot.find(XML('office:meta'))
+        self.meta = self.xmlroot.find(CN('office:meta'))
         if self.meta is None: # this is a new document
-            self.meta = XML.etree.SubElement(self.xmlroot, XML('office:meta'))
-            self.xmlroot.set(XML('grddl:transformation'), "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
+            self.meta = subelement(self.xmlroot, CN('office:meta'))
+            self.xmlroot.set(CN('grddl:transformation'), "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
             self['creation-date'] = datetime.now().isoformat()
             self.touch()
 
     def clear(self):
         """ Delete all metatags. """
         self.meta.clear()
-        self.count.stats = XML.etree.SubElement(self.meta, XML('meta:document-statistic'))
+        self.count.stats = etree.SubElement(self.meta, CN('meta:document-statistic'))
 
     def touch(self):
         self['date'] = datetime.now().isoformat()
         self['generator'] = Meta.generator
 
     def __setitem__(self, key, value):
-        cnkey = XML(TAGS[key]) # key in clark notation
-        element = self.meta.find(cnkey)
-        if element is None:
-            element = XML.etree.SubElement(self.meta, cnkey)
+        cnkey = CN(TAGS[key]) # key in clark notation
+        element = subelement(self.meta, cnkey)
         element.text = value
 
     def __getitem__(self, key):
-        element = self.meta.find(XML(TAGS[key]))
+        element = self.meta.find(CN(TAGS[key]))
         if element is not None:
             return element.text
         else:
@@ -95,7 +93,7 @@ class Keywords:
 
     def __iter__(self):
         """ Iterate over all keywords. """
-        for keyword in self.meta.findall(XML('meta:keyword')):
+        for keyword in self.meta.findall(CN('meta:keyword')):
             yield keyword.text
 
     def __contains__(self, keyword):
@@ -106,7 +104,7 @@ class Keywords:
         """ Add 'keyword' to meta data. """
         tag = self._find(keyword)
         if tag is None:
-            tag = XML.etree.SubElement(self.meta, XML('meta:keyword'))
+            tag = etree.SubElement(self.meta, CN('meta:keyword'))
             tag.text = keyword
 
     def remove(self, keyword):
@@ -117,12 +115,12 @@ class Keywords:
 
     def clear(self):
         """ Delete all keywords. """
-        for tag in self.meta.findall(XML('meta:keyword')):
+        for tag in self.meta.findall(CN('meta:keyword')):
             self.meta.remove(tag)
 
     def _find(self, keyword):
         """ Find XML element for `keyword`. """
-        for tag in self.meta.findall(XML('meta:keyword')):
+        for tag in self.meta.findall(CN('meta:keyword')):
             if  keyword == tag.text:
                 return tag
         return None
@@ -136,8 +134,8 @@ class Usertags:
 
         :returns: (name, value) tuples
         """
-        for metatag in self.meta.findall(XML('meta:user-defined')):
-            yield (metatag.get(XML('meta:name')), metatag.text)
+        for metatag in self.meta.findall(CN('meta:user-defined')):
+            yield (metatag.get(CN('meta:name')), metatag.text)
 
     def __contains__(self, name):
         return self._find(name) is not None
@@ -147,11 +145,11 @@ class Usertags:
         """
         tag = self._find(name)
         if tag is None:
-            tag = XML.etree.SubElement(self.meta, XML('meta:user-defined'))
-            tag.set(XML('meta:name'), name)
+            tag = etree.SubElement(self.meta, CN('meta:user-defined'))
+            tag.set(CN('meta:name'), name)
         tag.text = str(value)
         if value_type is not None:
-            tag.set(XML('meta:value-type'), value_type)
+            tag.set(CN('meta:value-type'), value_type)
 
     def __setitem__(self, name, value):
         self.set(name, value)
@@ -181,7 +179,7 @@ class Usertags:
         """ Get type of user defined tag `name`. """
         tag = self._find(name)
         if tag is not None:
-            return tag.get(XML('meta:value-type'), 'string')
+            return tag.get(CN('meta:value-type'), 'string')
         raise KeyError(name)
 
     def update(self, d):
@@ -191,12 +189,12 @@ class Usertags:
 
     def clear(self):
         """ Delete all user defined tags. """
-        for tag in self.meta.findall(XML('meta:user-defined')):
+        for tag in self.meta.findall(CN('meta:user-defined')):
             self.meta.remove(tag)
 
     def _find(self, name):
-        for tag in self.meta.findall(XML('meta:user-defined')):
-            if name == tag.get(XML('meta:name')):
+        for tag in self.meta.findall(CN('meta:user-defined')):
+            if name == tag.get(CN('meta:name')):
                 return tag
         return None
 
@@ -213,12 +211,14 @@ class Statistic:
     def __getitem__(self, key):
         if key in Statistic.TYPES:
             val = self.stats.get(Statistic.NS % key)
+            retval = 0
             try:
-                return int(val)
+                retval = int(val)
             except ValueError:
-                return 0
+                pass # it's not an int, should not happen (but shit happens)
             except TypeError:
-                return 0
+                pass # None, no stats for `key`
+            return retval
         else:
             raise KeyError(key)
 

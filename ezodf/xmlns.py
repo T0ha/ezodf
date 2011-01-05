@@ -11,12 +11,11 @@ from lxml import etree
 from .const import ALL_NSMAP
 
 class _XMLNamespaces:
-    def __init__(self, namespaces, etree):
+    def __init__(self, namespaces):
         self.prefix2uri = {}
         self.uri2prefix = {}
-        self.etree = etree
-        self._cache = {}
         self.classmap = {}
+        self._cache = {}
         self.update(namespaces)
 
     def update(self, namespaces):
@@ -39,7 +38,7 @@ class _XMLNamespaces:
             cls = self.classmap['BaseClass']
         return cls(xmlroot=element)
 
-    def __call__(self, tag):
+    def _prefix2clark_cached(self, tag):
         """ Convert tag in prefix notation into clark notation. """
         # cached calls
         try:
@@ -71,17 +70,21 @@ class XMLMixin:
         :param bool xml_declaration: create XML declaration
         :param bool pretty-print: enables formatted XML
         """
-        return XML.etree.tostring(self.xmlroot, encoding='UTF-8',
-                                  xml_declaration=xml_declaration,
-                                  pretty_print=pretty_print)
+        return etree.tostring(self.xmlroot, encoding='UTF-8',
+                              xml_declaration=xml_declaration,
+                              pretty_print=pretty_print)
 
 # global ODF Namespaces with OASIS prefixes
-XML = _XMLNamespaces(ALL_NSMAP, etree)
+XML = _XMLNamespaces(ALL_NSMAP)
 
 def subelement(parent, tag, new=True):
     """ Find/create SubElement `tag` in parent node.
     """
     element = parent.find(tag)
     if (element is None) and (new is True):
-        element = XML.etree.SubElement(parent, tag)
+        element = etree.SubElement(parent, tag)
     return element
+
+def CN(tag):
+    """ Convert `tag` string into clark notation. """
+    return XML._prefix2clark_cached(tag)
