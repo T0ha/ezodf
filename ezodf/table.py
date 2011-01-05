@@ -6,5 +6,5 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
-from .xmlns import XML
+from .xmlns import register_class
 from .base import BaseClass

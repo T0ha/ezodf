@@ -7,7 +7,7 @@
 # License: GPLv3
 
 from .const import STYLES_NSMAP
-from .xmlns import XML, XMLMixin, subelement, etree, CN
+from .xmlns import XMLMixin, subelement, etree, CN, register_class, to_object
 
 ## file 'styles.xml'
 
@@ -51,7 +51,7 @@ class Container:
         style = self._find(key) # by style:name attribute
         if style is not None:
             try: # to wrap the style element into a Python object
-                return XML.to_object(style)(style)
+                return to_object(style)(style)
             except KeyError:
                 raise TypeError('Unknown style element: %s (contact ezodf developer)' % style.tag)
         else:
@@ -102,14 +102,11 @@ class BaseStyle:
     def __setitem__(self, key, value):
         """ Set style attribute 'key' to 'value'. """
 
-    def _properties(self, key, property_factory, create=True):
+    def _properties(self, key, property_factory, new=True):
         """ Get or create a properties element. """
-        element = self.xmlroot.find(key)
+        element = subelement(self.xmlroot, key , new)
         if element is None:
-            if not create:
-                raise KeyError(key)
-            else:
-                element = etree.SubElement(self.xmlelement, key)
+            raise KeyError(key)
         propertiesname = key + '-properties'
         properties = element.find(propertiesname)
         if properties is None:
@@ -122,6 +119,7 @@ class Properties(BaseStyle):
 
 HeaderProperties = Properties
 
+@register_class
 class Style(BaseStyle):
     TAG = CN('style:style')
     ATTRIBUTEMAP = {
@@ -138,12 +136,14 @@ class Style(BaseStyle):
         'default-outline-level': CN('style:default-outline-level'),
     }
 
+@register_class
 class DefaultStyle(BaseStyle):
     TAG = CN('style:default-style')
     ATTRIBUTEMAP = {
         'family': CN('style:family'),
     }
 
+@register_class
 class PageLayout(BaseStyle):
     TAG = CN('style:page-layout')
     ATTRIBUTEMAP = {
@@ -155,12 +155,8 @@ class PageLayout(BaseStyle):
         self.header = self._properties(CN('style:header-style'), HeaderProperties)
         self.footer = self._properties(CN('style:footer-style'), HeaderProperties)
 
+@register_class
 class FontFace(BaseStyle):
     TAG = CN('style:font-face')
-
-XML.register_class(Style)
-XML.register_class(FontFace)
-XML.register_class(PageLayout)
-XML.register_class(DefaultStyle)
 
 

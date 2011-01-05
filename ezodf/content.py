@@ -7,7 +7,7 @@
 # License: GPLv3
 
 from .const import MIMETYPE_NSMAP
-from .xmlns import XML, XMLMixin, subelement, CN, etree
+from .xmlns import XMLMixin, subelement, CN, etree
 
 class Content(XMLMixin):
     def __init__(self, mimetype, content=None):

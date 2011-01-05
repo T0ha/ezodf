@@ -6,8 +6,9 @@
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-from .xmlns import XML, etree
+from .xmlns import etree, register_class, to_object
 
+@register_class
 class BaseClass:
     TAG = 'BaseClass'
 
@@ -19,7 +20,7 @@ class BaseClass:
 
     def __iter__(self):
         for element in self.xmlroot.iterchildren():
-            yield XML.to_object(element)
+            yield to_object(element)
 
     def __len__(self):
         """ Get count of children """
@@ -56,7 +57,7 @@ class BaseClass:
         """ Get children at `index` as wrapped object. """
         assert isinstance(index, int)
         xmlelement = self.xmlroot[index]
-        return XML.to_object(xmlelement)
+        return to_object(xmlelement)
 
     def getattr(self, key, default=None):
         value = self.xmlroot.get(key)
@@ -87,5 +88,3 @@ class BaseClass:
     def clear(self):
         """ Remove all content from node. """
         self.xmlroot.clear()
-
-XML.register_class(BaseClass)

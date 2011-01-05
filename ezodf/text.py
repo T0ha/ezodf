@@ -6,67 +6,63 @@
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-from .xmlns import CN, XML
+from .xmlns import CN, register_class
 from .base import BaseClass
 
+@register_class
 class Spaces(BaseClass):
     TAG = CN('text:s')
     def __init__(self, count=1, xmlroot=None):
         super(Spaces, self).__init__(xmlroot)
         if xmlroot is None:
-            self._set_count(count)
-
-    def _get_count(self):
+            self.count = count
+    @property
+    def count(self):
         count = self.getattr(CN('text:c'))
         return int(count) if count is not None else 1
-    def _set_count(self, value):
+    @count.setter
+    def count(self, value):
         self.setattr(CN('text:c'), str(value))
-    count = property(_get_count, _set_count)
 
     def plaintext(self):
         return ' ' * self.count
 
-XML.register_class(Spaces)
-
+@register_class
 class Tabulator(BaseClass):
     TAG = CN('text:t')
     def plaintext(self):
         return '\t'
 
-XML.register_class(Tabulator)
 
+@register_class
 class Span(BaseClass):
     TAG = CN('text:span')
     def __init__(self, text="", xmlroot=None):
         super(Span, self).__init__(xmlroot)
 
     def plaintext(self):
-        text = []
-        if self.xmlroot.text is not None:
-            text.append(self.xmlroot.text)
+        text = [self.xmlroot.text]
         for element in iter(self):
-            if hasattr(element, 'plaintext'):
+            try:
                 text.append(element.plaintext())
-        return "".join(text)
+            except AttributeError:
+                text.append(element.xmlroot.text)
+            text.append(element.xmlroot.tail)
+        return "".join(filter(None, text))
 
-XML.register_class(Span)
 
+@register_class
 class Paragraph(Span):
     TAG = CN('text:p')
 
-XML.register_class(Paragraph)
-
+@register_class
 class Heading(Span):
     TAG = CN('text:h')
 
-XML.register_class(Heading)
-
+@register_class
 class Section(BaseClass):
     TAG = CN('text:section')
 
-XML.register_class(Section)
-
+@register_class
 class List(BaseClass):
     TAG = CN('text:list')
-
-XML.register_class(List)

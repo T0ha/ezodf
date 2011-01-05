@@ -14,7 +14,6 @@ class _XMLNamespaces:
     def __init__(self, namespaces):
         self.prefix2uri = {}
         self.uri2prefix = {}
-        self.classmap = {}
         self._cache = {}
         self.update(namespaces)
 
@@ -26,17 +25,6 @@ class _XMLNamespaces:
         self.prefix2uri[prefix] = uri
         self.uri2prefix[uri] = prefix
         self._cache.clear()
-
-    def register_class(self, cls):
-        self.classmap[cls.TAG] = cls
-
-    def to_object(self, element):
-        """ Wrap element into a Python object. """
-        try:
-            cls = self.classmap[element.tag]
-        except KeyError: # wrap it into the BaseClass
-            cls = self.classmap['BaseClass']
-        return cls(xmlroot=element)
 
     def _prefix2clark_cached(self, tag):
         """ Convert tag in prefix notation into clark notation. """
@@ -88,3 +76,18 @@ def subelement(parent, tag, new=True):
 def CN(tag):
     """ Convert `tag` string into clark notation. """
     return XML._prefix2clark_cached(tag)
+
+# tag to class mapper
+classmap = {}
+
+def register_class(cls):
+    classmap[cls.TAG] = cls
+    return cls
+
+def to_object(element):
+    """ Wrap element into a Python object. """
+    try:
+        cls = classmap[element.tag]
+    except KeyError: # wrap it into the BaseClass
+        cls = classmap['BaseClass']
+    return cls(xmlroot=element)

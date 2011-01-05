@@ -15,7 +15,7 @@ from ezodf.xmlns import etree, CN
 from ezodf.base import BaseClass
 
 # objects to test
-from ezodf.text import Paragraph, Span, Heading, Section, List
+from ezodf.text import Paragraph, Span, Heading, Section, List, Spaces, Tabulator
 
 class TestSpan(unittest.TestCase):
     def test_bare_init(self):
@@ -70,6 +70,11 @@ class TestHeading(unittest.TestCase):
         self.assertTrue(isinstance(h, BaseClass))
         self.assertEqual(h.xmlroot.tag, CN('text:h'))
         self.assertEqual(h.xmlroot.get('test'), "heading")
+
+class TestSpaces(unittest.TestCase):
+    def test_get_count(self):
+        s = Spaces(count=3)
+        self.assertEqual(s.count, 3)
 
 if __name__=='__main__':
     unittest.main()
