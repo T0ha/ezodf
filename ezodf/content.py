@@ -8,6 +8,7 @@
 
 from .const import MIMETYPE_NSMAP
 from .xmlns import XMLMixin, subelement, CN, etree
+from .base import BaseClass
 
 class Content(XMLMixin):
     def __init__(self, mimetype, content=None):
@@ -34,27 +35,24 @@ class Content(XMLMixin):
         subelement(self.xmlroot, CN('office:scripts'))
         self.automatic_styles = subelement(self.xmlroot, CN('office:automatic-styles'))
 
-class _AbstractBody:
-    def __init__(self, parent, tag):
+class _AbstractBody(BaseClass):
+    def __init__(self, parent):
         # parent type should be etree.Element
         assert parent.tag == CN('office:document-content')
         # The office:body element is just frame element for the real document content:
         # office:text, office:spreadsheet, office:presentation, office:drawing
         body = subelement(parent, CN('office:body'))
-        self.xmlroot = subelement(body, tag)
+        # set xmlroot here, no need to call constructor of BaseClass
+        self.xmlroot = subelement(body, self.TAG)
 
 class TextBody(_AbstractBody):
-    def __init__(self, parent):
-        super (TextBody, self).__init__(parent, tag=CN('office:text'))
+    TAG = CN('office:text')
 
 class SpreadsheetBody(_AbstractBody):
-    def __init__(self, parent):
-        super (SpreadsheetBody, self).__init__(parent, tag=CN('office:spreadsheet'))
+    TAG = CN('office:spreadsheet')
 
 class PresentationBody(_AbstractBody):
-    def __init__(self, parent):
-        super (PresentationBody, self).__init__(parent, tag=CN('office:presentation'))
+    TAG = CN('office:presentation')
 
 class DrawingBody(_AbstractBody):
-    def __init__(self, parent):
-        super (DrawingBody, self).__init__(parent, tag=CN('office:drawing'))
+    TAG = CN('office:drawing')

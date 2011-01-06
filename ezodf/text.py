@@ -78,12 +78,16 @@ class Paragraph(Span):
 class Heading(Paragraph):
     TAG = CN('text:h')
 
+    def __init__(self, text="", level=1, stylename=None, xmlroot=None):
+        super(Heading, self).__init__(text, stylename, xmlroot)
+        self.level = level
+
     @property
-    def textlevel(self):
+    def level(self):
         return int(self.getattr(CN('text:level')))
 
-    @textlevel.setter
-    def textlevel(self, level):
+    @level.setter
+    def level(self, level):
         self.setattr(CN('text:level'), str(int(level)))
 
 

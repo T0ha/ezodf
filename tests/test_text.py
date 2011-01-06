@@ -102,6 +102,43 @@ class TestSpan(unittest.TestCase):
         span.stylename = "XXX"
         self.assertEqual(span.stylename, 'XXX')
 
+    def test_append_text(self):
+        txt = "TEXT"
+        span = Span(text=txt)
+        self.assertEqual(span.text, txt)
+        self.assertEqual(span.plaintext(), txt)
+
+    def test_append_text_2(self):
+        txt = "TEXT  TAIL"
+        span = Span(text=txt)
+        self.assertEqual(span.text, "TEXT ")
+        self.assertEqual(span[0].TAG, CN('text:s'))
+        self.assertEqual(span[0].tail, "TAIL")
+        self.assertEqual(span.plaintext(), txt)
+
+    def test_append_text_3(self):
+        txt = "TEXT  TAIL \n  \t    "
+        span = Span(text=txt)
+        self.assertEqual(span.text, "TEXT ")
+        self.assertEqual(span[0].TAG, CN('text:s'))
+        self.assertEqual(span[0].tail, "TAIL ")
+        self.assertEqual(span[1].TAG, CN('text:line-break'))
+        self.assertEqual(span[1].tail, " ")
+        self.assertEqual(span[2].TAG, CN('text:s'))
+        self.assertEqual(span[2].tail, None)
+        self.assertEqual(span[3].TAG, CN('text:tab'))
+        self.assertEqual(span[3].tail, " ")
+        self.assertEqual(span[4].TAG, CN('text:s'))
+        self.assertEqual(span[4].count, 3)
+        self.assertEqual(span.plaintext(), txt)
+
+    def test_append_text_4(self):
+        span = Span(text="TEXT")
+        span.append_plaintext("  TAIL")
+        self.assertEqual(span.text, "TEXT ")
+        self.assertEqual(span[0].TAG, CN('text:s'))
+        self.assertEqual(span[0].tail, "TAIL")
+
 DATA1 = '<text:p xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"'\
         ' text:style-name="Standard">Lorem ipsum <text:span text:style-name="T1">'\
         'dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor '\
