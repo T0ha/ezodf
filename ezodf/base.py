@@ -30,6 +30,20 @@ class BaseClass:
         """ Get count of children """
         return len(self.xmlroot)
 
+    @property
+    def text(self):
+        return self.xmlroot.text
+    @text.setter
+    def text(self, value):
+        self.xmlroot.text = value
+
+    @property
+    def tail(self):
+        return self.xmlroot.tail
+    @tail.setter
+    def tail(self, value):
+        self.xmlroot.tail = value
+
     ## Index operations
 
     def __getitem__(self, index):

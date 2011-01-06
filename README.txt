@@ -20,7 +20,7 @@ a simple example::
     # document content resides in the body object
     odt.body.add(paragraph)
     paragraph.add(ezodf.Span("This is another sentence."))
-    odt.body.add(ezodf.Heading("Chapter 1"), insertbefore=paragraph)
+    odt.body.add(ezodf.Heading("Chapter 1"), insert_before=paragraph)
     odt.save()
 
 for more examples see: /examples folder

@@ -15,7 +15,24 @@ from ezodf.xmlns import etree, CN
 from ezodf.base import BaseClass
 
 # objects to test
-from ezodf.text import Paragraph, Span, Heading, Section, List, Spaces, Tabulator
+from ezodf.text import Paragraph, Span, Heading
+
+
+SPANDATA = '<text:span xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" '\
+           'text:style-name="T2">aliquyam</text:span>'
+
+SPANDATA_SPC = '<text:span xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" '\
+               'text:style-name="T2">aliquyam <text:s text:c="3"/></text:span>'
+
+SPANDATA_BRK = '<text:span xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" '\
+               'text:style-name="T2">Line1<text:line-break />Line2</text:span>'
+
+SPANDATA_TAB = '<text:span xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" '\
+               'text:style-name="T2">Line1<text:tab />Line2</text:span>'
+
+SPANDATA_ALL = '<text:span xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" '\
+               'text:style-name="T2">Line1<text:line-break />Line2<text:tab />123 '\
+               '<text:s text:c="3"/>tail</text:span>'
 
 class TestSpan(unittest.TestCase):
     def test_bare_init(self):
@@ -29,6 +46,61 @@ class TestSpan(unittest.TestCase):
         self.assertTrue(isinstance(span, BaseClass))
         self.assertEqual(span.xmlroot.tag, CN('text:span'))
         self.assertEqual(span.xmlroot.get('test'), "span")
+
+    def test_init_XML(self):
+        node = etree.XML(SPANDATA)
+        span = Span(xmlroot=node)
+        self.assertTrue(isinstance(span, BaseClass))
+        self.assertEqual(span.xmlroot.tag, CN('text:span'))
+
+    def test_textlen(self):
+        span = Span(xmlroot=etree.XML(SPANDATA))
+        self.assertEqual(span.textlen, 8)
+
+    def test_textlen_with_spaces(self):
+        span = Span(xmlroot=etree.XML(SPANDATA_SPC))
+        self.assertEqual(span.textlen, 12)
+
+    def test_textlen_with_line_break(self):
+        span = Span(xmlroot=etree.XML(SPANDATA_BRK))
+        self.assertEqual(span.textlen, 11)
+
+    def test_textlen_with_tab(self):
+        span = Span(xmlroot=etree.XML(SPANDATA_TAB))
+        self.assertEqual(span.textlen, 11)
+
+    def test_textlen_with_all(self):
+        span = Span(xmlroot=etree.XML(SPANDATA_ALL))
+        self.assertEqual(span.textlen, 23)
+
+    def test_plaintext(self):
+        span = Span(xmlroot=etree.XML(SPANDATA))
+        self.assertEqual(span.plaintext(), 'aliquyam')
+
+    def test_plaintext_with_spaces(self):
+        span = Span(xmlroot=etree.XML(SPANDATA_SPC))
+        self.assertEqual(span.plaintext(), 'aliquyam    ')
+
+    def test_plaintext_with_line_break(self):
+        span = Span(xmlroot=etree.XML(SPANDATA_BRK))
+        self.assertEqual(span.plaintext(), 'Line1\nLine2')
+
+    def test_plaintext_with_tab(self):
+        span = Span(xmlroot=etree.XML(SPANDATA_TAB))
+        self.assertEqual(span.plaintext(), 'Line1\tLine2')
+
+    def test_plaintext_with_all(self):
+        span = Span(xmlroot=etree.XML(SPANDATA_ALL))
+        self.assertEqual(span.plaintext(), 'Line1\nLine2\t123    tail')
+
+    def test_get_stylename(self):
+        span = Span(xmlroot=etree.XML(SPANDATA))
+        self.assertEqual(span.stylename, 'T2')
+
+    def test_set_stylename(self):
+        span = Span(xmlroot=etree.XML(SPANDATA))
+        span.stylename = "XXX"
+        self.assertEqual(span.stylename, 'XXX')
 
 DATA1 = '<text:p xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"'\
         ' text:style-name="Standard">Lorem ipsum <text:span text:style-name="T1">'\
@@ -71,10 +143,6 @@ class TestHeading(unittest.TestCase):
         self.assertEqual(h.xmlroot.tag, CN('text:h'))
         self.assertEqual(h.xmlroot.get('test'), "heading")
 
-class TestSpaces(unittest.TestCase):
-    def test_get_count(self):
-        s = Spaces(count=3)
-        self.assertEqual(s.count, 3)
 
 if __name__=='__main__':
     unittest.main()
