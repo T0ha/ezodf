@@ -43,6 +43,16 @@ class TestBaseClass(unittest.TestCase):
         b.setattr('name', 'xxx')
         self.assertEqual(b.xmlroot.get('name'), 'xxx')
 
+    def test_setattr_None_error(self):
+        b = BaseClass(xmlroot=etree.fromstring(DATA1))
+        with self.assertRaises(ValueError):
+            b.setattr('name', None)
+
+    def test_setattr_empty_string_error(self):
+        b = BaseClass(xmlroot=etree.fromstring(DATA1))
+        with self.assertRaises(ValueError):
+            b.setattr('name', "")
+
     def test_iter(self):
         b = BaseClass(xmlroot=etree.fromstring(DATA1))
         for pos, e in enumerate(b):
@@ -108,7 +118,7 @@ class TestBaseClass(unittest.TestCase):
         b = BaseClass(xmlroot=etree.fromstring(DATA1))
         newitem = BaseClass()
         newitem.setattr('name', 'newitem')
-        b.add(newitem, insertbefore=b[2])
+        b.add(newitem, insert_before=b[2])
         self.assertEqual(b[2].getattr('name'), 'newitem')
 
     def test_remove(self):
