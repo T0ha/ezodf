@@ -8,3 +8,10 @@ Version 0.1.0 - 02 Januar 2011
   * open/saveas ODF documents
   * modify meta data
 
+Version 0.1.1 -
+
+  * Pre-Alpha version
+  * create new empty odt, ods, odp, odg file
+  * added template support - can create ott, ots, otp, otg files
+  * create new documents from template file: new_from_template(filename, templatefilename)
+  * Text: add paragraphs and headings to odt files

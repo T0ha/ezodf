@@ -161,12 +161,15 @@ def check_zipfile_for_oasis_validity(filename, mimetype):
     """
     def check_manifest(stream):
         xmltree = etree.XML(stream)
-        fullnames = [e.get(CN('manifest:full-path')) for e in xmltree.findall(CN('manifest:file-entry'))]
+        directory = { e.get(CN('manifest:full-path')):e for e in xmltree.findall(CN('manifest:file-entry')) }
         for name in ('content.xml', 'meta.xml', 'styles.xml', '/'):
-            if name not in fullnames:
+            if name not in directory:
                 return False
+        if str(mimetype, encoding='utf-8') != directory['/'].get(CN('manifest:media-type')):
+            return False
         return True
 
+    assert isinstance(mimetype, bytes)
     if not zipfile.is_zipfile(filename):
         return False
     # The first file in an OpenDocumentFormat zipfile should be the uncompressed
