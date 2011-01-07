@@ -30,16 +30,6 @@ MIMETYPES = {
     'oth': "application/vnd.oasis.opendocument.text-web",
 }
 
-TEMPLATE_MIMETYPES = {
-    "application/vnd.oasis.opendocument.text-template": "application/vnd.oasis.opendocument.text",
-    "application/vnd.oasis.opendocument.graphics-template":"application/vnd.oasis.opendocument.graphics",
-    "application/vnd.oasis.opendocument.presentation-template": "application/vnd.oasis.opendocument.presentation",
-    "application/vnd.oasis.opendocument.spreadsheet-template": "application/vnd.oasis.opendocument.spreadsheet",
-    "application/vnd.oasis.opendocument.chart-template": "application/vnd.oasis.opendocument.chart",
-    "application/vnd.oasis.opendocument.image-template": "application/vnd.oasis.opendocument.image",
-    "application/vnd.oasis.opendocument.formula-template": "application/vnd.oasis.opendocument.formula",
-}
-
 FILE_EXT_FOR_MIMETYPE = { mimetype:ext for ext, mimetype in MIMETYPES.items() }
 
 ANIM_NS ="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"

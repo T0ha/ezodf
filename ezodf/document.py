@@ -6,10 +6,9 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
-import shutil
 import zipfile
 
-from .const import MIMETYPES, TEMPLATE_MIMETYPES
+from .const import MIMETYPES
 from .xmlns import subelement, CN
 from .filemanager import FileManager
 from .meta import Meta
@@ -24,9 +23,7 @@ class InvalidFiletypeError(TypeError):
 def open(filename):
     if zipfile.is_zipfile(filename):
         fm = FileManager(filename)
-        mimetype = fm.get_text('mimetype').strip()
-        if mimetype not in list(MIMETYPES.values()):
-            raise InvalidFiletypeError('Unknown or unsupported mimetype: %s' % mimetype)
+        mimetype = fm.get_text('mimetype')
         try:
             return DOCUMENTCLASS[mimetype](filemanager=fm)
         except KeyError:
@@ -35,22 +32,18 @@ def open(filename):
     else:
         raise IOError('File does not exist or it is not a zipfile: %s' % filename)
 
-
 def new_from_template(filename, templatename):
     if zipfile.is_zipfile(templatename):
         fm = FileManager(templatename)
-        mimetype = fm.get_text('mimetype').strip()
-        if mimetype not in list(MIMETYPES.values()):
-            raise IOError('Unknown or unsupported mimetype: %s' % mimetype)
-
-        if mimetype in list(TEMPLATE_MIMETYPES.keys()):
-            doc = Document(fm, TEMPLATE_MIMETYPES[mimetype])
-            doc.docname = filename
-            return doc
-        else:
-            raise InvalidFiletypeError("Not a template file: %s".format(filename))
-
-
+        mimetype = fm.get_text('mimetype')
+        if mimetype.endswith('-template'):
+            mimetype = mimetype[:-9]
+        try:
+            return DOCUMENTCLASS[mimetype](filename=filename, filemanager=fm)
+        except KeyError:
+            raise InvalidFiletypeError("Unsupported mimetype: %s".format(mimetype))
+    else:
+        raise IOError('File does not exist or it is not a zipfile: %s' % templatename)
 
 class Document:
     """ OpenDocumentFormat BaseClass
