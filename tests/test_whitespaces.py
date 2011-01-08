@@ -14,8 +14,8 @@ import unittest
 from ezodf.xmlns import CN, etree
 
 # objects to test
-from ezodf.textprocessing import Spaces, Tabulator, LineBreak
-from ezodf.textprocessing import encode, decode
+from ezodf.whitespaces import Spaces, Tabulator, LineBreak
+from ezodf.whitespaces import encode_whitespaces, decode_whitespaces
 
 class TestSpaces(unittest.TestCase):
     def test_get_count(self):
@@ -75,133 +75,133 @@ class TestLineBreak(unittest.TestCase):
 
 class TestEncodeDecode(unittest.TestCase):
     def test_add_simple_text(self):
-        result = encode("TEXT")
+        result = encode_whitespaces("TEXT")
         self.assertEqual(result[0], "TEXT")
-        self.assertEqual(decode(result), "TEXT")
+        self.assertEqual(decode_whitespaces(result), "TEXT")
 
     def test_add_text_with_1_spc(self):
         txt = "TEXT TAIL"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], txt)
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_2_spc(self):
         txt = "TEXT  TAIL"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT ")
         self.assertEqual(result[1].TAG, CN('text:s'))
         self.assertEqual(result[1].count, 1)
         self.assertEqual(result[2], "TAIL")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_5_spc(self):
         txt = "TEXT     TAIL"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT ")
         self.assertEqual(result[1].TAG, CN('text:s'))
         self.assertEqual(result[1].count, 4)
         self.assertEqual(result[2], "TAIL")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_ends_with_5_spc(self):
         txt = "TEXT     "
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT ")
         self.assertEqual(result[1].TAG, CN('text:s'))
         self.assertEqual(result[1].count, 4)
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_start_with_5_spc(self):
         txt = "     TEXT"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], " ")
         self.assertEqual(result[1].TAG, CN('text:s'))
         self.assertEqual(result[1].count, 4)
         self.assertEqual(result[2], "TEXT")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_groups(self):
         txt = "TEXT  TAIL1  TAIL2"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT ")
         self.assertEqual(result[2], "TAIL1 ")
         self.assertEqual(result[4], "TAIL2")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_tab(self):
         txt = "TEXT\tTAIL"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT")
         self.assertEqual(result[1].TAG, CN('text:tab'))
         self.assertEqual(result[2], "TAIL")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_tab_2spc(self):
         txt = "TEXT\t  TAIL"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT")
         self.assertEqual(result[1].TAG, CN('text:tab'))
         self.assertEqual(result[2], " ")
         self.assertEqual(result[3].TAG, CN('text:s'))
         self.assertEqual(result[4], "TAIL")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_2spc_tab(self):
         txt = "TEXT  \tTAIL"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT ")
         self.assertEqual(result[1].TAG, CN('text:s'))
         self.assertEqual(result[2].TAG, CN('text:tab'))
         self.assertEqual(result[3], "TAIL")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_start_with_spc_tab(self):
         txt = "  \tTEXT"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], " ")
         self.assertEqual(result[1].TAG, CN('text:s'))
         self.assertEqual(result[2].TAG, CN('text:tab'))
         self.assertEqual(result[3], "TEXT")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_brk(self):
         txt = "TEXT\nTAIL"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT")
         self.assertEqual(result[1].TAG, CN('text:line-break'))
         self.assertEqual(result[2], "TAIL")
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_brk2(self):
         txt = "TEXT\nTAIL\n"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT")
         self.assertEqual(result[1].TAG, CN('text:line-break'))
         self.assertEqual(result[2], "TAIL")
         self.assertEqual(result[3].TAG, CN('text:line-break'))
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_brk_before_spc(self):
         txt = "TEXT\nTAIL\n  "
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT")
         self.assertEqual(result[1].TAG, CN('text:line-break'))
         self.assertEqual(result[2], "TAIL")
         self.assertEqual(result[3].TAG, CN('text:line-break'))
         self.assertEqual(result[4], " ")
         self.assertEqual(result[5].TAG, CN('text:s'))
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
     def test_add_text_with_brk_after_spc(self):
         txt = "TEXT\nTAIL     \n"
-        result = encode(txt)
+        result = encode_whitespaces(txt)
         self.assertEqual(result[0], "TEXT")
         self.assertEqual(result[1].TAG, CN('text:line-break'))
         self.assertEqual(result[2], "TAIL ")
         self.assertEqual(result[3].TAG, CN('text:s'))
         self.assertEqual(result[3].count, 4)
         self.assertEqual(result[4].TAG, CN('text:line-break'))
-        self.assertEqual(decode(result), txt)
+        self.assertEqual(decode_whitespaces(result), txt)
 
 if __name__=='__main__':
     unittest.main()

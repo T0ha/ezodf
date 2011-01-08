@@ -10,7 +10,7 @@ from array import array
 
 from .xmlns import CN, register_class, subelement
 from .base import BaseClass, safelen
-from .textprocessing import encode
+from .whitespaces import encode_whitespaces
 
 
 @register_class
@@ -52,7 +52,7 @@ class Span(BaseClass):
         def append(text, new):
             return text + new if text else new
 
-        for tag in encode(text):
+        for tag in encode_whitespaces(text):
             if isinstance(tag, str):
                 if len(self.xmlroot) > 0:
                     lastchild = self[-1]

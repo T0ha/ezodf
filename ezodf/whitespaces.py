@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman --<mozman@gmx.at>
-# Purpose: text processing
+# Purpose: whitespace processing
 # Created: 06.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
@@ -55,7 +55,7 @@ class Spaces(Tabulator):
     def plaintext(self):
         return ' ' * self.count
 
-class _ODFTextEncoder:
+class _WhitespaceEncoder:
     result = []
     stack = []
     space_counter = 0
@@ -126,10 +126,10 @@ class _ODFTextEncoder:
                 self.space_counter = 0
         self.stack.append(char)
 
-ODFTextEncoder = _ODFTextEncoder()
+WhitespaceEncoder = _WhitespaceEncoder()
 
-def encode(plaintext):
-    return ODFTextEncoder.encode(plaintext)
+def encode_whitespaces(plaintext):
+    return WhitespaceEncoder.encode(plaintext)
 
-def decode(taglist):
-    return ODFTextEncoder.decode(taglist)
+def decode_whitespaces(taglist):
+    return WhitespaceEncoder.decode(taglist)
