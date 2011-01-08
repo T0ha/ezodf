@@ -29,19 +29,13 @@ class OfficeDocumentMeta(XMLMixin):
     TAG = CN('office:document-meta')
     generator = GENERATOR
 
-    def __init__(self, content=None, xmlroot=None):
-        if content is None:
-            if xmlroot is None:
-                self.xmlroot = etree.Element(CN('office:document-meta'), nsmap=META_NSMAP)
-            else:
-                self.xmlroot = xmlroot
+    def __init__(self, xmlroot=None):
+        if xmlroot is None:
+            self.xmlroot = etree.Element(self.TAG, nsmap=META_NSMAP)
+        elif xmlroot.tag == self.TAG:
+            self.xmlroot = xmlroot
         else:
-            if isinstance(content, bytes):
-                self.xmlroot = etree.fromstring(content)
-            elif content.tag == CN('office:document-meta'):
-                self.xmlroot = content
-            else:
-                raise ValueError("Unexpected root node: %s" % content.tag)
+            raise ValueError("Unexpected root node: %s" % xmlroot.tag)
 
         self._setup()
         self.keywords = Keywords(self.meta)

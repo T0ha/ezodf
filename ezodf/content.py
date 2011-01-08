@@ -10,25 +10,22 @@ from .const import MIMETYPE_NSMAP
 from .xmlns import XMLMixin, subelement, CN, etree
 from .base import BaseClass
 
-class Content(XMLMixin):
-    def __init__(self, mimetype, content=None):
+class OfficeDocumentContent(XMLMixin):
+    TAG = CN('office:document-content')
 
-        if content is None:
-            self.xmlroot = etree.Element(CN('office:document-content'),
-                                         nsmap=MIMETYPE_NSMAP[mimetype])
+    def __init__(self, mimetype, xmlroot=None):
+
+        if xmlroot is None:
+            self.xmlroot = etree.Element(self.TAG, nsmap=MIMETYPE_NSMAP[mimetype])
             self.xmlroot.set(CN('grddl:transformation'),
                              "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
+        elif xmlroot.tag == self.TAG:
+            self.xmlroot = xmlroot
         else:
-            if isinstance(content, bytes):
-                self.xmlroot = etree.fromstring(content)
-            elif content.tag == CN('office:document-content'):
-                self.xmlroot = content
-            else:
-                raise ValueError("Unexpected root node: %s" % content.tag)
+            raise ValueError("Unexpected root node: %s" % content.tag)
+        self._setup(mimetype)
 
-        self.setup(mimetype)
-
-    def setup(self, mimetype):
+    def _setup(self, mimetype):
         # these elements are common to all document types
         # The element office:scripts always exists but is always empty
         # so I dont't keep a reference to it

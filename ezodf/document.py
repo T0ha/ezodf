@@ -9,13 +9,14 @@
 import zipfile
 
 from .const import MIMETYPES
-from .xmlns import subelement, CN
+from .xmlns import subelement, CN, etree
 from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
 from .styles import Styles
 from .styles import FontFaceDecls
-from .content import Content
+from .content import OfficeDocumentContent
 from .content import TextBody, SpreadsheetBody, PresentationBody, DrawingBody
+from .flatxmlfile import FlatXMLDocument
 
 class InvalidFiletypeError(TypeError):
     pass
@@ -30,7 +31,13 @@ def open(filename):
             # just the basics for: chart, image, formula, templates
             return Document(filemanager=fm, mimetype=mimetype)
     else:
-        raise IOError('File does not exist or it is not a zipfile: %s' % filename)
+        try:
+            xmlroot = etree.parse(filename)
+            return FlatXMLDocument(filename=filename, xmlroot=xmlroot)
+        except etree.ParseError:
+            pass
+        raise IOError("File '%s' is neither a zip-package nor a flat XML OpenDocumentFormat file." % filename)
+
 
 def new_from_template(filename, templatename):
     if zipfile.is_zipfile(templatename):
@@ -44,6 +51,7 @@ def new_from_template(filename, templatename):
             raise InvalidFiletypeError("Unsupported mimetype: %s".format(mimetype))
     else:
         raise IOError('File does not exist or it is not a zipfile: %s' % templatename)
+
 
 class Document:
     """ OpenDocumentFormat BaseClass
@@ -61,13 +69,13 @@ class Document:
         self.mimetype = mimetype
         fm.register('mimetype', self.mimetype)
 
-        self.meta = OfficeDocumentMeta(fm.get_bytes('meta.xml'))
+        self.meta = OfficeDocumentMeta(fm.get_xml_element('meta.xml'))
         fm.register('meta.xml', self.meta, 'text/xml')
 
-        self.styles = Styles(fm.get_bytes('styles.xml'))
+        self.styles = Styles(fm.get_xml_element('styles.xml'))
         fm.register('styles.xml', self.styles, 'text/xml')
 
-        self.content = Content(mimetype, fm.get_bytes('content.xml'))
+        self.content = OfficeDocumentContent(mimetype, fm.get_xml_element('content.xml'))
         fm.register('content.xml', self.content, 'text/xml')
 
     def save(self):

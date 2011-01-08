@@ -119,6 +119,13 @@ class FileManager:
         else:
             return default
 
+    def get_xml_element(self, filename):
+        content = self.get_bytes(filename)
+        if content:
+            return etree.XML(content)
+        else:
+            return None
+
     def _tozip(self, zippo):
         # write mimetype as first file
         mimetype = self.directory.pop('mimetype')

@@ -11,19 +11,18 @@ from .xmlns import XMLMixin, subelement, etree, CN, register_class, to_object
 
 ## file 'styles.xml'
 
+@register_class
 class Styles(XMLMixin):
-    def __init__(self, content=None):
-        if content is None:
-            self.xmlroot = etree.Element(CN('office:document-styles'),
-                                         nsmap=STYLES_NSMAP)
-            self.setup()
+    TAG = CN('office:document-styles')
+
+    def __init__(self, xmlroot=None):
+        if xmlroot is None:
+            self.xmlroot = etree.Element(self.TAG, nsmap=STYLES_NSMAP)
+        elif xmlroot.tag == self.TAG:
+            self.xmlroot = xmlroot
         else:
-            if isinstance(content, bytes):
-                self.xmlroot = etree.fromstring(content)
-            elif content.tag == CN('office:document-styles'):
-                self.xmlroot = content
-            else:
-                raise ValueError("Unexpected root node: %s" % content.tag)
+            raise ValueError("Unexpected root node: %s" % content.tag)
+        self.setup()
 
     def setup(self):
         fonts = subelement(self.xmlroot, CN('office:font-face-decls'))

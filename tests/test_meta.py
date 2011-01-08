@@ -57,13 +57,8 @@ TAGS = ['generator',
         ]
 
 class TestMeta(unittest.TestCase):
-    def test_open_from_text(self):
-        meta = OfficeDocumentMeta(testdata)
-        self.assertEqual(meta['initial-creator'], "Manfred Moitzi")
-
-    def test_open_from_ElementTree(self):
-        xmltree = etree.fromstring(testdata)
-        meta = OfficeDocumentMeta(xmltree)
+    def test_open(self):
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         self.assertEqual(meta['initial-creator'], "Manfred Moitzi")
 
     def test_new_Meta(self):
@@ -71,22 +66,22 @@ class TestMeta(unittest.TestCase):
         self.assertEqual(meta['generator'], GENERATOR)
 
     def test_tobytes_without_manipulation(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         result = meta.tobytes()
         self.assertTrue(in_XML(result, testdata))
 
     def test_set_metadata(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         meta['creator'] = 'Bob the Builder'
         self.assertEqual(meta['creator'], 'Bob the Builder')
 
     def test_get_metadata_error(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         with self.assertRaises(KeyError):
             meta['Terminator']
 
     def test_set_metadata_error(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         with self.assertRaises(KeyError):
             meta['Terminator'] = 'Arnold Schwarzenegger'
 
@@ -106,7 +101,7 @@ class TestMeta(unittest.TestCase):
         self.assertEqual(meta['editing-cycles'], '2')
 
     def test_clear(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         meta.clear()
         with self.assertRaises(KeyError):
             meta['generator']
@@ -249,7 +244,7 @@ class TestUsertags(unittest.TestCase):
 
 class TestStatistic(unittest.TestCase):
     def test_get(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         self.assertEqual(meta.count['word'], 99)
         self.assertEqual(meta.count['character'], 999)
         self.assertEqual(meta.count['paragraph'], 10)
@@ -258,23 +253,23 @@ class TestStatistic(unittest.TestCase):
         self.assertEqual(meta.count['sentence'], 0)
 
     def test_get_keyerror(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         with self.assertRaises(KeyError):
             meta.count['xxx']
 
     def test_set(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         self.assertEqual(meta.count['word'], 99)
         meta.count['word'] = 17
         self.assertEqual(meta.count['word'], 17)
 
     def test_set_keyerror(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         with self.assertRaises(KeyError):
             meta.count['xxx'] = 777
 
     def test__iter__(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         d = dict(meta.count)
         self.assertSequenceEqual(sorted(d.keys()),
                                  sorted(['character','paragraph', 'image', 'word',
@@ -289,14 +284,14 @@ class TestStatistic(unittest.TestCase):
             'page':6,
             'object': 7,
         }
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         meta.count.update(d)
 
         for key, value in d.items():
             self.assertEqual(meta.count[key], value, 'count fails on %s' % key)
 
     def test_clear(self):
-        meta = OfficeDocumentMeta(testdata)
+        meta = OfficeDocumentMeta(etree.XML(testdata))
         meta.count.clear()
         d = dict(meta.count)
         self.assertEqual(len(d), 0)
