@@ -32,6 +32,7 @@ class FlatXMLDocument:
 
     def _setup(self):
         self.meta = OfficeDocumentMeta(subelement(self.xmlroot, CN('office:document-meta')))
+        subelement(self.xmlroot, CN('office:scripts')) # always empty, don't need a reference
 
     def saveas(self, filename):
         self.docname = filename

@@ -22,7 +22,7 @@ class OfficeDocumentContent(XMLMixin):
         elif xmlroot.tag == self.TAG:
             self.xmlroot = xmlroot
         else:
-            raise ValueError("Unexpected root node: %s" % content.tag)
+            raise ValueError("Unexpected root node: %s" % xmlroot.tag)
         self._setup(mimetype)
 
     def _setup(self, mimetype):
