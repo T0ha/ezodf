@@ -17,7 +17,7 @@ from ezodf.const import GENERATOR
 from ezodf.xmlns import XML, etree
 
 # objects to test
-from ezodf.meta import Meta
+from ezodf.meta import OfficeDocumentMeta
 
 testdata = b"""<?xml version="1.0" encoding="UTF-8"?>
 <office:document-meta
@@ -58,47 +58,47 @@ TAGS = ['generator',
 
 class TestMeta(unittest.TestCase):
     def test_open_from_text(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         self.assertEqual(meta['initial-creator'], "Manfred Moitzi")
 
     def test_open_from_ElementTree(self):
         xmltree = etree.fromstring(testdata)
-        meta = Meta(xmltree)
+        meta = OfficeDocumentMeta(xmltree)
         self.assertEqual(meta['initial-creator'], "Manfred Moitzi")
 
     def test_new_Meta(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         self.assertEqual(meta['generator'], GENERATOR)
 
     def test_tobytes_without_manipulation(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         result = meta.tobytes()
         self.assertTrue(in_XML(result, testdata))
 
     def test_set_metadata(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         meta['creator'] = 'Bob the Builder'
         self.assertEqual(meta['creator'], 'Bob the Builder')
 
     def test_get_metadata_error(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         with self.assertRaises(KeyError):
             meta['Terminator']
 
     def test_set_metadata_error(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         with self.assertRaises(KeyError):
             meta['Terminator'] = 'Arnold Schwarzenegger'
 
     def test_all_tags(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         data = "djkwzr648tjdgdhjfzezglhfih"
         for tag in TAGS:
             meta[tag] = data
             self.assertEqual(meta[tag], data)
 
     def test_editing_cycles(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         self.assertRaises(KeyError, meta.__getitem__, 'editing-cycles')
         meta.inc_editing_cycles()
         self.assertEqual(meta['editing-cycles'], '1')
@@ -106,7 +106,7 @@ class TestMeta(unittest.TestCase):
         self.assertEqual(meta['editing-cycles'], '2')
 
     def test_clear(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         meta.clear()
         with self.assertRaises(KeyError):
             meta['generator']
@@ -117,17 +117,17 @@ class TestMeta(unittest.TestCase):
 
 class TestKeywords(unittest.TestCase):
     def test_keyword_in_xml_serialisation(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.keywords.add('KEYWORD1')
         self.assertTrue(b'<meta:keyword>KEYWORD1</meta:keyword>' in meta.tobytes())
 
     def test_add_and_in_operator(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.keywords.add('KEYWORD1')
         self.assertTrue('KEYWORD1' in meta.keywords)
 
     def test_remove_and_in_operator(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         KW = 'KEYWORD1'
         meta.keywords.add(KW)
         self.assertTrue(KW in meta.keywords)
@@ -135,7 +135,7 @@ class TestKeywords(unittest.TestCase):
         self.assertFalse(KW in meta.keywords)
 
     def test_iter(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         KW = ['KEYWORD1', 'KEYWORD2']
         for keyword in KW:
             meta.keywords.add(keyword)
@@ -143,7 +143,7 @@ class TestKeywords(unittest.TestCase):
         self.assertSequenceEqual(KW, result)
 
     def test_clear(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.keywords.add('KEYWORD1')
         meta.keywords.add('KEYWORD2')
         meta.keywords.clear()
@@ -152,39 +152,39 @@ class TestKeywords(unittest.TestCase):
 
 class TestUsertags(unittest.TestCase):
     def test_usertag_in_xml_serialisation(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags['TAG1'] = 'VALUE1'
         self.assertTrue(b'<meta:user-defined meta:name="TAG1">VALUE1</meta:user-defined>' in meta.tobytes())
 
     def test_usertag_with_type_in_xml_serialisation(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags.set('TAG1', '100.0', 'float')
         self.assertTrue(b'<meta:user-defined meta:name="TAG1" meta:value-type="float">100.0</meta:user-defined>' in meta.tobytes())
 
     def test_add_and_in_operator(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags['TAG1'] = 'VALUE1'
         self.assertTrue('TAG1' in meta.usertags)
 
     def test_add_and_get(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags['TAG1'] = 'VALUE1'
         self.assertEqual(meta.usertags['TAG1'], 'VALUE1')
 
     def test_add_and_modify(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags['TAG1'] = 'VALUE1'
         self.assertEqual(meta.usertags['TAG1'], 'VALUE1')
         meta.usertags['TAG1'] = 'VALUE2'
         self.assertEqual(meta.usertags['TAG1'], 'VALUE2')
 
     def test_get_error(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         with self.assertRaises(KeyError):
             meta['XXX']
 
     def test_remove_and_in_operator(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         NAME = 'TAG1'
         meta.usertags[NAME] = 'VALUE1'
         self.assertTrue(NAME in meta.usertags)
@@ -192,12 +192,12 @@ class TestUsertags(unittest.TestCase):
         self.assertFalse(NAME in meta.usertags)
 
     def test_remove_error(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         with self.assertRaises(KeyError):
             del meta.usertags['XXX']
 
     def test_iter(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         TAGS = [('TAG1', 'VALUE1'), ('TAG2', 'KEYWORD2')]
         for name, value in TAGS:
             meta.usertags[name] = value
@@ -209,13 +209,13 @@ class TestUsertags(unittest.TestCase):
             'TEST1': 'VALUE1',
             'TEST2': 'VALUE2',
         }
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags.update(d)
         self.assertEqual(meta.usertags['TEST1'], 'VALUE1')
         self.assertEqual(meta.usertags['TEST2'], 'VALUE2')
 
     def test_clear(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags.update({
             'TEST1': 'VALUE1',
             'TEST2': 'VALUE2',
@@ -225,7 +225,7 @@ class TestUsertags(unittest.TestCase):
         self.assertFalse('TEST2' in meta.usertags)
 
     def test_usertags_to_dict(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         TAGS = dict([('TAG1', 'VALUE1'), ('TAG2', 'KEYWORD2')])
         for name, value in TAGS.items():
             meta.usertags[name] = value
@@ -233,23 +233,23 @@ class TestUsertags(unittest.TestCase):
         self.assertDictEqual(TAGS, result)
 
     def test_typeof_string(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags['TAG1'] = 'VALUE1'
         self.assertEqual(meta.usertags.typeof('TAG1'), 'string')
 
     def test_typeof_float(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         meta.usertags.set('TAG1', '100.0', 'float')
         self.assertEqual(meta.usertags.typeof('TAG1'), 'float')
 
     def test_typeof_error(self):
-        meta = Meta()
+        meta = OfficeDocumentMeta()
         with self.assertRaises(KeyError):
             meta.usertags.typeof('Nelson')
 
 class TestStatistic(unittest.TestCase):
     def test_get(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         self.assertEqual(meta.count['word'], 99)
         self.assertEqual(meta.count['character'], 999)
         self.assertEqual(meta.count['paragraph'], 10)
@@ -258,23 +258,23 @@ class TestStatistic(unittest.TestCase):
         self.assertEqual(meta.count['sentence'], 0)
 
     def test_get_keyerror(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         with self.assertRaises(KeyError):
             meta.count['xxx']
 
     def test_set(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         self.assertEqual(meta.count['word'], 99)
         meta.count['word'] = 17
         self.assertEqual(meta.count['word'], 17)
 
     def test_set_keyerror(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         with self.assertRaises(KeyError):
             meta.count['xxx'] = 777
 
     def test__iter__(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         d = dict(meta.count)
         self.assertSequenceEqual(sorted(d.keys()),
                                  sorted(['character','paragraph', 'image', 'word',
@@ -289,14 +289,14 @@ class TestStatistic(unittest.TestCase):
             'page':6,
             'object': 7,
         }
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         meta.count.update(d)
 
         for key, value in d.items():
             self.assertEqual(meta.count[key], value, 'count fails on %s' % key)
 
     def test_clear(self):
-        meta = Meta(testdata)
+        meta = OfficeDocumentMeta(testdata)
         meta.count.clear()
         d = dict(meta.count)
         self.assertEqual(len(d), 0)

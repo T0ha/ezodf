@@ -11,7 +11,7 @@ import zipfile
 from .const import MIMETYPES
 from .xmlns import subelement, CN
 from .filemanager import FileManager
-from .meta import Meta
+from .meta import OfficeDocumentMeta
 from .styles import Styles
 from .styles import FontFaceDecls
 from .content import Content
@@ -61,7 +61,7 @@ class Document:
         self.mimetype = mimetype
         fm.register('mimetype', self.mimetype)
 
-        self.meta = Meta(fm.get_bytes('meta.xml'))
+        self.meta = OfficeDocumentMeta(fm.get_bytes('meta.xml'))
         fm.register('meta.xml', self.meta, 'text/xml')
 
         self.styles = Styles(fm.get_bytes('styles.xml'))

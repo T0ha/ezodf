@@ -8,7 +8,7 @@
 
 from datetime import datetime
 
-from .xmlns import XMLMixin, CN, subelement, etree
+from .xmlns import CN, subelement, etree, register_class, XMLMixin
 from .const import META_NSMAP, GENERATOR, META_NS
 
 TAGS = {
@@ -24,12 +24,17 @@ TAGS = {
     'language': 'dc:language',
 }
 
-class Meta(XMLMixin):
+@register_class
+class OfficeDocumentMeta(XMLMixin):
+    TAG = CN('office:document-meta')
     generator = GENERATOR
 
-    def __init__(self, content=None):
+    def __init__(self, content=None, xmlroot=None):
         if content is None:
-            self.xmlroot = etree.Element(CN('office:document-meta'), nsmap=META_NSMAP)
+            if xmlroot is None:
+                self.xmlroot = etree.Element(CN('office:document-meta'), nsmap=META_NSMAP)
+            else:
+                self.xmlroot = xmlroot
         else:
             if isinstance(content, bytes):
                 self.xmlroot = etree.fromstring(content)
@@ -62,7 +67,7 @@ class Meta(XMLMixin):
 
     def touch(self):
         self['date'] = datetime.now().isoformat()
-        self['generator'] = Meta.generator
+        self['generator'] = OfficeDocumentMeta.generator
 
     def __setitem__(self, key, value):
         cnkey = CN(TAGS[key]) # key in clark notation
