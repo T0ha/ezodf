@@ -16,6 +16,6 @@ P4 = "Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet d
 odt = ezodf.ODT('simple_text_document.odt')
 odt.body.add(ezodf.Heading("A Simple Test Document"))
 for nr, p in enumerate((P1, P2, P3, P4)):
-    odt.body.add(ezodf.Heading("Chapter %d" % nr))
+    odt.body.add(ezodf.Heading("Chapter %d" % nr, nr))
     odt.body.add(ezodf.Paragraph(p))
 odt.save()

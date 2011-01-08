@@ -93,14 +93,14 @@ class TestSpan(unittest.TestCase):
         span = Span(xmlroot=etree.XML(SPANDATA_ALL))
         self.assertEqual(span.plaintext(), 'Line1\nLine2\t123    tail')
 
-    def test_get_stylename(self):
+    def test_get_style_name(self):
         span = Span(xmlroot=etree.XML(SPANDATA))
-        self.assertEqual(span.stylename, 'T2')
+        self.assertEqual(span.style_name, 'T2')
 
-    def test_set_stylename(self):
+    def test_set_style_name(self):
         span = Span(xmlroot=etree.XML(SPANDATA))
-        span.stylename = "XXX"
-        self.assertEqual(span.stylename, 'XXX')
+        span.style_name = "XXX"
+        self.assertEqual(span.style_name, 'XXX')
 
     def test_append_text(self):
         txt = "TEXT"

@@ -24,10 +24,10 @@ class Span(BaseClass):
             self.append_plaintext(text)
 
     @property
-    def stylename(self):
+    def style_name(self):
         return self.getattr(CN('text:style-name'))
-    @stylename.setter
-    def stylename(self, name):
+    @style_name.setter
+    def style_name(self, name):
         self.setattr(CN('text:style-name'), name)
 
     @property
@@ -78,17 +78,17 @@ class Paragraph(Span):
 class Heading(Paragraph):
     TAG = CN('text:h')
 
-    def __init__(self, text="", level=1, stylename=None, xmlroot=None):
+    def __init__(self, text="", outline_level=1, stylename=None, xmlroot=None):
         super(Heading, self).__init__(text, stylename, xmlroot)
-        self.level = level
+        self.outline_level = outline_level
 
     @property
-    def level(self):
-        return int(self.getattr(CN('text:level')))
+    def outline_level(self):
+        return int(self.getattr(CN('text:outline-level')))
 
-    @level.setter
-    def level(self, level):
-        self.setattr(CN('text:level'), str(int(level)))
+    @outline_level.setter
+    def outline_level(self, level):
+        self.setattr(CN('text:outline-level'), str(int(level)))
 
 
 @register_class
