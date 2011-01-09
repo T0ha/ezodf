@@ -7,7 +7,7 @@
 # License: GPLv3
 
 from .const import MIMETYPES
-from .xmlns import etree, CN, ALL_NSMAP, subelement, to_object
+from .xmlns import etree, CN, ALL_NSMAP, subelement, pyobj
 from .meta import OfficeDocumentMeta
 
 class FlatXMLDocument:

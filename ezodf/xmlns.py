@@ -81,10 +81,11 @@ def CN(tag):
 classmap = {}
 
 def register_class(cls):
+    """ Function/Decorator for class registration. """
     classmap[cls.TAG] = cls
     return cls
 
-def to_object(element):
+def pyobj(element):
     """ Wrap element into a Python object. """
     try:
         cls = classmap[element.tag]

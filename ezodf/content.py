@@ -17,8 +17,6 @@ class OfficeDocumentContent(XMLMixin):
 
         if xmlroot is None:
             self.xmlroot = etree.Element(self.TAG, nsmap=MIMETYPE_NSMAP[mimetype])
-            self.xmlroot.set(CN('grddl:transformation'),
-                             "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
         elif xmlroot.tag == self.TAG:
             self.xmlroot = xmlroot
         else:

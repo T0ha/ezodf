@@ -7,12 +7,12 @@
 # License: GPLv3
 
 from .const import STYLES_NSMAP
-from .xmlns import XMLMixin, subelement, etree, CN, register_class, to_object
+from .xmlns import XMLMixin, subelement, etree, CN, register_class, pyobj
 
 ## file 'styles.xml'
 
 @register_class
-class Styles(XMLMixin):
+class OfficeDocumentStyles(XMLMixin):
     TAG = CN('office:document-styles')
 
     def __init__(self, xmlroot=None):
@@ -25,24 +25,17 @@ class Styles(XMLMixin):
         self.setup()
 
     def setup(self):
-        fonts = subelement(self.xmlroot, CN('office:font-face-decls'))
-        self.fonts = FontFaceDecls(fonts)
-
-        styles = subelement(self.xmlroot, CN('office:styles'))
-        self.styles = StyleContainer(styles)
-
-        automatic_styles = subelement(self.xmlroot, CN('office:automatic-styles'))
-        self.automatic_styles = StyleContainer(automatic_styles)
-
-        master_styles = subelement(self.xmlroot, CN('office:master-styles'))
-        self.master_styles = StyleContainer(master_styles)
+        self.fonts = pyobj(subelement(self.xmlroot, CN('office:font-face-decls')))
+        self.styles = pyobj(subelement(self.xmlroot, CN('office:styles')))
+        self.automatic_styles = pyobj(subelement(self.xmlroot, CN('office:automatic-styles')))
+        self.master_styles = pyobj(subelement(self.xmlroot, CN('office:master-styles')))
 
 
 ## style container
 
 class Container:
     def __init__(self, xmlroot):
-        assert xmlroot.tag in self.ROOTNAMES
+        assert xmlroot.tag == self.TAG
         self.xmlroot = xmlroot
         self._cache = {}
 
@@ -50,14 +43,14 @@ class Container:
         style = self._find(key) # by style:name attribute
         if style is not None:
             try: # to wrap the style element into a Python object
-                return to_object(style)(style)
+                return pyobj(style)(style)
             except KeyError:
                 raise TypeError('Unknown style element: %s (contact ezodf developer)' % style.tag)
         else:
             raise KeyError(key)
 
     def __setitem__(self, key, value):
-        if XML.etree.iselement(value):
+        if etree.iselement(value):
             style = self._find(key)
             if style is None:
                 self.xmlroot.append(value)
@@ -78,13 +71,21 @@ class Container:
                     return style
         return None
 
-class FontFaceDecls(Container):
-    ROOTNAMES = frozenset([CN('office:font-face-decls'),])
+@register_class
+class OfficeFontFaceDecls(Container):
+    TAG = CN('office:font-face-decls')
 
-class StyleContainer(Container):
-    ROOTNAMES = frozenset([CN('office:styles'),
-                           CN('office:automatic-styles'),
-                           CN('office:master-styles')])
+@register_class
+class OfficeStyles(Container):
+    TAG = CN('office:styles')
+
+@register_class
+class OfficeAutomaticStyles(Container):
+    TAG = CN('office:automatic-styles')
+
+@register_class
+class OfficeMasterStyles(Container):
+    TAG = CN('office:master-styles')
 
 ## style objects
 

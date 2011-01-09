@@ -9,11 +9,10 @@
 import zipfile
 
 from .const import MIMETYPES
-from .xmlns import subelement, CN, etree
+from .xmlns import subelement, CN, etree, pyobj
 from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
-from .styles import Styles
-from .styles import FontFaceDecls
+from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
 from .content import TextBody, SpreadsheetBody, PresentationBody, DrawingBody
 from .flatxmlfile import FlatXMLDocument
@@ -72,7 +71,7 @@ class Document:
         self.meta = OfficeDocumentMeta(fm.get_xml_element('meta.xml'))
         fm.register('meta.xml', self.meta, 'text/xml')
 
-        self.styles = Styles(fm.get_xml_element('styles.xml'))
+        self.styles = OfficeDocumentStyles(fm.get_xml_element('styles.xml'))
         fm.register('styles.xml', self.styles, 'text/xml')
 
         self.content = OfficeDocumentContent(mimetype, fm.get_xml_element('content.xml'))
@@ -97,8 +96,7 @@ class ODT(Document):
         assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
         self.body = TextBody(self.content.xmlroot)
-        font_face_decls = subelement(self.content.xmlroot, CN('office:font-face-decls'))
-        self.fonts = FontFaceDecls(font_face_decls)
+        self.fonts = pyobj(subelement(self.content.xmlroot, CN('office:font-face-decls')))
 
 class OTT(ODT):
     """ Open Document Text Template """
@@ -113,8 +111,7 @@ class ODS(Document):
         assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
         self.body = SpreadsheetBody(self.content.xmlroot)
-        font_face_decls = subelement(self.content.xmlroot, CN('office:font-face-decls'))
-        self.fonts = FontFaceDecls(font_face_decls)
+        self.fonts = pyobj(subelement(self.content.xmlroot, CN('office:font-face-decls')))
 
 class OTS(ODS):
     """ Open Document Spreadsheet Template """

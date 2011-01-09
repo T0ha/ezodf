@@ -6,7 +6,7 @@
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-from .xmlns import etree, register_class, to_object
+from .xmlns import etree, register_class, pyobj
 
 def safelen(text):
     # can handle `None` as input
@@ -24,7 +24,7 @@ class BaseClass:
 
     def __iter__(self):
         for element in self.xmlroot.iterchildren():
-            yield to_object(element)
+            yield pyobj(element)
 
     def __len__(self):
         """ Get count of children """
@@ -95,7 +95,7 @@ class BaseClass:
         :returns: WrapperClass
         """
         xmlelement = self.xmlroot[int(index)]
-        return to_object(xmlelement)
+        return pyobj(xmlelement)
 
     ## Attribute access for the xmlroot element
 
