@@ -8,6 +8,7 @@
 
 from .const import STYLES_NSMAP
 from .xmlns import XMLMixin, subelement, etree, CN, register_class, pyobj
+from .base import BaseClass
 
 ## file 'styles.xml'
 
@@ -43,22 +44,19 @@ class Container:
         style = self._find(key) # by style:name attribute
         if style is not None:
             try: # to wrap the style element into a Python object
-                return pyobj(style)(style)
+                return pyobj(style, default=None)(style)
             except KeyError:
                 raise TypeError('Unknown style element: %s (contact ezodf developer)' % style.tag)
         else:
             raise KeyError(key)
 
     def __setitem__(self, key, value):
-        if etree.iselement(value):
-            style = self._find(key)
-            if style is None:
-                self.xmlroot.append(value)
-            else:
-                self.xmlroot.replace(style, value)
-            self._cache[key] = value
+        style = self._find(key)
+        if style is None:
+            self.xmlroot.append(value.xmlroot)
         else:
-            raise TypeError(str(type(value)))
+            self.xmlroot.replace(style, value.xmlroot)
+        self._cache[key] = value
 
     def _find(self, name):
         try:

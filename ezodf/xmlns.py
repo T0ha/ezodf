@@ -85,10 +85,13 @@ def register_class(cls):
     classmap[cls.TAG] = cls
     return cls
 
-def pyobj(element):
+def pyobj(element, default='BaseClass'):
     """ Wrap element into a Python object. """
     try:
         cls = classmap[element.tag]
     except KeyError: # wrap it into the BaseClass
-        cls = classmap['BaseClass']
+        if default is None:
+            raise
+        else:
+            cls = classmap[default]
     return cls(xmlroot=element)
