@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 #coding:utf-8
 # Author:  mozman --<mozman@gmx.at>
-# Purpose: BaseClass for ODF content objects
+# Purpose: GenericWrapper for ODF content objects
 # Created: 03.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-from .xmlns import etree, register_class, pyobj
+from .xmlns import etree, register_class, wrap
 
 def safelen(text):
     # can handle `None` as input
     return len(text) if text else 0
 
 @register_class
-class BaseClass:
-    TAG = 'BaseClass'
+class GenericWrapper:
+    TAG = 'GenericWrapper'
 
     def __init__(self, xmlnode=None):
         if xmlnode is not None:
@@ -24,7 +24,7 @@ class BaseClass:
 
     def __iter__(self):
         for element in self.xmlnode.iterchildren():
-            yield pyobj(element)
+            yield wrap(element)
 
     def __len__(self):
         """ Get count of children """
@@ -47,28 +47,11 @@ class BaseClass:
     ## Index operations
 
     def __getitem__(self, index):
-        """ Get the child at position `index` as wrapped class.
-
-        :param int index: child position
-        :returns: WrapperClass
-        """
-        return self.get(index)
-
+        return self.get_child(index)
     def __setitem__(self, index, element):
-        """ Set (replace) the child at position `index` by element.
-
-        :param int index: child position
-        :param aWrapperClass element: new child node
-        """
-        found = self.xmlnode[int(index)]
-        self.xmlnode.replace(found, element.xmlnode)
-
+        self.set_child(index, element)
     def __delitem__(self, index):
-        """ Delete child at position `index`.
-
-        :param int index: child position
-        """
-        del self.xmlnode[int(index)]
+        self.del_child(index)
 
     def index(self, child):
         """ Get numeric index of `child`.
@@ -88,18 +71,34 @@ class BaseClass:
         self.xmlnode.insert(int(index), child.xmlnode)
         return child # pass through
 
-    def get(self, index):
+    def get_child(self, index):
         """ Get children at `index` as wrapped object.
 
         :param int index: child position
         :returns: WrapperClass
         """
         xmlelement = self.xmlnode[int(index)]
-        return pyobj(xmlelement)
+        return wrap(xmlelement)
+
+    def set_child(self, index, element):
+        """ Set (replace) the child at position `index` by element.
+
+        :param int index: child position
+        :param WrapperClass element: new child node
+        """
+        found = self.xmlnode[int(index)]
+        self.xmlnode.replace(found, element.xmlnode)
+
+    def del_child(self, index):
+        """ Delete child at position `index`.
+
+        :param int index: child position
+        """
+        del self.xmlnode[int(index)]
 
     ## Attribute access for the xmlnode element
 
-    def getattr(self, key, default=None):
+    def get_attr(self, key, default=None):
         """ Get the `key` attribute value of the xmlnode element or `default`
         if `key` does not exist.
 
@@ -112,7 +111,7 @@ class BaseClass:
             value = default
         return value
 
-    def setattr(self, key, value):
+    def set_attr(self, key, value):
         """ Set the `key` attribute of the xmlnode element to `value`.
 
         :param str key: name of key
@@ -163,15 +162,4 @@ class BaseClass:
         # default implementation, does not respect child elements
         text = self.xmlnode.text
         return text if text else ""
-
-    def element_at_cursorpos(self, pos):
-        """ Find element at `pos`, where `pos` is relative to the elements start.
-
-        :returns: tuple (element, cursorpos-relative-to-element-start) or (None, None)
-        """
-        # basic function for text navigation ???
-        # pos in element.text ... return (self, pos)
-        # pos in child of element ... ok  (child, pos - start-of-child)
-        # how to deal with text in child.tail
-        raise NotImplemented
 

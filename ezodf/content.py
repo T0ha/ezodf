@@ -8,7 +8,7 @@
 
 from .const import MIMETYPE_NSMAP
 from .xmlns import XMLMixin, subelement, CN, etree
-from .base import BaseClass
+from .base import GenericWrapper
 
 class OfficeDocumentContent(XMLMixin):
     TAG = CN('office:document-content')
@@ -30,14 +30,14 @@ class OfficeDocumentContent(XMLMixin):
         subelement(self.xmlnode, CN('office:scripts'))
         self.automatic_styles = subelement(self.xmlnode, CN('office:automatic-styles'))
 
-class _AbstractBody(BaseClass):
+class _AbstractBody(GenericWrapper):
     def __init__(self, parent):
         # parent type should be etree.Element
         assert parent.tag == CN('office:document-content')
         # The office:body element is just frame element for the real document content:
         # office:text, office:spreadsheet, office:presentation, office:drawing
         body = subelement(parent, CN('office:body'))
-        # set xmlnode here, no need to call constructor of BaseClass
+        # set xmlnode here, no need to call constructor of GenericWrapper
         self.xmlnode = subelement(body, self.TAG)
 
 class TextBody(_AbstractBody):

@@ -85,11 +85,11 @@ def register_class(cls):
     classmap[cls.TAG] = cls
     return cls
 
-def pyobj(element, default='BaseClass'):
-    """ Wrap element into a Python object. """
+def wrap(element, default='GenericWrapper'):
+    """ Wrap element into a Python wrapper object. """
     try:
         cls = classmap[element.tag]
-    except KeyError: # wrap it into the BaseClass
+    except KeyError: # wrap it into the GenericWrapper
         if default is None:
             raise
         else:

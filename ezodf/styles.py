@@ -7,8 +7,8 @@
 # License: GPLv3
 
 from .const import STYLES_NSMAP
-from .xmlns import XMLMixin, subelement, etree, CN, register_class, pyobj
-from .base import BaseClass
+from .xmlns import XMLMixin, subelement, etree, CN, register_class, wrap
+from .base import GenericWrapper
 
 ## file 'styles.xml'
 
@@ -26,10 +26,10 @@ class OfficeDocumentStyles(XMLMixin):
         self.setup()
 
     def setup(self):
-        self.fonts = pyobj(subelement(self.xmlnode, CN('office:font-face-decls')))
-        self.styles = pyobj(subelement(self.xmlnode, CN('office:styles')))
-        self.automatic_styles = pyobj(subelement(self.xmlnode, CN('office:automatic-styles')))
-        self.master_styles = pyobj(subelement(self.xmlnode, CN('office:master-styles')))
+        self.fonts = wrap(subelement(self.xmlnode, CN('office:font-face-decls')))
+        self.styles = wrap(subelement(self.xmlnode, CN('office:styles')))
+        self.automatic_styles = wrap(subelement(self.xmlnode, CN('office:automatic-styles')))
+        self.master_styles = wrap(subelement(self.xmlnode, CN('office:master-styles')))
 
 
 ## style container
@@ -44,7 +44,7 @@ class Container:
         style = self._find(key) # by style:name attribute
         if style is not None:
             try: # to wrap the style element into a Python object
-                return pyobj(style, default=None)(style)
+                return wrap(style, default=None)(style)
             except KeyError:
                 raise TypeError('Unknown style element: %s (contact ezodf developer)' % style.tag)
         else:

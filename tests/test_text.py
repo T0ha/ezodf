@@ -12,7 +12,7 @@ import unittest
 
 # trusted or separately tested modules
 from ezodf.xmlns import etree, CN
-from ezodf.base import BaseClass
+from ezodf.base import GenericWrapper
 
 # objects to test
 from ezodf.text import Paragraph, Span, Heading
@@ -37,20 +37,20 @@ SPANDATA_ALL = '<text:span xmlns:text="urn:oasis:names:tc:opendocument:xmlns:tex
 class TestSpan(unittest.TestCase):
     def test_bare_init(self):
         span = Span()
-        self.assertTrue(isinstance(span, BaseClass))
+        self.assertTrue(isinstance(span, GenericWrapper))
         self.assertEqual(span.xmlnode.tag, CN('text:span'))
 
     def test_init_xmlroot(self):
         node = etree.Element(CN('text:span'), test="span")
         span = Span(xmlnode=node)
-        self.assertTrue(isinstance(span, BaseClass))
+        self.assertTrue(isinstance(span, GenericWrapper))
         self.assertEqual(span.xmlnode.tag, CN('text:span'))
         self.assertEqual(span.xmlnode.get('test'), "span")
 
     def test_init_XML(self):
         node = etree.XML(SPANDATA)
         span = Span(xmlnode=node)
-        self.assertTrue(isinstance(span, BaseClass))
+        self.assertTrue(isinstance(span, GenericWrapper))
         self.assertEqual(span.xmlnode.tag, CN('text:span'))
 
     def test_textlen(self):
@@ -157,26 +157,26 @@ DATA1 = '<text:p xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"'\
 class TestParagraph(unittest.TestCase):
     def test_bare_init(self):
         p = Paragraph()
-        self.assertTrue(isinstance(p, BaseClass))
+        self.assertTrue(isinstance(p, GenericWrapper))
         self.assertEqual(p.xmlnode.tag, CN('text:p'))
 
     def test_init_xmlroot(self):
         node = etree.Element(CN('text:p'), test="paragraph")
         p = Paragraph(xmlnode=node)
-        self.assertTrue(isinstance(p, BaseClass))
+        self.assertTrue(isinstance(p, GenericWrapper))
         self.assertEqual(p.xmlnode.tag, CN('text:p'))
         self.assertEqual(p.xmlnode.get('test'), "paragraph")
 
 class TestHeading(unittest.TestCase):
     def test_bare_init(self):
         h = Heading()
-        self.assertTrue(isinstance(h, BaseClass))
+        self.assertTrue(isinstance(h, GenericWrapper))
         self.assertEqual(h.xmlnode.tag, CN('text:h'))
 
     def test_init_xmlroot(self):
         node = etree.Element(CN('text:h'), test="heading")
         h = Heading(xmlnode=node)
-        self.assertTrue(isinstance(h, BaseClass))
+        self.assertTrue(isinstance(h, GenericWrapper))
         self.assertEqual(h.xmlnode.tag, CN('text:h'))
         self.assertEqual(h.xmlnode.get('test'), "heading")
 

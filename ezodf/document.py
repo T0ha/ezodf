@@ -9,7 +9,7 @@
 import zipfile
 
 from .const import MIMETYPES
-from .xmlns import subelement, CN, etree, pyobj
+from .xmlns import subelement, CN, etree, wrap
 from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
 from .styles import OfficeDocumentStyles
@@ -53,7 +53,7 @@ def new_from_template(filename, templatename):
 
 
 class Document:
-    """ OpenDocumentFormat BaseClass
+    """ OpenDocumentFormat Base Class
 
     The `Document` class can hold every ODF file type.
     """
@@ -96,7 +96,7 @@ class ODT(Document):
         assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
         self.body = TextBody(self.content.xmlnode)
-        self.fonts = pyobj(subelement(self.content.xmlnode, CN('office:font-face-decls')))
+        self.fonts = wrap(subelement(self.content.xmlnode, CN('office:font-face-decls')))
 
 class OTT(ODT):
     """ Open Document Text Template """
@@ -111,7 +111,7 @@ class ODS(Document):
         assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
         self.body = SpreadsheetBody(self.content.xmlnode)
-        self.fonts = pyobj(subelement(self.content.xmlnode, CN('office:font-face-decls')))
+        self.fonts = wrap(subelement(self.content.xmlnode, CN('office:font-face-decls')))
 
 class OTS(ODS):
     """ Open Document Spreadsheet Template """

@@ -7,4 +7,4 @@
 # License: GPLv3
 
 from .xmlns import register_class
-from .base import BaseClass
+from .base import GenericWrapper

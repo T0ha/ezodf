@@ -9,12 +9,12 @@
 from array import array
 
 from .xmlns import CN, register_class, subelement
-from .base import BaseClass, safelen
+from .base import GenericWrapper, safelen
 from .whitespaces import encode_whitespaces
 
 
 @register_class
-class Span(BaseClass):
+class Span(GenericWrapper):
     TAG = CN('text:span')
     def __init__(self, text="", stylename=None, xmlnode=None):
         super(Span, self).__init__(xmlnode)
@@ -25,10 +25,10 @@ class Span(BaseClass):
 
     @property
     def style_name(self):
-        return self.getattr(CN('text:style-name'))
+        return self.get_attr(CN('text:style-name'))
     @style_name.setter
     def style_name(self, name):
-        self.setattr(CN('text:style-name'), name)
+        self.set_attr(CN('text:style-name'), name)
 
     @property
     def textlen(self):
@@ -84,18 +84,18 @@ class Heading(Paragraph):
 
     @property
     def outline_level(self):
-        return int(self.getattr(CN('text:outline-level')))
+        return int(self.get_attr(CN('text:outline-level')))
 
     @outline_level.setter
     def outline_level(self, level):
-        self.setattr(CN('text:outline-level'), str(int(level)))
+        self.set_attr(CN('text:outline-level'), str(int(level)))
 
 
 @register_class
-class Section(BaseClass):
+class Section(GenericWrapper):
     TAG = CN('text:section')
 
 
 @register_class
-class List(BaseClass):
+class List(GenericWrapper):
     TAG = CN('text:list')

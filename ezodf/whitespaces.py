@@ -7,11 +7,11 @@
 # License: GPLv3
 
 from .xmlns import register_class, CN
-from .base import BaseClass
+from .base import GenericWrapper
 
 
 @register_class
-class Tabulator(BaseClass):
+class Tabulator(GenericWrapper):
     TAG = CN('text:tab')
 
     def __str__(self):
@@ -41,12 +41,12 @@ class Spaces(Tabulator):
 
     @property
     def count(self):
-        count = self.getattr(CN('text:c'))
+        count = self.get_attr(CN('text:c'))
         return int(count) if count is not None else 1
     @count.setter
     def count(self, value):
         if int(value) > 1:
-            self.setattr(CN('text:c'), str(value))
+            self.set_attr(CN('text:c'), str(value))
 
     @property
     def textlen(self):
