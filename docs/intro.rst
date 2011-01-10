@@ -36,8 +36,8 @@ Data model
 ----------
 
 I use the `lxml <http://codespeak.net/lxml/>`_ package to manage the XML data.
-You have access to the `lxml` Elements by the **xmlroot** attribute at the most
-classes. All document classes have the attributes **meta**, **styles**,
-**manifest** and **content** and each of them have a **xmlroot** attribute to
+You have access to the `lxml` Elements by the **xmlnode** attribute all classes.
+All document classes have the attributes **meta**, **styles**,
+**manifest** and **content** and each of them have a **xmlnode** attribute to
 the XML representation of the associated XML files `manifest.xml`, `styles.xml`,
 `meta.xml` and `content.xml`.

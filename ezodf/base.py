@@ -16,33 +16,33 @@ def safelen(text):
 class BaseClass:
     TAG = 'BaseClass'
 
-    def __init__(self, xmlroot=None):
-        if xmlroot is not None:
-            self.xmlroot = xmlroot
+    def __init__(self, xmlnode=None):
+        if xmlnode is not None:
+            self.xmlnode = xmlnode
         else:
-            self.xmlroot = etree.Element(self.TAG)
+            self.xmlnode = etree.Element(self.TAG)
 
     def __iter__(self):
-        for element in self.xmlroot.iterchildren():
+        for element in self.xmlnode.iterchildren():
             yield pyobj(element)
 
     def __len__(self):
         """ Get count of children """
-        return len(self.xmlroot)
+        return len(self.xmlnode)
 
     @property
     def text(self):
-        return self.xmlroot.text
+        return self.xmlnode.text
     @text.setter
     def text(self, value):
-        self.xmlroot.text = value
+        self.xmlnode.text = value
 
     @property
     def tail(self):
-        return self.xmlroot.tail
+        return self.xmlnode.tail
     @tail.setter
     def tail(self, value):
-        self.xmlroot.tail = value
+        self.xmlnode.tail = value
 
     ## Index operations
 
@@ -60,15 +60,15 @@ class BaseClass:
         :param int index: child position
         :param aWrapperClass element: new child node
         """
-        found = self.xmlroot[int(index)]
-        self.xmlroot.replace(found, element.xmlroot)
+        found = self.xmlnode[int(index)]
+        self.xmlnode.replace(found, element.xmlnode)
 
     def __delitem__(self, index):
         """ Delete child at position `index`.
 
         :param int index: child position
         """
-        del self.xmlroot[int(index)]
+        del self.xmlnode[int(index)]
 
     def index(self, child):
         """ Get numeric index of `child`.
@@ -76,7 +76,7 @@ class BaseClass:
         :param WrapperClass child: get index for this child
         :returns: int
         """
-        return self.xmlroot.index(child.xmlroot)
+        return self.xmlnode.index(child.xmlnode)
 
     def insert(self, index, child):
         """ Insert child at position `index`.
@@ -85,7 +85,7 @@ class BaseClass:
         :param WrapperClass child: child to insert
         :returns: WrappedClass child
         """
-        self.xmlroot.insert(int(index), child.xmlroot)
+        self.xmlnode.insert(int(index), child.xmlnode)
         return child # pass through
 
     def get(self, index):
@@ -94,32 +94,32 @@ class BaseClass:
         :param int index: child position
         :returns: WrapperClass
         """
-        xmlelement = self.xmlroot[int(index)]
+        xmlelement = self.xmlnode[int(index)]
         return pyobj(xmlelement)
 
-    ## Attribute access for the xmlroot element
+    ## Attribute access for the xmlnode element
 
     def getattr(self, key, default=None):
-        """ Get the `key` attribute value of the xmlroot element or `default`
+        """ Get the `key` attribute value of the xmlnode element or `default`
         if `key` does not exist.
 
         :param str key: name of key
         :param default: default value if `key` not found
         :return: str
         """
-        value = self.xmlroot.get(key)
+        value = self.xmlnode.get(key)
         if value is None:
             value = default
         return value
 
     def setattr(self, key, value):
-        """ Set the `key` attribute of the xmlroot element to `value`.
+        """ Set the `key` attribute of the xmlnode element to `value`.
 
         :param str key: name of key
         :param value: value for key
         """
         if value:
-            self.xmlroot.set(key, str(value))
+            self.xmlnode.set(key, str(value))
         else:
             raise ValueError(value)
 
@@ -136,7 +136,7 @@ class BaseClass:
             position = self.index(insert_before)
             self.insert(position, child)
         else:
-            self.xmlroot.append(child.xmlroot)
+            self.xmlnode.append(child.xmlnode)
         return child # pass through
 
     def remove(self, child):
@@ -144,11 +144,11 @@ class BaseClass:
 
         :param WrapperClass child: child to remove
         """
-        self.xmlroot.remove(child.xmlroot)
+        self.xmlnode.remove(child.xmlnode)
 
     def clear(self):
         """ Remove all content from node. """
-        self.xmlroot.clear()
+        self.xmlnode.clear()
 
     ## production code
 
@@ -156,12 +156,12 @@ class BaseClass:
     def textlen(self):
         """ Returns the character count of the plain text content as int. """
         # default implementation, does not respect child elements
-        return safelen(self.xmlroot.text)
+        return safelen(self.xmlnode.text)
 
     def plaintext(self):
         """ Get content of node as plain (unformatted) text string. """
         # default implementation, does not respect child elements
-        text = self.xmlroot.text
+        text = self.xmlnode.text
         return text if text else ""
 
     def element_at_cursorpos(self, pos):

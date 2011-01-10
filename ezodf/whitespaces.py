@@ -34,9 +34,9 @@ class LineBreak(Tabulator):
 @register_class
 class Spaces(Tabulator):
     TAG = CN('text:s')
-    def __init__(self, count=1, xmlroot=None):
-        super(Spaces, self).__init__(xmlroot)
-        if xmlroot is None:
+    def __init__(self, count=1, xmlnode=None):
+        super(Spaces, self).__init__(xmlnode)
+        if xmlnode is None:
             self.count = count
 
     @property

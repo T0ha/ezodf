@@ -58,7 +58,7 @@ class XMLMixin:
         :param bool xml_declaration: create XML declaration
         :param bool pretty-print: enables formatted XML
         """
-        return etree.tostring(self.xmlroot, encoding='UTF-8',
+        return etree.tostring(self.xmlnode, encoding='UTF-8',
                               xml_declaration=xml_declaration,
                               pretty_print=pretty_print)
 
@@ -94,4 +94,4 @@ def pyobj(element, default='BaseClass'):
             raise
         else:
             cls = classmap[default]
-    return cls(xmlroot=element)
+    return cls(xmlnode=element)

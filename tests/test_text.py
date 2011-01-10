@@ -38,67 +38,67 @@ class TestSpan(unittest.TestCase):
     def test_bare_init(self):
         span = Span()
         self.assertTrue(isinstance(span, BaseClass))
-        self.assertEqual(span.xmlroot.tag, CN('text:span'))
+        self.assertEqual(span.xmlnode.tag, CN('text:span'))
 
     def test_init_xmlroot(self):
         node = etree.Element(CN('text:span'), test="span")
-        span = Span(xmlroot=node)
+        span = Span(xmlnode=node)
         self.assertTrue(isinstance(span, BaseClass))
-        self.assertEqual(span.xmlroot.tag, CN('text:span'))
-        self.assertEqual(span.xmlroot.get('test'), "span")
+        self.assertEqual(span.xmlnode.tag, CN('text:span'))
+        self.assertEqual(span.xmlnode.get('test'), "span")
 
     def test_init_XML(self):
         node = etree.XML(SPANDATA)
-        span = Span(xmlroot=node)
+        span = Span(xmlnode=node)
         self.assertTrue(isinstance(span, BaseClass))
-        self.assertEqual(span.xmlroot.tag, CN('text:span'))
+        self.assertEqual(span.xmlnode.tag, CN('text:span'))
 
     def test_textlen(self):
-        span = Span(xmlroot=etree.XML(SPANDATA))
+        span = Span(xmlnode=etree.XML(SPANDATA))
         self.assertEqual(span.textlen, 8)
 
     def test_textlen_with_spaces(self):
-        span = Span(xmlroot=etree.XML(SPANDATA_SPC))
+        span = Span(xmlnode=etree.XML(SPANDATA_SPC))
         self.assertEqual(span.textlen, 12)
 
     def test_textlen_with_line_break(self):
-        span = Span(xmlroot=etree.XML(SPANDATA_BRK))
+        span = Span(xmlnode=etree.XML(SPANDATA_BRK))
         self.assertEqual(span.textlen, 11)
 
     def test_textlen_with_tab(self):
-        span = Span(xmlroot=etree.XML(SPANDATA_TAB))
+        span = Span(xmlnode=etree.XML(SPANDATA_TAB))
         self.assertEqual(span.textlen, 11)
 
     def test_textlen_with_all(self):
-        span = Span(xmlroot=etree.XML(SPANDATA_ALL))
+        span = Span(xmlnode=etree.XML(SPANDATA_ALL))
         self.assertEqual(span.textlen, 23)
 
     def test_plaintext(self):
-        span = Span(xmlroot=etree.XML(SPANDATA))
+        span = Span(xmlnode=etree.XML(SPANDATA))
         self.assertEqual(span.plaintext(), 'aliquyam')
 
     def test_plaintext_with_spaces(self):
-        span = Span(xmlroot=etree.XML(SPANDATA_SPC))
+        span = Span(xmlnode=etree.XML(SPANDATA_SPC))
         self.assertEqual(span.plaintext(), 'aliquyam    ')
 
     def test_plaintext_with_line_break(self):
-        span = Span(xmlroot=etree.XML(SPANDATA_BRK))
+        span = Span(xmlnode=etree.XML(SPANDATA_BRK))
         self.assertEqual(span.plaintext(), 'Line1\nLine2')
 
     def test_plaintext_with_tab(self):
-        span = Span(xmlroot=etree.XML(SPANDATA_TAB))
+        span = Span(xmlnode=etree.XML(SPANDATA_TAB))
         self.assertEqual(span.plaintext(), 'Line1\tLine2')
 
     def test_plaintext_with_all(self):
-        span = Span(xmlroot=etree.XML(SPANDATA_ALL))
+        span = Span(xmlnode=etree.XML(SPANDATA_ALL))
         self.assertEqual(span.plaintext(), 'Line1\nLine2\t123    tail')
 
     def test_get_style_name(self):
-        span = Span(xmlroot=etree.XML(SPANDATA))
+        span = Span(xmlnode=etree.XML(SPANDATA))
         self.assertEqual(span.style_name, 'T2')
 
     def test_set_style_name(self):
-        span = Span(xmlroot=etree.XML(SPANDATA))
+        span = Span(xmlnode=etree.XML(SPANDATA))
         span.style_name = "XXX"
         self.assertEqual(span.style_name, 'XXX')
 
@@ -158,27 +158,27 @@ class TestParagraph(unittest.TestCase):
     def test_bare_init(self):
         p = Paragraph()
         self.assertTrue(isinstance(p, BaseClass))
-        self.assertEqual(p.xmlroot.tag, CN('text:p'))
+        self.assertEqual(p.xmlnode.tag, CN('text:p'))
 
     def test_init_xmlroot(self):
         node = etree.Element(CN('text:p'), test="paragraph")
-        p = Paragraph(xmlroot=node)
+        p = Paragraph(xmlnode=node)
         self.assertTrue(isinstance(p, BaseClass))
-        self.assertEqual(p.xmlroot.tag, CN('text:p'))
-        self.assertEqual(p.xmlroot.get('test'), "paragraph")
+        self.assertEqual(p.xmlnode.tag, CN('text:p'))
+        self.assertEqual(p.xmlnode.get('test'), "paragraph")
 
 class TestHeading(unittest.TestCase):
     def test_bare_init(self):
         h = Heading()
         self.assertTrue(isinstance(h, BaseClass))
-        self.assertEqual(h.xmlroot.tag, CN('text:h'))
+        self.assertEqual(h.xmlnode.tag, CN('text:h'))
 
     def test_init_xmlroot(self):
         node = etree.Element(CN('text:h'), test="heading")
-        h = Heading(xmlroot=node)
+        h = Heading(xmlnode=node)
         self.assertTrue(isinstance(h, BaseClass))
-        self.assertEqual(h.xmlroot.tag, CN('text:h'))
-        self.assertEqual(h.xmlroot.get('test'), "heading")
+        self.assertEqual(h.xmlnode.tag, CN('text:h'))
+        self.assertEqual(h.xmlnode.get('test'), "heading")
 
 
 if __name__=='__main__':

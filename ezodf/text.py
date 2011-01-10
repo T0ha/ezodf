@@ -16,9 +16,9 @@ from .whitespaces import encode_whitespaces
 @register_class
 class Span(BaseClass):
     TAG = CN('text:span')
-    def __init__(self, text="", stylename=None, xmlroot=None):
-        super(Span, self).__init__(xmlroot)
-        if (xmlroot is None) and (stylename is not None):
+    def __init__(self, text="", stylename=None, xmlnode=None):
+        super(Span, self).__init__(xmlnode)
+        if (xmlnode is None) and (stylename is not None):
             self.stylename = stylename
         if text:
             self.append_plaintext(text)
@@ -34,18 +34,18 @@ class Span(BaseClass):
     def textlen(self):
         # NOTE: do not cache this value before you can guarantee that
         # you detect ALL text changes in this node and all of it child nodes.
-        length = safelen(self.xmlroot.text)
+        length = safelen(self.xmlnode.text)
         for element in iter(self):
-            length += (element.textlen + safelen(element.xmlroot.tail))
+            length += (element.textlen + safelen(element.xmlnode.tail))
         return length
 
     def plaintext(self):
         # NOTE: do not cache this value before you can guarantee that
         # you detect ALL text changes in this node and all of it child nodes.
-        text = [self.xmlroot.text]
+        text = [self.xmlnode.text]
         for element in iter(self):
             text.append(element.plaintext())
-            text.append(element.xmlroot.tail)
+            text.append(element.xmlnode.tail)
         return "".join(filter(None, text))
 
     def append_plaintext(self, text):
@@ -54,7 +54,7 @@ class Span(BaseClass):
 
         for tag in encode_whitespaces(text):
             if isinstance(tag, str):
-                if len(self.xmlroot) > 0:
+                if len(self.xmlnode) > 0:
                     lastchild = self[-1]
                     lastchild.tail = append(lastchild.tail, tag)
                 else:
@@ -78,8 +78,8 @@ class Paragraph(Span):
 class Heading(Paragraph):
     TAG = CN('text:h')
 
-    def __init__(self, text="", outline_level=1, stylename=None, xmlroot=None):
-        super(Heading, self).__init__(text, stylename, xmlroot)
+    def __init__(self, text="", outline_level=1, stylename=None, xmlnode=None):
+        super(Heading, self).__init__(text, stylename, xmlnode)
         self.outline_level = outline_level
 
     @property

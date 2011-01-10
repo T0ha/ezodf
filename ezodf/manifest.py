@@ -14,16 +14,16 @@ IGNORE_LIST = frozenset(['META-INF/manifest.xml'])
 class Manifest(XMLMixin):
     def __init__(self, content=None):
         if content is None:
-            self.xmlroot = etree.Element(CN('manifest:manifest'), nsmap=MANIFEST_NSMAP)
+            self.xmlnode = etree.Element(CN('manifest:manifest'), nsmap=MANIFEST_NSMAP)
         else:
-            self.xmlroot = etree.fromstring(content)
+            self.xmlnode = etree.fromstring(content)
 
     def add(self, full_path, media_type="", version=None):
         if full_path in IGNORE_LIST:
             return
         file_entry = self.find(full_path)
         if file_entry is None:
-            file_entry = etree.SubElement(self.xmlroot, CN('manifest:file-entry'))
+            file_entry = etree.SubElement(self.xmlnode, CN('manifest:file-entry'))
             file_entry.set(CN('manifest:full-path'), full_path)
 
         file_entry.set(CN('manifest:media-type'), media_type)
@@ -33,10 +33,10 @@ class Manifest(XMLMixin):
     def remove(self, full_path):
         file_entry = self.find(full_path)
         if file_entry is not None:
-            self.xmlroot.remove(file_entry)
+            self.xmlnode.remove(file_entry)
 
     def find(self, full_path):
-        for node in self.xmlroot.getchildren():
+        for node in self.xmlnode.getchildren():
             if node.get(CN('manifest:full-path')) == full_path:
                 return node
         return None

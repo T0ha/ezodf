@@ -32,18 +32,18 @@ class TestSpaces(unittest.TestCase):
         self.assertEqual(str(s), '   ')
 
     def test_spaces_from_XML(self):
-        s = Spaces(xmlroot=etree.XML('<text:s xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" text:c="3" />'))
+        s = Spaces(xmlnode=etree.XML('<text:s xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" text:c="3" />'))
         self.assertEqual(s.count, 3)
 
 class TestTabulator(unittest.TestCase):
     def test_init(self):
         t = Tabulator()
         self.assertEqual(t.TAG, CN('text:tab'))
-        self.assertEqual(t.xmlroot.tag, CN('text:tab'))
+        self.assertEqual(t.xmlnode.tag, CN('text:tab'))
 
     def test_init_XML(self):
-        t = Tabulator(xmlroot=etree.XML('<text:tab xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"/>'))
-        self.assertEqual(t.xmlroot.tag, CN('text:tab'))
+        t = Tabulator(xmlnode=etree.XML('<text:tab xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"/>'))
+        self.assertEqual(t.xmlnode.tag, CN('text:tab'))
 
     def test_textlen(self):
         t = Tabulator()
@@ -58,11 +58,11 @@ class TestLineBreak(unittest.TestCase):
     def test_init(self):
         t = LineBreak()
         self.assertEqual(t.TAG, CN('text:line-break'))
-        self.assertEqual(t.xmlroot.tag, CN('text:line-break'))
+        self.assertEqual(t.xmlnode.tag, CN('text:line-break'))
 
     def test_init_XML(self):
-        t = LineBreak(xmlroot=etree.XML('<text:line-break xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"/>'))
-        self.assertEqual(t.xmlroot.tag, CN('text:line-break'))
+        t = LineBreak(xmlnode=etree.XML('<text:line-break xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"/>'))
+        self.assertEqual(t.xmlnode.tag, CN('text:line-break'))
 
     def test_textlen(self):
         t = LineBreak()

@@ -14,16 +14,16 @@ class FlatXMLDocument:
     """ OpenDocument contained in a single XML file. """
     TAG = CN('office:document')
 
-    def __init__(self, filetype='odt', filename=None, xmlroot=None):
+    def __init__(self, filetype='odt', filename=None, xmlnode=None):
         self.docname=filename
         self.mimetype = MIMETYPES[filetype]
-        if xmlroot is None: # new document
-            self.xmlroot = etree.Element(self.TAG, nsmap=ALL_NSMAP)
-        elif xmlroot.tag == self.TAG:
-            self.xmlroot = xmlroot
-            self.mimetype = xmlroot.get(CN('office:mimetype')) # required
+        if xmlnode is None: # new document
+            self.xmlnode = etree.Element(self.TAG, nsmap=ALL_NSMAP)
+        elif xmlnode.tag == self.TAG:
+            self.xmlnode = xmlnode
+            self.mimetype = xmlnode.get(CN('office:mimetype')) # required
         else:
-            raise ValueError("Unexpected root tag: %s" % self.xmlroot.tag)
+            raise ValueError("Unexpected root tag: %s" % self.xmlnode.tag)
 
         if self.mimetype not in frozenset(MIMETYPES.values()):
             raise TypeError("Unsupported mimetype: %s" % self.mimetype)
@@ -31,8 +31,8 @@ class FlatXMLDocument:
         self._setup()
 
     def _setup(self):
-        self.meta = OfficeDocumentMeta(subelement(self.xmlroot, CN('office:document-meta')))
-        subelement(self.xmlroot, CN('office:scripts')) # always empty, don't need a reference
+        self.meta = OfficeDocumentMeta(subelement(self.xmlnode, CN('office:document-meta')))
+        subelement(self.xmlnode, CN('office:scripts')) # always empty, don't need a reference
 
     def saveas(self, filename):
         self.docname = filename

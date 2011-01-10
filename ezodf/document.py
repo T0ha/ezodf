@@ -31,8 +31,8 @@ def open(filename):
             return Document(filemanager=fm, mimetype=mimetype)
     else:
         try:
-            xmlroot = etree.parse(filename)
-            return FlatXMLDocument(filename=filename, xmlroot=xmlroot)
+            xmlnode = etree.parse(filename)
+            return FlatXMLDocument(filename=filename, xmlnode=xmlnode)
         except etree.ParseError:
             pass
         raise IOError("File '%s' is neither a zip-package nor a flat XML OpenDocumentFormat file." % filename)
@@ -95,8 +95,8 @@ class ODT(Document):
         super(ODT, self).__init__(filemanager, self.FIXEDMIMETYPE)
         assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
-        self.body = TextBody(self.content.xmlroot)
-        self.fonts = pyobj(subelement(self.content.xmlroot, CN('office:font-face-decls')))
+        self.body = TextBody(self.content.xmlnode)
+        self.fonts = pyobj(subelement(self.content.xmlnode, CN('office:font-face-decls')))
 
 class OTT(ODT):
     """ Open Document Text Template """
@@ -110,8 +110,8 @@ class ODS(Document):
         super(ODS, self).__init__(filemanager, self.FIXEDMIMETYPE)
         assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
-        self.body = SpreadsheetBody(self.content.xmlroot)
-        self.fonts = pyobj(subelement(self.content.xmlroot, CN('office:font-face-decls')))
+        self.body = SpreadsheetBody(self.content.xmlnode)
+        self.fonts = pyobj(subelement(self.content.xmlnode, CN('office:font-face-decls')))
 
 class OTS(ODS):
     """ Open Document Spreadsheet Template """
@@ -124,7 +124,7 @@ class ODP(Document):
         super(ODP, self).__init__(filemanager, self.FIXEDMIMETYPE)
         assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
-        self.body = PresentationBody(self.content.xmlroot)
+        self.body = PresentationBody(self.content.xmlnode)
 
 class OTP(ODP):
     """ Open Document Presentation Template """
@@ -137,7 +137,7 @@ class ODG(Document):
         super(ODG, self).__init__(filemanager, self.FIXEDMIMETYPE)
         assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
-        self.body = DrawingBody(self.content.xmlroot)
+        self.body = DrawingBody(self.content.xmlnode)
 
 class OTG(ODG):
     """ Open Document Graphic (Drawing) Template """

@@ -16,28 +16,28 @@ from .base import BaseClass
 class OfficeDocumentStyles(XMLMixin):
     TAG = CN('office:document-styles')
 
-    def __init__(self, xmlroot=None):
-        if xmlroot is None:
-            self.xmlroot = etree.Element(self.TAG, nsmap=STYLES_NSMAP)
-        elif xmlroot.tag == self.TAG:
-            self.xmlroot = xmlroot
+    def __init__(self, xmlnode=None):
+        if xmlnode is None:
+            self.xmlnode = etree.Element(self.TAG, nsmap=STYLES_NSMAP)
+        elif xmlnode.tag == self.TAG:
+            self.xmlnode = xmlnode
         else:
             raise ValueError("Unexpected root node: %s" % content.tag)
         self.setup()
 
     def setup(self):
-        self.fonts = pyobj(subelement(self.xmlroot, CN('office:font-face-decls')))
-        self.styles = pyobj(subelement(self.xmlroot, CN('office:styles')))
-        self.automatic_styles = pyobj(subelement(self.xmlroot, CN('office:automatic-styles')))
-        self.master_styles = pyobj(subelement(self.xmlroot, CN('office:master-styles')))
+        self.fonts = pyobj(subelement(self.xmlnode, CN('office:font-face-decls')))
+        self.styles = pyobj(subelement(self.xmlnode, CN('office:styles')))
+        self.automatic_styles = pyobj(subelement(self.xmlnode, CN('office:automatic-styles')))
+        self.master_styles = pyobj(subelement(self.xmlnode, CN('office:master-styles')))
 
 
 ## style container
 
 class Container:
-    def __init__(self, xmlroot):
-        assert xmlroot.tag == self.TAG
-        self.xmlroot = xmlroot
+    def __init__(self, xmlnode):
+        assert xmlnode.tag == self.TAG
+        self.xmlnode = xmlnode
         self._cache = {}
 
     def __getitem__(self, key):
@@ -53,16 +53,16 @@ class Container:
     def __setitem__(self, key, value):
         style = self._find(key)
         if style is None:
-            self.xmlroot.append(value.xmlroot)
+            self.xmlnode.append(value.xmlnode)
         else:
-            self.xmlroot.replace(style, value.xmlroot)
+            self.xmlnode.replace(style, value.xmlnode)
         self._cache[key] = value
 
     def _find(self, name):
         try:
             return self._cache[name]
         except KeyError:
-            for style in self.xmlroot.iterchildren():
+            for style in self.xmlnode.iterchildren():
                 stylename = style.get(CN('style:name'))
                 if stylename == name:
                     self._cache[name] = style
@@ -91,8 +91,8 @@ class OfficeMasterStyles(Container):
 class BaseStyle:
     ATTRIBUTEMAP = {}
 
-    def __init__(self, xmlroot):
-        self.xmlroot = xmlroot
+    def __init__(self, xmlnode):
+        self.xmlnode = xmlnode
 
     def __getitem__(self, key):
         """ Get style attribute 'key'. """
@@ -102,7 +102,7 @@ class BaseStyle:
 
     def _properties(self, key, property_factory, new=True):
         """ Get or create a properties element. """
-        element = subelement(self.xmlroot, key , new)
+        element = subelement(self.xmlnode, key , new)
         if element is None:
             raise KeyError(key)
         propertiesname = key + '-properties'

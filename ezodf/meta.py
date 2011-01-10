@@ -29,13 +29,13 @@ class OfficeDocumentMeta(XMLMixin):
     TAG = CN('office:document-meta')
     generator = GENERATOR
 
-    def __init__(self, xmlroot=None):
-        if xmlroot is None:
-            self.xmlroot = etree.Element(self.TAG, nsmap=META_NSMAP)
-        elif xmlroot.tag == self.TAG:
-            self.xmlroot = xmlroot
+    def __init__(self, xmlnode=None):
+        if xmlnode is None:
+            self.xmlnode = etree.Element(self.TAG, nsmap=META_NSMAP)
+        elif xmlnode.tag == self.TAG:
+            self.xmlnode = xmlnode
         else:
-            raise ValueError("Unexpected root node: %s" % xmlroot.tag)
+            raise ValueError("Unexpected root node: %s" % xmlnode.tag)
 
         self._setup()
         self.keywords = Keywords(self.meta)
@@ -47,10 +47,10 @@ class OfficeDocumentMeta(XMLMixin):
         self.count = Statistic(stats)
 
     def _setup(self):
-        self.meta = self.xmlroot.find(CN('office:meta'))
+        self.meta = self.xmlnode.find(CN('office:meta'))
         if self.meta is None: # this is a new document
-            self.meta = subelement(self.xmlroot, CN('office:meta'))
-            self.xmlroot.set(CN('grddl:transformation'), "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
+            self.meta = subelement(self.xmlnode, CN('office:meta'))
+            self.xmlnode.set(CN('grddl:transformation'), "http://docs.oasis-open.org/office/1.2/xslt/odf2rdf.xsl")
             self['creation-date'] = datetime.now().isoformat()
             self.touch()
 
