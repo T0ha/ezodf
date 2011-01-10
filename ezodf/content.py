@@ -7,7 +7,7 @@
 # License: GPLv3
 
 from .const import MIMETYPE_NSMAP
-from .xmlns import XMLMixin, subelement, CN, etree
+from .xmlns import XMLMixin, subelement, CN, etree, register_class, wrap
 from .base import GenericWrapper
 
 class OfficeDocumentContent(XMLMixin):
@@ -21,33 +21,41 @@ class OfficeDocumentContent(XMLMixin):
             self.xmlnode = xmlnode
         else:
             raise ValueError("Unexpected root node: %s" % xmlnode.tag)
-        self._setup(mimetype)
+        self._setup_references(mimetype)
 
-    def _setup(self, mimetype):
+    def _setup_references(self, mimetype):
         # these elements are common to all document types
         # The element office:scripts always exists but is always empty
-        # so I dont't keep a reference to it
-        subelement(self.xmlnode, CN('office:scripts'))
-        self.automatic_styles = subelement(self.xmlnode, CN('office:automatic-styles'))
+        self.scripts = wrap(subelement(self.xmlnode, CN('office:scripts')))
+        self.fonts = wrap(subelement(self.xmlnode, CN('office:font-face-decls')))
+        self.automatic_styles = wrap(subelement(self.xmlnode, CN('office:automatic-styles')))
+        self.body = wrap(subelement(self.xmlnode, CN('office:body')))
 
-class _AbstractBody(GenericWrapper):
-    def __init__(self, parent):
-        # parent type should be etree.Element
-        assert parent.tag == CN('office:document-content')
+    def get_application_body(self, bodytag):
         # The office:body element is just frame element for the real document content:
         # office:text, office:spreadsheet, office:presentation, office:drawing
-        body = subelement(parent, CN('office:body'))
-        # set xmlnode here, no need to call constructor of GenericWrapper
-        self.xmlnode = subelement(body, self.TAG)
+        return wrap(subelement(self.body.xmlnode, bodytag))
 
-class TextBody(_AbstractBody):
+@register_class
+class TextBody(GenericWrapper):
     TAG = CN('office:text')
 
-class SpreadsheetBody(_AbstractBody):
+@register_class
+class SpreadsheetBody(GenericWrapper):
     TAG = CN('office:spreadsheet')
 
-class PresentationBody(_AbstractBody):
+@register_class
+class PresentationBody(GenericWrapper):
     TAG = CN('office:presentation')
 
-class DrawingBody(_AbstractBody):
+@register_class
+class DrawingBody(GenericWrapper):
     TAG = CN('office:drawing')
+
+@register_class
+class ChartBody(GenericWrapper):
+    TAG = CN('office:chart')
+
+@register_class
+class ImageBody(GenericWrapper):
+    TAG = CN('office:image')

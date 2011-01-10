@@ -197,3 +197,16 @@ MIMETYPE_NSMAP = {
     "application/vnd.oasis.opendocument.image" : GRAPHICS_NSMAP,
     "application/vnd.oasis.opendocument.formula" : GRAPHICS_NSMAP,
 }
+
+MIMETYPE_BODYTAG_MAP = {
+    "application/vnd.oasis.opendocument.text" : "office:text",
+    "application/vnd.oasis.opendocument.text-template" : "office:text",
+    "application/vnd.oasis.opendocument.graphics" : "office:drawing",
+    "application/vnd.oasis.opendocument.graphics-template" : "office:drawing",
+    "application/vnd.oasis.opendocument.presentation" : "office:presentation",
+    "application/vnd.oasis.opendocument.presentation-template" : "office:presentation",
+    "application/vnd.oasis.opendocument.spreadsheet": "office:spreadsheet",
+    "application/vnd.oasis.opendocument.spreadsheet-template": "office:spreadsheet",
+    "application/vnd.oasis.opendocument.chart" : "office:chart",
+    "application/vnd.oasis.opendocument.image" : "office:image",
+}

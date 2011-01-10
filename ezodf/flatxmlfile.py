@@ -9,6 +9,7 @@
 from .const import MIMETYPES
 from .xmlns import etree, CN, ALL_NSMAP, subelement, wrap
 from .meta import OfficeDocumentMeta
+from .content import OfficeDocumentContent
 
 class FlatXMLDocument:
     """ OpenDocument contained in a single XML file. """
@@ -32,7 +33,24 @@ class FlatXMLDocument:
 
     def _setup(self):
         self.meta = OfficeDocumentMeta(subelement(self.xmlnode, CN('office:document-meta')))
-        subelement(self.xmlnode, CN('office:scripts')) # always empty, don't need a reference
+        self.styles = wrap(subelement(self.xmlnode, CN('office:settings')))
+        self.scripts = wrap(subelement(self.xmlnode, CN('office:scripts')))
+        self.fonts = wrap(subelement(self.xmlnode, CN('office:font-face-decls')))
+        self.styles = wrap(subelement(self.xmlnode, CN('office:styles')))
+        self.automatic_styles = wrap(subelement(self.xmlnode, CN('office:automatic-styles')))
+        self.master_styles = wrap(subelement(self.xmlnode, CN('office:master-styles')))
+        self.body = self.get_application_body(self.application_body_tag)
+
+    @property
+    def application_body_tag(self):
+        return CN(MIMETYPE_BODYTAG_MAP[self.mimetype])
+
+    def get_application_body(self, bodytag):
+        # The office:body element is just frame element for the real document content:
+        # office:text, office:spreadsheet, office:presentation, office:drawing
+        office_body = subelement(self.xmlnode, CN('office:body'))
+        application_body = subelement(office_body, bodytag)
+        return wrap(application_body)
 
     def saveas(self, filename):
         self.docname = filename

@@ -53,7 +53,6 @@ class TestNewDocument(unittest.TestCase):
         self.assertIsNotNone(doc.styles)
         self.assertIsNotNone(doc.content)
         self.assertIsNotNone(doc.body)
-        self.assertIsNotNone(doc.fonts)
 
         doc.backup=False
         doc.save()
@@ -70,7 +69,6 @@ class TestNewDocument(unittest.TestCase):
         self.assertIsNotNone(doc.styles)
         self.assertIsNotNone(doc.content)
         self.assertIsNotNone(doc.body)
-        self.assertIsNotNone(doc.fonts)
 
         doc.backup=False
         doc.save()
@@ -87,8 +85,6 @@ class TestNewDocument(unittest.TestCase):
         self.assertIsNotNone(doc.styles)
         self.assertIsNotNone(doc.content)
         self.assertIsNotNone(doc.body)
-        with self.assertRaises(AttributeError):
-            doc.fonts
 
         doc.backup=False
         doc.save()
@@ -105,8 +101,6 @@ class TestNewDocument(unittest.TestCase):
         self.assertIsNotNone(doc.styles)
         self.assertIsNotNone(doc.content)
         self.assertIsNotNone(doc.body)
-        with self.assertRaises(AttributeError):
-            doc.fonts
 
         doc.backup=False
         doc.save()

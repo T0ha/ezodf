@@ -8,13 +8,12 @@
 
 import zipfile
 
-from .const import MIMETYPES
+from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP
 from .xmlns import subelement, CN, etree, wrap
 from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
 from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
-from .content import TextBody, SpreadsheetBody, PresentationBody, DrawingBody
 from .flatxmlfile import FlatXMLDocument
 
 class InvalidFiletypeError(TypeError):
@@ -77,6 +76,12 @@ class Document:
         self.content = OfficeDocumentContent(mimetype, fm.get_xml_element('content.xml'))
         fm.register('content.xml', self.content, 'text/xml')
 
+        self.body = self.content.get_application_body(self.application_body_tag)
+
+    @property
+    def application_body_tag(self):
+        return CN(MIMETYPE_BODYTAG_MAP[self.mimetype])
+
     def save(self):
         if self.docname is None:
             raise IOError('No filename specified!')
@@ -88,56 +93,37 @@ class Document:
         self.docname = filename
         self.save()
 
+
 class ODT(Document):
     """ Open Document Text """
     FIXEDMIMETYPE = MIMETYPES['odt']
     def __init__(self, filename=None, filemanager=None):
         super(ODT, self).__init__(filemanager, self.FIXEDMIMETYPE)
-        assert self.mimetype == self.FIXEDMIMETYPE
         self.docname = filename
-        self.body = TextBody(self.content.xmlnode)
-        self.fonts = wrap(subelement(self.content.xmlnode, CN('office:font-face-decls')))
 
 class OTT(ODT):
     """ Open Document Text Template """
     FIXEDMIMETYPE = MIMETYPES['ott']
 
-class ODS(Document):
+class ODS(ODT):
     """ Open Document Spreadsheet """
     FIXEDMIMETYPE = MIMETYPES['ods']
-
-    def __init__(self, filename=None, filemanager=None):
-        super(ODS, self).__init__(filemanager, self.FIXEDMIMETYPE)
-        assert self.mimetype == self.FIXEDMIMETYPE
-        self.docname = filename
-        self.body = SpreadsheetBody(self.content.xmlnode)
-        self.fonts = wrap(subelement(self.content.xmlnode, CN('office:font-face-decls')))
 
 class OTS(ODS):
     """ Open Document Spreadsheet Template """
     FIXEDMIMETYPE = MIMETYPES['ots']
 
-class ODP(Document):
+class ODP(ODT):
     """ Open Document Presentation """
     FIXEDMIMETYPE = MIMETYPES['odp']
-    def __init__(self, filename=None, filemanager=None):
-        super(ODP, self).__init__(filemanager, self.FIXEDMIMETYPE)
-        assert self.mimetype == self.FIXEDMIMETYPE
-        self.docname = filename
-        self.body = PresentationBody(self.content.xmlnode)
 
 class OTP(ODP):
     """ Open Document Presentation Template """
     FIXEDMIMETYPE = MIMETYPES['otp']
 
-class ODG(Document):
+class ODG(ODP):
     """ Open Document Graphic (Drawing) """
     FIXEDMIMETYPE = MIMETYPES['odg']
-    def __init__(self, filename=None, filemanager=None):
-        super(ODG, self).__init__(filemanager, self.FIXEDMIMETYPE)
-        assert self.mimetype == self.FIXEDMIMETYPE
-        self.docname = filename
-        self.body = DrawingBody(self.content.xmlnode)
 
 class OTG(ODG):
     """ Open Document Graphic (Drawing) Template """

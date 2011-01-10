@@ -23,14 +23,13 @@ class OfficeDocumentStyles(XMLMixin):
             self.xmlnode = xmlnode
         else:
             raise ValueError("Unexpected root node: %s" % content.tag)
-        self.setup()
+        self._setup()
 
-    def setup(self):
+    def _setup(self):
         self.fonts = wrap(subelement(self.xmlnode, CN('office:font-face-decls')))
         self.styles = wrap(subelement(self.xmlnode, CN('office:styles')))
         self.automatic_styles = wrap(subelement(self.xmlnode, CN('office:automatic-styles')))
         self.master_styles = wrap(subelement(self.xmlnode, CN('office:master-styles')))
-
 
 ## style container
 
