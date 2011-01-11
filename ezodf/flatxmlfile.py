@@ -11,6 +11,8 @@ from .xmlns import etree, CN, ALL_NSMAP, subelement, wrap
 from .meta import OfficeDocumentMeta
 from .content import OfficeDocumentContent
 
+from . import body # register body classes
+
 class FlatXMLDocument:
     """ OpenDocument contained in a single XML file. """
     TAG = CN('office:document')

@@ -29,8 +29,7 @@ def opendoc(filename):
             xmlnode = etree.parse(filename)
             return FlatXMLDocument(filename=filename, xmlnode=xmlnode)
         except etree.ParseError:
-            pass
-        raise IOError("File '%s' is neither a zip-package nor a flat XML OpenDocumentFormat file." % filename)
+            raise IOError("File '%s' is neither a zip-package nor a flat XML OpenDocumentFormat file." % filename)
 
 
 def newdoc(doctype="odt", filename="", template=None):
@@ -43,6 +42,7 @@ def newdoc(doctype="odt", filename="", template=None):
     return document
 
 def _new_doc_from_template(filename, templatename):
+    #TODO: only works with zip packaged documents
     if zipfile.is_zipfile(templatename):
         fm = FileManager(templatename)
         mimetype = fm.get_text('mimetype')

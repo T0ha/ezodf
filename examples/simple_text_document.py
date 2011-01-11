@@ -13,7 +13,8 @@ P2 = "Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse moles
 P3 = "Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi."
 P4 = "Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer"
 
-odt = ezodf.ODT('simple_text_document.odt')
+name = 'simple_text_document.odt'
+odt = ezodf.newdoc(doctype=name[-3:], filename=name)
 odt.body.add(ezodf.Heading("A Simple Test Document"))
 for nr, p in enumerate((P1, P2, P3, P4)):
     odt.body.add(ezodf.Heading("Chapter %d" % nr, nr))

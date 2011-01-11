@@ -10,6 +10,8 @@ from .const import MIMETYPE_NSMAP
 from .xmlns import XMLMixin, subelement, CN, etree, register_class, wrap
 from .base import GenericWrapper
 
+from . import body # register body classes
+
 class OfficeDocumentContent(XMLMixin):
     TAG = CN('office:document-content')
 
@@ -35,27 +37,3 @@ class OfficeDocumentContent(XMLMixin):
         # The office:body element is just frame element for the real document content:
         # office:text, office:spreadsheet, office:presentation, office:drawing
         return wrap(subelement(self.body.xmlnode, bodytag))
-
-@register_class
-class TextBody(GenericWrapper):
-    TAG = CN('office:text')
-
-@register_class
-class SpreadsheetBody(GenericWrapper):
-    TAG = CN('office:spreadsheet')
-
-@register_class
-class PresentationBody(GenericWrapper):
-    TAG = CN('office:presentation')
-
-@register_class
-class DrawingBody(GenericWrapper):
-    TAG = CN('office:drawing')
-
-@register_class
-class ChartBody(GenericWrapper):
-    TAG = CN('office:chart')
-
-@register_class
-class ImageBody(GenericWrapper):
-    TAG = CN('office:image')
