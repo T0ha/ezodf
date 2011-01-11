@@ -10,14 +10,14 @@ a simple example::
     import ezodf
 
     # this ODS example doesn't work yet
-    ods = ezodf.ODS('spreadsheet.ods')
+    ods = ezodf.newdoc(doctype='ods', 'spreadsheet.ods')
     # document content resides in the body object
     sheet = ods.body.add(ezodf.Spreadsheet('SHEET'))
     sheet[0, 0] = ezodf.Paragraph("Textcell")
     ods.save()
 
     # this simple ODT example works
-    odt = ezodf.ODT('text.odt')
+    odt = ezodf.newdoc(doctype='odt', 'text.odt')
     paragraph = ezodf.Paragraph("This is a paragraph. ")
     # document content resides in the body object
     odt.body.add(paragraph)

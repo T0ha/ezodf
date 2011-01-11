@@ -33,7 +33,7 @@ class TestDocumentCopy(unittest.TestCase):
         infile = testdatafile(filename)
         names1 = get_zip_names(infile)
         outfile = testdatafile('new.'+filename)
-        odt = document.open(infile)
+        odt = document.opendoc(infile)
         odt.saveas(outfile)
         names2 = get_zip_names(outfile)
         remove(outfile)
@@ -46,7 +46,7 @@ class TestDocumentCopy(unittest.TestCase):
 class TestNewDocument(unittest.TestCase):
     def test_new_odt(self):
         docname = testdatafile('new.odt')
-        doc = document.ODT(filename=docname)
+        doc = document.newdoc(doctype='odt', filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odt'])
         self.assertEqual(doc.docname, docname)
         self.assertIsNotNone(doc.meta)
@@ -62,7 +62,7 @@ class TestNewDocument(unittest.TestCase):
 
     def test_new_ods(self):
         docname = testdatafile('new.ods')
-        doc = document.ODS(filename=docname)
+        doc = document.newdoc(doctype='ods', filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['ods'])
         self.assertEqual(doc.docname, docname)
         self.assertIsNotNone(doc.meta)
@@ -78,7 +78,7 @@ class TestNewDocument(unittest.TestCase):
 
     def test_new_odp(self):
         docname = testdatafile('new.odp')
-        doc = document.ODP(filename=docname)
+        doc = document.newdoc(doctype='odp', filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odp'])
         self.assertEqual(doc.docname, docname)
         self.assertIsNotNone(doc.meta)
@@ -94,7 +94,7 @@ class TestNewDocument(unittest.TestCase):
 
     def test_new_odg(self):
         docname = testdatafile('new.odg')
-        doc = document.ODG(filename=docname)
+        doc = document.newdoc(doctype='odg', filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odg'])
         self.assertEqual(doc.docname, docname)
         self.assertIsNotNone(doc.meta)

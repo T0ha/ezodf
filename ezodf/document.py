@@ -19,15 +19,11 @@ from .flatxmlfile import FlatXMLDocument
 class InvalidFiletypeError(TypeError):
     pass
 
-def open(filename):
+def opendoc(filename):
     if zipfile.is_zipfile(filename):
         fm = FileManager(filename)
         mimetype = fm.get_text('mimetype')
-        try:
-            return DOCUMENTCLASS[mimetype](filemanager=fm)
-        except KeyError:
-            # just the basics for: chart, image, formula, templates
-            return Document(filemanager=fm, mimetype=mimetype)
+        return PackagedDocument(filemanager=fm, mimetype=mimetype)
     else:
         try:
             xmlnode = etree.parse(filename)
@@ -37,24 +33,32 @@ def open(filename):
         raise IOError("File '%s' is neither a zip-package nor a flat XML OpenDocumentFormat file." % filename)
 
 
-def new_from_template(filename, templatename):
+def newdoc(doctype="odt", filename="", template=None):
+    if template is None:
+        mimetype = MIMETYPES[doctype]
+        document = PackagedDocument(None, mimetype)
+        document.docname = filename
+    else:
+        document = _new_doc_from_template(filename, template)
+    return document
+
+def _new_doc_from_template(filename, templatename):
     if zipfile.is_zipfile(templatename):
         fm = FileManager(templatename)
         mimetype = fm.get_text('mimetype')
         if mimetype.endswith('-template'):
             mimetype = mimetype[:-9]
         try:
-            return DOCUMENTCLASS[mimetype](filename=filename, filemanager=fm)
+            document = PackagedDocument(filemanager=fm, mimetype=mimetype)
+            document.docname = filename
+            return document
         except KeyError:
             raise InvalidFiletypeError("Unsupported mimetype: %s".format(mimetype))
     else:
         raise IOError('File does not exist or it is not a zipfile: %s' % templatename)
 
-
-class Document:
-    """ OpenDocumentFormat Base Class
-
-    The `Document` class can hold every ODF file type.
+class PackagedDocument:
+    """ OpenDocument as package in a zipfile.
     """
     def __init__(self, filemanager, mimetype):
         self.filemanager = fm = FileManager() if filemanager is None else filemanager
@@ -92,50 +96,3 @@ class Document:
     def saveas(self, filename):
         self.docname = filename
         self.save()
-
-
-class ODT(Document):
-    """ Open Document Text """
-    FIXEDMIMETYPE = MIMETYPES['odt']
-    def __init__(self, filename=None, filemanager=None):
-        super(ODT, self).__init__(filemanager, self.FIXEDMIMETYPE)
-        self.docname = filename
-
-class OTT(ODT):
-    """ Open Document Text Template """
-    FIXEDMIMETYPE = MIMETYPES['ott']
-
-class ODS(ODT):
-    """ Open Document Spreadsheet """
-    FIXEDMIMETYPE = MIMETYPES['ods']
-
-class OTS(ODS):
-    """ Open Document Spreadsheet Template """
-    FIXEDMIMETYPE = MIMETYPES['ots']
-
-class ODP(ODT):
-    """ Open Document Presentation """
-    FIXEDMIMETYPE = MIMETYPES['odp']
-
-class OTP(ODP):
-    """ Open Document Presentation Template """
-    FIXEDMIMETYPE = MIMETYPES['otp']
-
-class ODG(ODP):
-    """ Open Document Graphic (Drawing) """
-    FIXEDMIMETYPE = MIMETYPES['odg']
-
-class OTG(ODG):
-    """ Open Document Graphic (Drawing) Template """
-    FIXEDMIMETYPE = MIMETYPES['otg']
-
-DOCUMENTCLASS = {
-    MIMETYPES['odt']: ODT,
-    MIMETYPES['ott']: OTT,
-    MIMETYPES['ods']: ODS,
-    MIMETYPES['ots']: OTS,
-    MIMETYPES['odg']: ODG,
-    MIMETYPES['otg']: OTG,
-    MIMETYPES['odp']: ODP,
-    MIMETYPES['otp']: OTP,
-}

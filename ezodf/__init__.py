@@ -20,6 +20,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .document import open, new_from_template
-from .document import ODT, ODS, ODP, ODG, OTT, OTS, OTP, OTG
+from .document import opendoc, newdoc
 from .text import Paragraph, Heading, Span, List, Section

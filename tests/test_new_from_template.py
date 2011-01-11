@@ -16,13 +16,13 @@ from mytesttools import testdatafile
 from ezodf.filemanager import check_zipfile_for_oasis_validity
 
 # objects to test
-from ezodf.document import new_from_template
+from ezodf.document import _new_doc_from_template
 
 class TestNewFromTemplate(unittest.TestCase):
     def test_new_from_ott(self):
         templatename = testdatafile('template.ott')
         filename = testdatafile('newfromtemplate.odt')
-        doc = new_from_template(filename, templatename)
+        doc = _new_doc_from_template(filename, templatename)
         doc.save()
         self.assertTrue(check_zipfile_for_oasis_validity(filename, b"application/vnd.oasis.opendocument.text"))
         os.remove(filename)
@@ -30,7 +30,7 @@ class TestNewFromTemplate(unittest.TestCase):
     def test_new_from_ots(self):
         templatename = testdatafile('template.ots')
         filename = testdatafile('newfromtemplate.ods')
-        doc = new_from_template(filename, templatename)
+        doc = _new_doc_from_template(filename, templatename)
         doc.save()
         self.assertTrue(check_zipfile_for_oasis_validity(filename, b"application/vnd.oasis.opendocument.spreadsheet"))
         os.remove(filename)
@@ -38,7 +38,7 @@ class TestNewFromTemplate(unittest.TestCase):
     def test_new_from_otp(self):
         templatename = testdatafile('template.otp')
         filename = testdatafile('newfromtemplate.odp')
-        doc = new_from_template(filename, templatename)
+        doc = _new_doc_from_template(filename, templatename)
         doc.save()
         self.assertTrue(check_zipfile_for_oasis_validity(filename, b"application/vnd.oasis.opendocument.presentation"))
         os.remove(filename)
@@ -46,7 +46,7 @@ class TestNewFromTemplate(unittest.TestCase):
     def test_new_from_otg(self):
         templatename = testdatafile('template.otg')
         filename = testdatafile('newfromtemplate.odg')
-        doc = new_from_template(filename, templatename)
+        doc = _new_doc_from_template(filename, templatename)
         doc.save()
         self.assertTrue(check_zipfile_for_oasis_validity(filename, b"application/vnd.oasis.opendocument.graphics"))
         os.remove(filename)
