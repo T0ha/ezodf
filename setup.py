@@ -22,7 +22,7 @@
 import os
 from distutils.core import setup
 
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 AUTHOR_NAME = 'Manfred Moitzi'
 AUTHOR_EMAIL = 'mozman@gmx.at'
 
@@ -47,7 +47,7 @@ setup(name='ezodf',
     platforms="OS Independent",
     license="GPLv3",
     classifiers=[
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: GNU General Public License (GPL)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",

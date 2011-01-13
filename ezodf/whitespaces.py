@@ -55,6 +55,15 @@ class Spaces(Tabulator):
     def plaintext(self):
         return ' ' * self.count
 
+@register_class
+class SoftPageBreak(Tabulator):
+    TAG = CN('text:soft-page-break')
+    def textlen(self):
+        return 0
+
+    def plaintext(self):
+        return ''
+
 class _WhitespaceEncoder:
     result = []
     stack = []
@@ -62,7 +71,7 @@ class _WhitespaceEncoder:
 
     def encode(self, plaintext):
         self.result = []
-        self.stack=[]
+        self.stack = []
         self.space_counter = 0
         for char in plaintext:
             if char == '\n':

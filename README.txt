@@ -9,21 +9,22 @@ a simple example::
 
     import ezodf
 
+    odt = ezodf.newdoc(doctype='odt', 'text.odt')
+    paragraph = ezodf.Paragraph("This is a paragraph. ")
+    # document content resides in the body object
+    # append paragraph to body
+    odt.body.add(paragraph)
+    paragraph.append_plaintext("This is another sentence.\nNormal usage of line breaks.")
+    # insert new heading before 'paragraph'
+    odt.body.add(ezodf.Heading("Chapter 1"), insert_before=paragraph)
+    odt.save()
+
     # this ODS example doesn't work yet
     ods = ezodf.newdoc(doctype='ods', 'spreadsheet.ods')
     # document content resides in the body object
     sheet = ods.body.add(ezodf.Spreadsheet('SHEET'))
     sheet[0, 0] = ezodf.Paragraph("Textcell")
     ods.save()
-
-    # this simple ODT example works
-    odt = ezodf.newdoc(doctype='odt', 'text.odt')
-    paragraph = ezodf.Paragraph("This is a paragraph. ")
-    # document content resides in the body object
-    odt.body.add(paragraph)
-    paragraph.append_plaintext("This is another sentence.\nNormal useage of line breaks.")
-    odt.body.add(ezodf.Heading("Chapter 1"), insert_before=paragraph)
-    odt.save()
 
 for more examples see: /examples folder
 

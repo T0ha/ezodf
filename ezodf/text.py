@@ -6,8 +6,6 @@
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-from array import array
-
 from .xmlns import CN, register_class, subelement
 from .base import GenericWrapper, safelen
 from .whitespaces import encode_whitespaces
@@ -16,9 +14,9 @@ from .whitespaces import encode_whitespaces
 @register_class
 class Span(GenericWrapper):
     TAG = CN('text:span')
-    def __init__(self, text="", stylename=None, xmlnode=None):
+    def __init__(self, text="", stylename="", xmlnode=None):
         super(Span, self).__init__(xmlnode)
-        if (xmlnode is None) and (stylename is not None):
+        if stylename:
             self.stylename = stylename
         if text:
             self.append_plaintext(text)
