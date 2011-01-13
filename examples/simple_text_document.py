@@ -17,6 +17,7 @@ name = 'simple_text_document.odt'
 odt = ezodf.newdoc(doctype=name[-3:], filename=name)
 odt.body.add(ezodf.Heading("A Simple Test Document"))
 for nr, p in enumerate((P1, P2, P3, P4)):
-    odt.body.add(ezodf.Heading("Chapter %d" % nr, nr))
+    cnr = nr+1
+    odt.body.add(ezodf.Heading("Chapter %d" % cnr, cnr))
     odt.body.add(ezodf.Paragraph(p))
 odt.save()
