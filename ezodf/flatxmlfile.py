@@ -20,6 +20,8 @@ class FlatXMLDocument:
     def __init__(self, filetype='odt', filename=None, xmlnode=None):
         self.docname=filename
         self.mimetype = MIMETYPES[filetype]
+        self.doctype = filetype
+
         if xmlnode is None: # new document
             self.xmlnode = etree.Element(self.TAG, nsmap=ALL_NSMAP)
         elif xmlnode.tag == self.TAG:

@@ -64,21 +64,14 @@ class Span(GenericWrapper):
 class Paragraph(Span):
     TAG = CN('text:p')
 
-    @property
-    def textlen(self):
-        return super(Paragraph, self).textlen + 1
-
-    def plaintext(self):
-        return super(Paragraph, self).plaintext() + '\n'
-
-
 @register_class
-class Heading(Paragraph):
+class Heading(Span):
     TAG = CN('text:h')
 
     def __init__(self, text="", outline_level=1, stylename=None, xmlnode=None):
         super(Heading, self).__init__(text, stylename, xmlnode)
-        self.outline_level = outline_level
+        if xmlnode is None:
+            self.outline_level = outline_level
 
     @property
     def outline_level(self):

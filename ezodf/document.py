@@ -8,7 +8,7 @@
 
 import zipfile
 
-from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP
+from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
 from .xmlns import subelement, CN, etree, wrap
 from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
@@ -69,6 +69,7 @@ class PackagedDocument:
         self.filemanager.manifest.add('/', mimetype)
 
         self.mimetype = mimetype
+        self.doctype = FILE_EXT_FOR_MIMETYPE[mimetype]
         fm.register('mimetype', self.mimetype)
 
         self.meta = OfficeDocumentMeta(fm.get_xml_element('meta.xml'))

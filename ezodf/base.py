@@ -44,6 +44,10 @@ class GenericWrapper:
     def tail(self, value):
         self.xmlnode.tail = value
 
+    @property
+    def kind(self):
+        return self.__class__.__name__
+
     ## Index operations
 
     def __getitem__(self, index):
@@ -95,6 +99,9 @@ class GenericWrapper:
         :param int index: child position
         """
         del self.xmlnode[int(index)]
+
+    def filter(self, kind):
+        return (e for e in iter(self) if e.kind == kind)
 
     ## Attribute access for the xmlnode element
 
