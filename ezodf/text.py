@@ -79,7 +79,8 @@ class Heading(Span):
 
     @outline_level.setter
     def outline_level(self, level):
-        self.set_attr(CN('text:outline-level'), str(int(level)))
+        number = max(int(level), 1)
+        self.set_attr(CN('text:outline-level'), str(number))
 
 
 @register_class

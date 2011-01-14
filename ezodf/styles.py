@@ -42,10 +42,7 @@ class Container:
     def __getitem__(self, key):
         style = self._find(key) # by style:name attribute
         if style is not None:
-            try: # to wrap the style element into a Python object
-                return wrap(style, default=None)(style)
-            except KeyError:
-                raise TypeError('Unknown style element: %s (contact ezodf developer)' % style.tag)
+            return wrap(style)
         else:
             raise KeyError(key)
 
@@ -121,7 +118,7 @@ class Style(BaseStyle):
     TAG = CN('style:style')
     ATTRIBUTEMAP = {
         'name': CN('style:name'),
-        'display-name': CN('style:disply-name'),
+        'display-name': CN('style:display-name'),
         'family': CN('style:family'),
         'parent-style-name': CN('style:parent-style-name'),
         'next-style-name': CN('style:next-style-name'),

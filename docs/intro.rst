@@ -31,13 +31,3 @@ In addition to being an OASIS standard, it is published (in one of its version
 Open Document Format for Office Applications (OpenDocument) v1.0.
 
 .. seealso:: https://secure.wikimedia.org/wikipedia/en/wiki/OpenDocument
-
-Data model
-----------
-
-I use the `lxml <http://codespeak.net/lxml/>`_ package to manage the XML data.
-You have access to the `lxml` Elements by the **xmlnode** attribute all classes.
-All document classes have the attributes **meta**, **styles**,
-**manifest** and **content** and each of them have a **xmlnode** attribute to
-the XML representation of the associated XML files `manifest.xml`, `styles.xml`,
-`meta.xml` and `content.xml`.

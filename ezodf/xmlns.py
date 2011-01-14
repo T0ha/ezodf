@@ -90,8 +90,5 @@ def wrap(element, default='GenericWrapper'):
     try:
         cls = classmap[element.tag]
     except KeyError: # wrap it into the GenericWrapper
-        if default is None:
-            raise
-        else:
-            cls = classmap[default]
+        cls = classmap[default]
     return cls(xmlnode=element)

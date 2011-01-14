@@ -1,7 +1,7 @@
 .. _meta module:
 
-meta module
-===========
+Meta Data Management
+====================
 
 In the `meta` module contains all classes to access the documents
 meta data, keywords and user defined tags.
@@ -18,6 +18,12 @@ of `Meta` class.
 
 Meta class
 ----------
+
+.. class:: meta.Meta()
+
+.. warning::
+
+   Don't create instances of this class by yourself.
 
 You always get/set strings, also for date and time values.
 

@@ -9,37 +9,45 @@ Welcome to ezodf's documentation!
 **ezodf** is a Python package to create new or open existing OpenDocumentFormat
 files to extract, add, modify or delete document data.
 
-To open an existing document, just use the `ezodf.opendoc()` function::
+To open an existing document, just use the :func:`ezodf.opendoc` function::
 
     doc = ezodf.opendoc('documentname.ext')
 
 You don't have to care about the document type at the open function, to check
-the type of the document you got, use the **mimetype** attribute::
+the type of the document you got, use the :attr:`~PackagedDocument.doctype` or
+the :attr:`~PackagedDocument.mimetype` attribute::
 
-    if doc.mimetype == ezodf.const.MIMETYPES['odt']:
+    if doc.doctype == 'odt':
         pass
         # this is a text document
-        # and so on for 'ods', 'odg' or 'odg'
+        # and so on for 'ods', 'odg' or 'odp'
 
-To change the meta data of the document use the **meta** attribute,
-which is an instance of the :ref:`Meta class`::
+To change the meta data of the document use the :attr:`~PackagedDocument.meta`
+attribute, which is an instance of the :class:`~meta.Meta` class::
 
    document_title = doc.meta['title']
    # or set meta attributes
    doc.meta['description'] = 'set a new description'
 
-For more information about meta data see the :ref:`meta module` .
+For more information about meta data see: :ref:`meta module`.
 
-Contents:
+Contents
+--------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    intro.rst
 
+   docmanagement.rst
+   document.rst
    meta.rst
    styles.rst
-   content.rst
+   textdocument.rst
+   spreadsheetdocument.rst
+   graphicsdocument.rst
+   presentationdocument.rst
+
 
 Indices and tables
 ==================
