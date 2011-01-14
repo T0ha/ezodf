@@ -60,7 +60,7 @@ class GenericWrapper:
     def index(self, child):
         """ Get numeric index of `child`.
 
-        :param WrapperClass child: get index for this child
+        :param GenericWrapper child: get index for this child
         :returns: int
         """
         return self.xmlnode.index(child.xmlnode)
@@ -69,8 +69,8 @@ class GenericWrapper:
         """ Insert child at position `index`.
 
         :param int index: insert position for child
-        :param WrapperClass child: child to insert
-        :returns: WrappedClass child
+        :param GenericWrapper child: child to insert
+        :returns: GenericWrapper child
         """
         self.xmlnode.insert(int(index), child.xmlnode)
         return child # pass through
@@ -79,7 +79,7 @@ class GenericWrapper:
         """ Get children at `index` as wrapped object.
 
         :param int index: child position
-        :returns: WrapperClass
+        :returns: GenericWrapper
         """
         xmlelement = self.xmlnode[int(index)]
         return wrap(xmlelement)
@@ -88,7 +88,7 @@ class GenericWrapper:
         """ Set (replace) the child at position `index` by element.
 
         :param int index: child position
-        :param WrapperClass element: new child node
+        :param GenericWrapper element: new child node
         """
         found = self.xmlnode[int(index)]
         self.xmlnode.replace(found, element.xmlnode)
@@ -134,9 +134,9 @@ class GenericWrapper:
     def add(self, child, insert_before=None):
         """ Add `child` as to node.
 
-        :param WrapperClass child: child to insert/append
-        :param WrapperClass insert_before: insert child before `insert_before`
-        :returns: WrappedClass child
+        :param GenericWrapper child: child to insert/append
+        :param GenericWrapper insert_before: insert child before `insert_before`
+        :returns: GenericWrapper child
         """
         if insert_before is not None:
             position = self.index(insert_before)
@@ -148,7 +148,7 @@ class GenericWrapper:
     def remove(self, child):
         """ Remove `child` object from node.
 
-        :param WrapperClass child: child to remove
+        :param GenericWrapper child: child to remove
         """
         self.xmlnode.remove(child.xmlnode)
 

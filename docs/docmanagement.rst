@@ -9,15 +9,15 @@ Open an existing Document
 .. function:: ezodf.opendoc(filename)
 
    :param str filename: filename of the document
-   :returns: :class:`PackagedDocument` or :class:`FlatXMLDocument`
+   :returns: :class:`~document.PackagedDocument` or :class:`~document.FlatXMLDocument`
 
-   Open the document `filename`. Returns an instance of the :class:`PackagedDocument`
+   Open the document `filename`. Returns an instance of the :class:`~document.PackagedDocument`
    class, if the file is a zip-packed document, or an instance of the
-   :class:`FlatXMLDocument` class, if the document is a single-XML-file document.
+   :class:`~document.FlatXMLDocument` class, if the document is a single-XML-file document.
    The document type is determined by the file content.
 
-   You can check the document type by the :attr:`~PackagedDocument.doctype` or the
-   :attr:`~PackagedDocument.mimetype` attribute.
+   You can check the document type by the :attr:`~document.PackagedDocument.doctype` or the
+   :attr:`~document.PackagedDocument.mimetype` attribute.
 
 .. _newdoc:
 
@@ -29,14 +29,14 @@ Create a new Document
   :param str doctype: document type, three character string like the usual file
     extensions (``'odt'`` for text, ``'ods'`` for spreadsheets and so on)
   :param str filename: filename of the document, can also be set by the
-    :func:`~PackagedDocument.saveas()` method
+    :func:`~document.PackagedDocument.saveas()` method
   :param str template: filename of a template file, it has to be a zip-packed
     document and the parameter `doctype` is ignored, because the template content
     determines the document type.
-  :returns: :class:`PackagedDocument`
+  :returns: :class:`~document.PackagedDocument`
 
   Create a new ODF Document. Returns always an instance of the
-  :class:`PackagedDocument` class.
+  :class:`~document.PackagedDocument` class.
 
 .. _doctype_table:
 
@@ -64,12 +64,23 @@ odm     application/vnd.oasis.opendocument.text-master
 oth     application/vnd.oasis.opendocument.text-web
 ======= ========================================================================
 
-Data model
+Data Model
 ----------
 
 I use the `lxml <http://codespeak.net/lxml/>`_ package to manage the XML data.
-You have access to the `lxml` Elements by the **xmlnode** attribute all classes.
-All document classes have the attributes **meta**, **styles**,
-**manifest** and **content** and each of them have a **xmlnode** attribute to
-the XML representation of the associated XML files `manifest.xml`, `styles.xml`,
-`meta.xml` and `content.xml`.
+You have access to the :mod:`lxml` Elements by the :attr:`~base.GenericWrapper.xmlnode`
+attribute in all ODF Content Wrapper classes which bases on the
+:class:`~base.GenericWrapper` class.
+
+All document classes have the attributes :attr:`~document.PackagedDocument.meta`,
+:attr:`~document.PackagedDocument.styles`, :attr:`~document.PackagedDocument.manifest`,
+:attr:`~document.PackagedDocument.content` and :attr:`~document.PackagedDocument.body`
+and each of them have a :attr:`xmlnode` attribute to the XML representation
+of the associated XML files `manifest.xml`, `styles.xml`, `meta.xml` and
+`content.xml`.
+
+.. toctree::
+   :maxdepth: 1
+
+   xmlns.rst
+   base.rst

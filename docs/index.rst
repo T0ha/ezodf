@@ -14,22 +14,29 @@ To open an existing document, just use the :func:`ezodf.opendoc` function::
     doc = ezodf.opendoc('documentname.ext')
 
 You don't have to care about the document type at the open function, to check
-the type of the document you got, use the :attr:`~PackagedDocument.doctype` or
-the :attr:`~PackagedDocument.mimetype` attribute::
+the type of the document, use the :attr:`~document.PackagedDocument.doctype` or
+the :attr:`~document.PackagedDocument.mimetype` attribute::
 
     if doc.doctype == 'odt':
         pass
         # this is a text document
         # and so on for 'ods', 'odg' or 'odp'
 
-To change the meta data of the document use the :attr:`~PackagedDocument.meta`
-attribute, which is an instance of the :class:`~meta.Meta` class::
+To change the meta data of the document use the :attr:`~document.PackagedDocument.meta`
+attribute, which is an instance of the :class:`meta.Meta` class::
 
    document_title = doc.meta['title']
    # or set meta attributes
    doc.meta['description'] = 'set a new description'
 
-For more information about meta data see: :ref:`meta module`.
+And save the modified document with the same filename as opened, a backup of
+the original file will be created (if not disabled)::
+
+   doc.save()
+
+or save it with a new name::
+
+   doc.saveas('newname.ext')
 
 Contents
 --------

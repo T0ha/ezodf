@@ -85,10 +85,10 @@ def register_class(cls):
     classmap[cls.TAG] = cls
     return cls
 
-def wrap(element, default='GenericWrapper'):
+def wrap(element):
     """ Wrap element into a Python wrapper object. """
     try:
         cls = classmap[element.tag]
     except KeyError: # wrap it into the GenericWrapper
-        cls = classmap[default]
+        cls = classmap['GenericWrapper']
     return cls(xmlnode=element)

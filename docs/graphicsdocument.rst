@@ -1,3 +1,5 @@
+.. module:: drawing
+
 Drawing Document
 ================
 

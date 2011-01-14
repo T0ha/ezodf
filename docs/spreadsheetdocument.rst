@@ -1,3 +1,5 @@
+.. module:: spreadsheet
+
 Spreadsheet Document
 ====================
 

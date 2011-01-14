@@ -1,25 +1,23 @@
-.. _meta module:
-
 Meta Data Management
 ====================
+
+.. module:: meta
 
 In the `meta` module contains all classes to access the documents
 meta data, keywords and user defined tags.
 
-- :ref:`Meta class` gives you access to the simple meta data
-- :ref:`Keywords class` gives you access to the document keywords
-- :ref:`Usertags class` gives you access to the user defined tags
-- :ref:`Statistic class` gives you access to the document statistics
+- :class:`Meta` class gives you access to the simple meta data
+- :class:`Keywords` class gives you access to the document keywords
+- :class:`Usertags` class gives you access to the user defined tags
+- :class:`Statistic` class gives you access to the document statistics
 
-Every ODF document class has an attribute called `meta` which is an instance
-of `Meta` class.
+Every ODF document class has an attribute called :attr:`~document.PackagedDocument.meta`
+which is an instance of :class:`Meta` class.
 
-.. _Meta class:
-
-Meta class
+Meta Class
 ----------
 
-.. class:: meta.Meta()
+.. class:: Meta()
 
 .. warning::
 
@@ -30,15 +28,15 @@ You always get/set strings, also for date and time values.
 Methods
 ~~~~~~~
 
-.. method:: __setitem__(key, value)
+.. method:: Meta.__setitem__(key, value)
 
    Set metatag `name` to `value`.
 
-.. method:: __getitem__(name)
+.. method:: Meta.__getitem__(name)
 
    Get metatag `name`.
 
-You got access to the documents metatags by the [ ] operator::
+You got access to the documents metatags by the `subscript` operator::
 
     # get values
     value = document.meta['generator']
@@ -68,54 +66,58 @@ editing-cycles   number of editing cycles the document has been through.
 language         the document language like ``'en-US'`` or ``'de-AT'``
 ================ ============================================================
 
-.. method:: clear()
+.. method:: Meta.clear()
 
    Delete all metatags, keywords, user-defined tags and statistics.
 
 Attributes
 ~~~~~~~~~~
 
-.. attribute:: keywords
+.. attribute:: Meta.keywords
 
-   Attribute of the `Meta` class, gives you access to the documents
-   keywords by the :ref:`Keywords class`.
+   The :attr:`~Meta.keywords` attribute gives you access to the documents
+   keywords by the :class:`Keywords` class.
 
-.. attribute:: usertags
+.. attribute:: Meta.usertags
 
-   Attribute of the `Meta` class, gives you access to the documents
-   user defined tags by the :ref:`Usertags class`.
+   The :attr:`~Meta.usertags` attribute gives you access to the documents
+   user defined tags by the :class:`Usertags` class.
 
-.. attribute:: count
+.. attribute:: Meta.count
 
-   Attribute  of the `Meta` class, gives you access to the documents
-   statistics by the :ref:`Statistic class`.
+   The :attr:`~Meta.count` attribute  gives you access to the documents
+   statistics by the :class:`Statistic` class.
 
-.. _Keywords class:
-
-Keywords class
+Keywords Class
 --------------
 
-The `Keywords` class manages the `<meta:keyword>` elements.
+.. class:: Keywords
+
+   The :class:`Keywords` class manages the `<meta:keyword>` elements.
+
+.. warning::
+
+   Don't create instances of this class by yourself.
 
 Methods
 ~~~~~~~
 
-.. method:: add(keyword)
+.. method:: Keywords.add(keyword)
 
    Add `keyword` to the document meta data.
 
-.. method:: remove(keyword)
+.. method:: Keywords.remove(keyword)
 
    remove `keyword` from the document meta data.
 
-.. method:: __iter__()
+.. method:: Keywords.__iter__()
 
    Iterate over all `keywords`::
 
        for keyword in document.meta.keywords:
           pass # or do something
 
-.. method:: __contains__(keyword)
+.. method:: Keywords.__contains__(keyword)
 
    `True` if `keyword` is in the meta data else `False`.
 
@@ -124,35 +126,39 @@ Methods
        if 'text' in document.meta.keywords:
            pass # or do something
 
-.. method:: clear()
+.. method:: Keywords.clear()
 
    Delete all keywords.
 
-.. _Usertags class:
-
-Usertags class
+Usertags Class
 --------------
 
-The `Usertags` class manages the `<meta:user-defined>` elements.
+.. class:: Usertags
+
+   The :class:`Usertags` class manages the `<meta:user-defined>` elements.
+
+.. warning::
+
+   Don't create instances of this class by yourself.
 
 Methods
 ~~~~~~~
 
-.. method:: set(name, value, value_type=None)
+.. method:: Usertags.set(name, value, value_type=None)
 
    Set the usertag `name` the `value` and the type to `value_type`. The
    allowed meta types are ``'float'``, ``'date'``, ``'time'``, ``'boolean'``
    and ``'string'``.
 
-.. method:: __setitem__(name, value)
+.. method:: Usertags.__setitem__(name, value)
 
    Set usertag `name` to `value`, type is ``'string'``.
 
-.. method:: __getitem__(name)
+.. method:: Usertags.__getitem__(name)
 
    Get usertag `name`.
 
-.. method:: __delitem__(name)
+.. method:: Usertags.__delitem__(name)
 
    Delete usertag `name`.
 
@@ -162,12 +168,12 @@ Methods
        value = document.meta.usertags['mytag']
        del document.meta.usertags['mytag']
 
-.. method:: typeof(name)
+.. method:: Usertags.typeof(name)
 
    Get type of user defined tag `name`. The allowed meta types are ``'float'``,
    ``'date'``, ``'time'``, ``'boolean'`` and ``'string'``.
 
-.. method:: __contains__(name)
+.. method:: Usertags.__contains__(name)
 
    `True` if the document has a usertag `name` else `False`.
 
@@ -176,7 +182,7 @@ Methods
        if 'mytag' in document.meta.usertags:
            pass # or do something
 
-.. method:: __iter__()
+.. method:: Usertags.__iter__()
 
    Iterate over all `usertags`, returns 2-tuple (tagname, tagvalue)::
 
@@ -186,30 +192,35 @@ Methods
        # create a dict of user defined tags
        d = dict(document.meta.usertags)
 
-.. method:: update(d)
+.. method:: Usertags.update(d)
 
    Set user defined tags from dict `d`.
 
-.. method:: clear()
+.. method:: Usertags.clear()
 
    Delete all user defined tags.
 
-.. _Statistic class:
 
-Statistic class
+Statistic Class
 ---------------
 
-The `Statistic` class manages the `<meta:document-statistic>` element.
+.. class:: Statistic
+
+   The :class:`Statistic` class manages the `<meta:document-statistic>` element.
+
+.. warning::
+
+   Don't create instances of this class by yourself.
 
 Methods
 ~~~~~~~
 
-.. method:: __getitem__(key)
+.. method:: Statistic.__getitem__(key)
 
    Get count of statistic element `key` as `int`, if `key` is not defined
    for the document the result is ``0``.
 
-.. method:: __setitem__(key, value)
+.. method:: Statistic.__setitem__(key, value)
 
    Set count of statistic element `key` to `value`.
 
@@ -220,7 +231,7 @@ Methods
       # or set values
       document.meta.count['character'] = 4711
 
-.. method:: __iter__()
+.. method:: Statistic.__iter__()
 
    Iterate over all statistics, returns 2-tuple (element, value).
 
@@ -228,11 +239,11 @@ Methods
 
       d = dict(document.meta.count)
 
-.. method:: update(d)
+.. method:: Statistic.update(d)
 
    Set statistics from dict `d`.
 
-.. method:: clear()
+.. method:: Statistic.clear()
 
    Clear all statistics.
 

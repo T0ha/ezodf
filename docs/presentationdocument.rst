@@ -1,3 +1,5 @@
+.. module:: presentation
+
 Presentation Document
 =====================
 

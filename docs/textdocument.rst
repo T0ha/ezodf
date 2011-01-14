@@ -1,3 +1,5 @@
+.. module:: text
+
 Text Document
 =============
 

@@ -1,4 +1,4 @@
-.. document:
+.. module:: document
 
 Document Classes
 ================
