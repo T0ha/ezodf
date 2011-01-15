@@ -23,8 +23,7 @@ class GenericWrapper:
             self.xmlnode = etree.Element(self.TAG)
 
     def __iter__(self):
-        for element in self.xmlnode.iterchildren():
-            yield wrap(element)
+        return map(wrap, self.xmlnode.iterchildren())
 
     def __len__(self):
         """ Get count of children """
@@ -101,7 +100,12 @@ class GenericWrapper:
         del self.xmlnode[int(index)]
 
     def filter(self, kind):
-        return (e for e in iter(self) if e.kind == kind)
+        """ Filter child nodes by `kind`. """
+        return filter(lambda e: e.kind == kind, iter(self))
+
+    def findall(self, tag):
+        """ Find all subelements by xml-tag (in Clark Notation)."""
+        return map(wrap, self.xmlnode.findall(tag))
 
     ## Attribute access for the xmlnode element
 
