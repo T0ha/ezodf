@@ -10,6 +10,14 @@ from lxml import etree
 
 from .const import ALL_NSMAP
 
+def subelement(parent, tag, new=True):
+    """ Find/create SubElement `tag` in parent node.
+    """
+    element = parent.find(tag)
+    if (element is None) and (new is True):
+        element = etree.SubElement(parent, tag)
+    return element
+
 class _XMLNamespaces:
     def __init__(self, namespaces):
         self.prefix2uri = {}
@@ -51,6 +59,10 @@ class _XMLNamespaces:
         else:
             raise ValueError("prefix-notation required 'prefix:local': %s" % tag)
 
+# global ODF Namespaces with OASIS prefixes
+XML = _XMLNamespaces(ALL_NSMAP)
+CN = XML._prefix2clark_cached
+
 class XMLMixin:
     def tobytes(self, xml_declaration=None, pretty_print=False):
         """ Returns the XML representation as bytes in 'UTF-8' encoding.
@@ -62,33 +74,24 @@ class XMLMixin:
                               xml_declaration=xml_declaration,
                               pretty_print=pretty_print)
 
-# global ODF Namespaces with OASIS prefixes
-XML = _XMLNamespaces(ALL_NSMAP)
+class _ClassRegistry:
+    """ Class Registry """
+    _classmap = {}
 
-def subelement(parent, tag, new=True):
-    """ Find/create SubElement `tag` in parent node.
-    """
-    element = parent.find(tag)
-    if (element is None) and (new is True):
-        element = etree.SubElement(parent, tag)
-    return element
+    def register(self, cls):
+        """ Class registration. """
+        self._classmap[cls.TAG] = cls
+        return cls
 
-def CN(tag):
-    """ Convert `tag` string into clark notation. """
-    return XML._prefix2clark_cached(tag)
+    def wrap(self, element):
+        """ Wrap element into a wrapper object. """
+        try:
+            cls = self._classmap[element.tag]
+        except KeyError: # wrap it into the GenericWrapper
+            cls = self._classmap['GenericWrapper']
+        return cls(xmlnode=element)
 
-# tag to class mapper
-classmap = {}
+_class_registry = _ClassRegistry()
+register_class = _class_registry.register
+wrap = _class_registry.wrap
 
-def register_class(cls):
-    """ Function/Decorator for class registration. """
-    classmap[cls.TAG] = cls
-    return cls
-
-def wrap(element):
-    """ Wrap element into a Python wrapper object. """
-    try:
-        cls = classmap[element.tag]
-    except KeyError: # wrap it into the GenericWrapper
-        cls = classmap['GenericWrapper']
-    return cls(xmlnode=element)
