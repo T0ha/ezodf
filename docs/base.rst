@@ -112,7 +112,13 @@ Methods
 
    :param str kind: class name of element to filter
 
-   Iterate over all XML child nodes, where `child.kind == kind`.
+   Filter all child nodes by :attr:`~GenericWrapper.kind`.
+
+.. method:: GenericWrapper.findall(tag)
+
+   :param str tag: tag name in Clark Notation
+
+   Find all subelements by xml-tag (in Clark Notation).
 
 .. method:: GenericWrapper.get_attr(key, default=None)
 

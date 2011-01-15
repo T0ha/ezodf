@@ -104,7 +104,7 @@ class GenericWrapper:
         return filter(lambda e: e.kind == kind, iter(self))
 
     def findall(self, tag):
-        """ Find all subelements by xml-tag (in Clark Notation)."""
+        """ Find all subelements by xml-tag (in Clark Notation). """
         return map(wrap, self.xmlnode.findall(tag))
 
     ## Attribute access for the xmlnode element

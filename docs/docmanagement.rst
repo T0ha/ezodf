@@ -1,7 +1,7 @@
-.. _opendoc:
-
 Document Management
 ===================
+
+.. _opendoc:
 
 Open an existing Document
 -------------------------

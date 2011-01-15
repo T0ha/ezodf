@@ -11,14 +11,31 @@ import sys
 import unittest
 
 # trusted or separately tested modules
-from ezodf.xmlns import XML, etree
+from ezodf.xmlns import etree, CN
 
 # objects to test
 from ezodf.base import GenericWrapper
 
+TEXT_NS = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+
 DATA1 = '<GenericWrapper name="root"><GenericWrapper pos="0"/><GenericWrapper pos="1"/>'\
         '<GenericWrapper pos="2"/><GenericWrapper pos="3"/></GenericWrapper>'
-
+DATA2 = """
+<text:p xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0">
+<text:span>
+SPAN1
+  <text:span>
+  SPAN2
+  </text:span>
+</text:span>
+<text:span>
+SPAN3
+  <text:span>
+  SPAN4
+  </text:span>
+</text:span>
+</text:p>
+"""
 class TestBaseClass(unittest.TestCase):
     def test_bare_init(self):
         b = GenericWrapper()
@@ -126,6 +143,34 @@ class TestBaseClass(unittest.TestCase):
         b.remove(b[2])
         self.assertEqual(len(b), 3)
         self.assertEqual(b[2].get_attr('pos'), '3')
+
+    def test_filter_All(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        result = list(b.filter('GenericWrapper'))
+        self.assertEqual(len(result), 4)
+
+    def test_filter_None(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        result = list(b.filter('Unknown'))
+        self.assertEqual(len(result), 0)
+
+    def test_findall_All(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        result = list(b.findall(GenericWrapper.TAG))
+        self.assertEqual(len(result), 4)
+
+    def test_findall_None(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        result = list(b.findall(CN('text:p')))
+        self.assertEqual(len(result), 0)
+
+    def test_findall_subelements(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA2))
+        subelements = list(b.findall(CN('text:span')))
+        children = list(b.filter("Span"))
+        self.assertEqual(len(subelements), 2)
+        self.assertEqual(len(children), 2)
+
 
 if __name__=='__main__':
     unittest.main()

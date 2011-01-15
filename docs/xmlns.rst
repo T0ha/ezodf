@@ -15,15 +15,17 @@ Functions
 
 .. function:: register_class(cls)
 
-   Register `cls` for wrapping mechanism. Can be used as class decorator.
+   Register `cls` for wrapping mechanism.
+   Can be used as class decorator.
    `cls` has to have a :attr:`cls.TAG` attribute in Clark-Notation which
-   determines the XML element to wrap, and `cls` has to accept the keyword attribute
-   `xmlnode` which is the :class:`lxml.Element` object to wrap.
+   determines the XML element to wrap, and `cls` has to accept the keyword
+   attribute `xmlnode` on the `__init__()` constructor, which is the
+   :class:`lxml.Element` object to wrap. (see :class:`~base.GenericWrapper`)
 
 .. seealso:: :class:`base.GenericWrapper`
 
 .. function:: wrap(element)
 
-   Wrap element into a Python wrapper object, where element is an
-   :class:`lxml.Element` object. Returns the :class:`base.GenericWrapper` if
-   no other python class is registered for `element`.
+   Wrap element into a wrapper object, where element is an
+   :class:`lxml.Element` object. Returns a :class:`~base.GenericWrapper` object,
+   if no class is registered for `element`.

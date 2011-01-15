@@ -54,6 +54,7 @@ Contents
    spreadsheetdocument.rst
    graphicsdocument.rst
    presentationdocument.rst
+   howtos.rst
 
 
 Indices and tables
