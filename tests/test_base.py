@@ -128,14 +128,14 @@ class TestBaseClass(unittest.TestCase):
         pos = len(b)
         newitem = GenericWrapper()
         newitem.set_attr('name', 'newitem')
-        b.add(newitem)
+        b.append(newitem)
         self.assertEqual(b[pos].get_attr('name'), 'newitem')
 
     def test_insert_before(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         newitem = GenericWrapper()
         newitem.set_attr('name', 'newitem')
-        b.add(newitem, insert_before=b[2])
+        b.insert_before(b[2], newitem)
         self.assertEqual(b[2].get_attr('name'), 'newitem')
 
     def test_remove(self):

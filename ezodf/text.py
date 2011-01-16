@@ -19,7 +19,7 @@ class Span(GenericWrapper):
         if stylename:
             self.stylename = stylename
         if text:
-            self.append_plaintext(text)
+            self.append_text(text)
 
     @property
     def style_name(self):
@@ -46,7 +46,7 @@ class Span(GenericWrapper):
             text.append(element.xmlnode.tail)
         return "".join(filter(None, text))
 
-    def append_plaintext(self, text):
+    def append_text(self, text):
         def append(text, new):
             return text + new if text else new
 
@@ -58,7 +58,7 @@ class Span(GenericWrapper):
                 else:
                     self.text = append(self.text, tag)
             else:
-                self.add(tag)
+                self.append(tag)
 
 @register_class
 class Paragraph(Span):
@@ -68,7 +68,7 @@ class Paragraph(Span):
 class Heading(Span):
     TAG = CN('text:h')
 
-    def __init__(self, text="", outline_level=1, stylename=None, xmlnode=None):
+    def __init__(self, text="", outline_level=1, stylename="", xmlnode=None):
         super(Heading, self).__init__(text, stylename, xmlnode)
         if xmlnode is None:
             self.outline_level = outline_level
@@ -82,6 +82,37 @@ class Heading(Span):
         number = max(int(level), 1)
         self.set_attr(CN('text:outline-level'), str(number))
 
+@register_class
+class Hyperlink(Paragraph):
+    TAG = CN('text:a')
+
+    def __init__(self, href, text="", stylename="", xmlnode=None):
+        super(Hyperlink, self).__init__(text, stylename, xmlnode)
+        self.href = href
+        self.target_frame = '_blank'
+
+    @property
+    def name(self):
+        return self.get_attr(CN('office:name'))
+    @name.setter
+    def name(self, name):
+        self.set_attr(CN('office:name'), name)
+
+    @property
+    def href(self):
+        return self.get_attr(CN('xlink:href'))
+    @href.setter
+    def href(self, href):
+        self.set_attr(CN('xlink:href'), href)
+
+    @property
+    def target_frame(self):
+        return self.get_attr(CN('office:target-frame-name'))
+    @target_frame.setter
+    def target_frame(self, framename):
+        self.set_attr(CN('office:target-frame-name'), framename)
+        show = 'new' if framename == '_blank' else 'replace'
+        self.set_attr(CN('xlink:show'), show)
 
 @register_class
 class Section(GenericWrapper):

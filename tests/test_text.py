@@ -134,7 +134,7 @@ class TestSpan(unittest.TestCase):
 
     def test_append_text_4(self):
         span = Span(text="TEXT")
-        span.append_plaintext("  TAIL")
+        span.append_text("  TAIL")
         self.assertEqual(span.text, "TEXT ")
         self.assertEqual(span[0].TAG, CN('text:s'))
         self.assertEqual(span[0].tail, "TAIL")

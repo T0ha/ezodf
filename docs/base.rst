@@ -134,13 +134,18 @@ Methods
 
    Set attribute `key` of the `wrapped` XML node to value.
 
-.. method:: GenericWrapper.add(child, insert_before=None)
+.. method:: GenericWrapper.append(child)
 
-   :param GenericWrapper child: insert or append `wrapped` XML node
-   :param GenericWrapper insert_before: insert child before `insert_before`
+   :param GenericWrapper child: append `wrapped` XML node
 
-   Append `child` as last child into the `wrapped` XML node or insert `child`
-   before the child node `insert_before`.
+   Append `child` as last child into the `wrapped` XML node.
+
+.. method:: GenericWrapper.insert_before(target, child)
+
+   :param GenericWrapper target: target node
+   :param GenericWrapper child: new node
+
+   Insert `child` before the target node `target`.
 
 .. method:: GenericWrapper.remove(child)
 

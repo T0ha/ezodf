@@ -8,11 +8,11 @@ Version 0.1.0 - 02 January 2011
   * open/saveas ODF documents
   * modify meta data
 
-Version 0.2.0 - 16 January 2011
+Version 0.2.0 - ?? January 2011
 
   * Alpha version
   * create new empty odt, ods, odp, odg file
   * added template support - can create ott, ots, otp, otg files
   * open documents - ezodf.opendoc(filename)
   * create new documents - ezdof.newdoc(doctype, filename, template)
-  * Text: add paragraphs and headings to odt files
+  * Text: added Paragraph, Heading, Span, Hyperlink objects

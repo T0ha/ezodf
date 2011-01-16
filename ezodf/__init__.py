@@ -21,4 +21,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .document import opendoc, newdoc
-from .text import Paragraph, Heading, Span, List, Section
+
+# register classes by import
+from .whitespaces import LineBreak, Tabulator, Spaces, SoftPageBreak
+from .text import Span, Paragraph, Heading, List, Section, Hyperlink

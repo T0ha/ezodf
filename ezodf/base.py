@@ -135,18 +135,23 @@ class GenericWrapper:
 
     ## List operations
 
-    def add(self, child, insert_before=None):
-        """ Add `child` as to node.
+    def append(self, child):
+        """ Append `child` as to node.
 
-        :param GenericWrapper child: child to insert/append
-        :param GenericWrapper insert_before: insert child before `insert_before`
+        :param GenericWrapper child: child to append
+        """
+        self.xmlnode.append(child.xmlnode)
+        return child # pass through
+
+    def insert_before(self, target, child):
+        """ Insert `child` before to `target`.
+
+        :param GenericWrapper target: target node
+        :param GenericWrapper child: new object
         :returns: GenericWrapper child
         """
-        if insert_before is not None:
-            position = self.index(insert_before)
-            self.insert(position, child)
-        else:
-            self.xmlnode.append(child.xmlnode)
+        position = self.index(target)
+        self.insert(position, child)
         return child # pass through
 
     def remove(self, child):

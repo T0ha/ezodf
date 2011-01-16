@@ -18,14 +18,17 @@ see :ref:`newdoc`
 
 All ODF objects, like :class:`~text.Paragraph` or :class:`~text.Heading`, resides
 in the :attr:`~document.PackagedDocument.body` attribute of the document object.
-All data management function are method calls to this object.
+All data management function are method calls of this object.
 
 **How do I append/insert ODF objects to a document?**
 
 Use the :attr:`~document.PackagedDocument.body` attribute of the document object::
 
-    p1 = doc.body.add(Paragraph('text1')) # append/add at the end of the document
-    p2 = doc.body.add(Paragraph('text2'), insert_before=p1) # insert p2 before p1
+    p1 = doc.body.append(Paragraph('text1'))
+    p2 = doc.body.insert_before(p1, Paragraph('text2'))
+
+    # insert object at 'position'
+    doc.body.insert(0, Paragraph('New first paragraph.'))
 
 **How do I get ODF objects from a document?**
 
@@ -67,6 +70,13 @@ Use the :attr:`~document.PackagedDocument.body` attribute of the document object
 
 Text Documents
 --------------
+
+**How to insert a page break?**
+
+Add :class:`~whitespaces.SoftPageBreak` object to heading or paragraph::
+
+   p = doc.body.append(Paragraph("some text"))
+   p.append(SoftPageBreak())
 
 .. _howtos_spreadsheet:
 
