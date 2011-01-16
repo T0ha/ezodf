@@ -6,14 +6,14 @@ Text Document
 Span Class
 ----------
 
-.. class:: Span(text="", stylename="", xmlnode=None)
+.. class:: Span(text="", style_name="", xmlnode=None)
 
    extends the :class:`~base.GenericWrapper` class.
 
    The :class:`Span` element represents portions of text that are attributed
    using a certain text style. The content of this element is the
    text that uses the text style. The name of the text style is the value of the
-   :attr:`Span.stylename` attribute. These attribute must refer to a text style.
+   :attr:`Span.style_name` attribute. These attribute must refer to a text style.
    :class:`Span` elements can be nested.
 
    Whitespace encoding is applied to the `text` parameter.
@@ -26,7 +26,7 @@ Attributes
 
    Count of charcters of the plain text representation.
 
-.. attribute:: Span.stylename (read/write)
+.. attribute:: Span.style_name (read/write)
 
    Name of the associated style.
 
@@ -46,17 +46,39 @@ Methods
 Paragraph Class
 ---------------
 
-.. class:: Paragraph(text="", stylename="", xmlnode=None)
+.. class:: Paragraph(text="", style_name="", xmlnode=None)
 
    extends the :class:`Span` class.
 
    Paragraphs are the basic unit of text. Whitespace encoding is applied to
    the `text` parameter. (see :ref:`whitespace_encoding`)
 
+Attributes
+~~~~~~~~~~
+
+.. attribute:: Paragraph.cond_style_name (read/write)
+
+   The :attr:`~Paragraph.cond_style_name` attribute references a conditional-style,
+   that is, a style that contains conditions and maps to other styles. If a
+   conditional style is applied to a paragraph, the :attr:`~Paragraph.style_name`
+   attribute contains the name of the style that was the result of the
+   conditional style evaluation, while the conditional style name itself is
+   the value of the :attr:`~Paragraph.cond_style_name` attribute.
+
+.. attribute:: Paragraph.ID (read/write)
+
+   A paragraph may have an ID. This ID can be used to reference the paragraph
+   from other elements.
+
+NumberedParagraph Class
+-----------------------
+
+.. class:: NumberedParagraph(number, text="", style_name="", xmlnode=None)
+
 Heading Class
 -------------
 
-.. class:: Heading(text="", outline_level=1, stylename="", xmlnode=None)
+.. class:: Heading(text="", outline_level=1, style_name="", xmlnode=None)
 
    extends the :class:`Span` class.
 
@@ -73,14 +95,38 @@ Attributes
    The :attr:`~text.Heading.outline_level` attribute determines the level
    of the heading, starting with 1.
 
+.. attribute:: Heading.restart_numbering (read/write)
+
+   The numbering of headers can be restarted by setting the
+   :attr:`~text.Heading.restart_numbering` attribute to `True`.
+
+.. attribute:: Heading.start_value (read/write)
+
+   The attribute :attr:`~text.Heading.start_value` may be used to restart the
+   numbering of headers of the current header's level, by setting a new value
+   for the numbering.
+
+.. attribute:: Heading.suppress_numbering (read/write)
+
+   It is sometimes desired to have a specific heading which should not be
+   numbered. To facilitate this, set this attribute `True` and the given header
+   will not be numbered.
+
+.. attribute:: Heading.formatted_number (read/write)
+
+   If a heading has a numbering applied, the text of the formatted number can
+   be included. This text can be used by applications that do not support
+   numbering of headings, but it will be ignored by applications that support
+   numbering.
+
 .. _whitespace_encoding:
 
 Hyperlink Class
 ---------------
 
-.. class:: Hyperlink(href, text="", stylename="", xmlnode=None)
+.. class:: Hyperlink(href, text="", style_name="", xmlnode=None)
 
-   extends the :class:`Paragraph` class.
+   extends the :class:`Span` class.
 
    Represents `hyperlinks` in text documents. The parameter `href` is the
    URL of the target location of this link. The `text` parameter is the link
@@ -120,6 +166,26 @@ Attributes
                 the named frame does not exist, a new frame with that name is
                 created.
    ============ =============================================================
+
+List Class
+----------
+
+.. class:: List(style_name="", xmlnode=None)
+
+ListItem Class
+--------------
+
+.. class:: ListItem(text="", xmlnode=None)
+
+ListHeader Class
+----------------
+
+.. class:: ListHeader(text="", xmlnode=None)
+
+Section Class
+-------------
+
+.. class:: Section(xmlnode=None)
 
 Whitespace Encoding/Decoding
 ----------------------------

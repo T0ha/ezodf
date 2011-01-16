@@ -24,4 +24,20 @@ from .document import opendoc, newdoc
 
 # register classes by import
 from .whitespaces import LineBreak, Tabulator, Spaces, SoftPageBreak
-from .text import Span, Paragraph, Heading, List, Section, Hyperlink
+from .text import Span, Paragraph, Heading, Section, Hyperlink
+from .text import List, ListHeader, ListItem, NumberedParagraph
+
+def ezlist(items, header="", style_name=""):
+    """ Create a simple list.
+
+    :param iterable items: iterable which yields strings
+    :param str header: prepending list header
+    :param str style_name: name of the associated list style
+    :returns: ezodf.text.List object
+    """
+    slist = List(style_name=style_name)
+    if header:
+        slist.header = ListHeader(header)
+    for item in items:
+        slist.append(ListItem(item))
+    return slist
