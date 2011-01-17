@@ -6,10 +6,13 @@
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-from .xmlns import CN, register_class, subelement
+import random
+
+from .xmlns import CN, register_class, subelement, wrap
 from .base import GenericWrapper, safelen
 from .whitespaces import encode_whitespaces
 
+FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
 class _StyleNameMixin:
     @property
@@ -27,7 +30,7 @@ class _NumberingMixin:
         return int(value) if value is not None else None
     @start_value.setter
     def start_value(self, value):
-        value = str(int(value))
+        value = str(max(int(value), 1))
         self.set_attr(CN('text:start-value'), value)
 
     @property
@@ -45,10 +48,11 @@ class Span(GenericWrapper, _StyleNameMixin):
     TAG = CN('text:span')
     def __init__(self, text="", style_name="", xmlnode=None):
         super(Span, self).__init__(xmlnode)
-        if style_name:
-            self.style_name = style_name
-        if text:
-            self.append_text(text)
+        if xmlnode is None:
+            if style_name:
+                self.style_name = style_name
+            if text:
+                self.append_text(text)
 
     @property
     def textlen(self):
@@ -102,8 +106,33 @@ class Paragraph(Span):
         self.set_attr(CN('text:id'), value)
 
 @register_class
-class NumberedParagraph(Span):
+class NumberedParagraph(GenericWrapper, _NumberingMixin):
     TAG = CN('text:numbered-paragraph')
+
+    def __init__(self, paragraph=None, xmlnode=None):
+        super(NumberedParagraph, self).__init__(xmlnode)
+        if xmlnode is None:
+            if paragraph is not None:
+                if isinstance(paragraph, GenericWrapper):
+                    self.append(paragraph)
+                else:
+                    raise TypeError("Parameter 'paragraph' has to be a subclass of class 'GenericWrapper'")
+
+
+    @property
+    def level(self):
+        return int(self.get_attr(CN('text:level')))
+    @level.setter
+    def level(self, value):
+        number = max(int(value), 1)
+        self.set_attr(CN('text:level'), str(number))
+
+    @property
+    def content(self):
+        p = self.xmlnode.find(CN('text:h'))
+        if p is None:
+            p = subelement(self.xmlnode, CN('text:p'))
+        return wrap(p)
 
 @register_class
 class Heading(Span, _NumberingMixin):
@@ -143,10 +172,11 @@ class Heading(Span, _NumberingMixin):
 class Hyperlink(Span):
     TAG = CN('text:a')
 
-    def __init__(self, href, text="", style_name="", xmlnode=None):
+    def __init__(self, href="", text="", style_name="", xmlnode=None):
         super(Hyperlink, self).__init__(text, style_name, xmlnode)
-        self.href = href
-        self.target_frame = '_blank'
+        if xmlnode is None:
+            if href: self.href = href
+            self.target_frame = '_blank'
 
     @property
     def name(self):
@@ -178,8 +208,9 @@ class ListHeader(GenericWrapper):
 
     def __init__(self, text="", xmlnode=None):
         super(ListHeader, self).__init__(xmlnode)
-        if text:
-            self.append(Paragraph(text))
+        if xmlnode is None:
+            if text:
+                self.append(Paragraph(text))
 
 
 @register_class
@@ -193,8 +224,9 @@ class List(GenericWrapper, _StyleNameMixin):
 
     def __init__(self, style_name="", xmlnode=None):
         super(List, self).__init__(xmlnode)
-        if style_name:
-            self.style_name = stylename
+        if xmlnode is None:
+            if style_name:
+                self.style_name = style_name
 
     @property
     def continue_numbering(self):
@@ -206,7 +238,8 @@ class List(GenericWrapper, _StyleNameMixin):
 
     @property
     def header(self):
-        return self.xmlnode.find(CN('text:list-header'))
+        h = self.xmlnode.find(CN('text:list-header'))
+        return wrap(h) if h else None
     @header.setter
     def header(self, header):
         if header.kind != 'ListHeader':
@@ -214,12 +247,45 @@ class List(GenericWrapper, _StyleNameMixin):
         oldheader = self.xmlnode.find(CN('text:list-header'))
         if oldheader:
             self.xmlnode.remove(oldheader)
-        self.append(header)
+        self.insert(0, header) # should be first child node
 
     def iteritems(self):
         return self.findall(CN('text:list-item'))
 
 
 @register_class
-class Section(GenericWrapper):
+class Section(GenericWrapper, _StyleNameMixin):
     TAG = CN('text:section')
+
+    def __init__(self, name="", style_name="", xmlnode=None):
+        super(Section, self).__init__(xmlnode)
+        if xmlnode is None:
+            if style_name:
+                self.style_name = style_name
+            if name:
+                self.name = name
+    @property
+    def name(self):
+        return self.get_attr(CN('text:name'))
+    @name.setter
+    def name(self, value):
+        return self.set_attr(CN('text:name'), value)
+
+    @property
+    def protected(self):
+        value = self.get_attr(CN('text:protected'))
+        if value:
+            return True if value == 'true' else False
+        else:
+            return False
+
+    @protected.setter
+    def protected(self, value):
+        if value:
+            value = 'true'
+            # set a random password, guess!
+            key = random.sample(FNCHARS, 12)
+            self.set_attr(CN('text:protection-key'), key)
+        else:
+            value = 'false'
+        self.set_attr(CN('text:protected'), value)
