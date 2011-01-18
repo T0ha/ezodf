@@ -50,17 +50,6 @@ or from source::
 
     python setup.py install
 
-Tests
-=====
-
-run tests ::
-
-    python runtests.py
-
-on Windows::
-
-    runtests.bat
-
 Documentation
 =============
 

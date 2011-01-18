@@ -16,45 +16,40 @@ Version 0.2.0
 
   * Alpha
   * odt - application/vnd.oasis.opendocument.text
-  * basic style management for text
 
 Version 0.2.1
 -------------
 
   * Alpha
   * ods - application/vnd.oasis.opendocument.spreadsheet
-  * basic style management for spreadsheet
 
 Version 0.2.2
 -------------
 
   * Alpha
   * odp - application/vnd.oasis.opendocument.presentation
-  * basic style management for presentation
 
 Version 0.2.3
 -------------
 
   * Alpha
   * odg - application/vnd.oasis.opendocument.graphics
-  * basic style management for graphics
 
 Version 0.2.4
 -------------
 
   * Alpha
   * odc - application/vnd.oasis.opendocument.chart
-  * basic style management for charts
 
 Version 0.2.5
 -------------
 
   * Alpha
   * odf - application/vnd.oasis.opendocument.formula
-  * basic style management for formulas
 
 Version 0.3.0
 -------------
 
   * Beta
+  * basic style management
 
