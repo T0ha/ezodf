@@ -10,7 +10,7 @@ a simple example::
     import ezodf
     from ezodf import Paragraph, Heading
 
-    odt = ezodf.newdoc(doctype='odt', 'text.odt')
+    odt = ezodf.newdoc(doctype='odt', filename='text.odt')
     paragraph = Paragraph("This is a paragraph. ")
     # document content resides in the body object
     odt.body.append(paragraph)
@@ -22,7 +22,7 @@ a simple example::
     from ezodf import Sheet
 
     # this ODS example doesn't work yet
-    ods = ezodf.newdoc(doctype='ods', 'spreadsheet.ods')
+    ods = ezodf.newdoc(doctype='ods', filename='spreadsheet.ods')
     # document content resides in the body object
     sheet = ods.body.append(Sheet('SHEET'))
     sheet[0, 0] = Paragraph("Textcell")

@@ -6,13 +6,10 @@
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-import random
-
 from .xmlns import CN, register_class, subelement, wrap
 from .base import GenericWrapper, safelen
 from .whitespaces import encode_whitespaces
-
-FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+from .protection import random_protection_key
 
 class _StyleNameMixin:
     @property
@@ -153,19 +150,17 @@ class Heading(Span, _NumberingMixin):
 
     @property
     def restart_numbering(self):
-        return True if self.get_attr(CN('text:restart-numbering')) == 'true' else False
+        return self.get_bool_attr(CN('text:restart-numbering'))
     @restart_numbering.setter
     def restart_numbering(self, value):
-        value = 'true' if value else 'false'
-        self.set_attr(CN('text:restart-numbering'), value)
+        self.set_bool_attr(CN('text:restart-numbering'), value)
 
     @property
     def suppress_numbering(self):
-        return True if self.get_attr(CN('text:is-list-header')) == 'true' else False
+        return self.get_bool_attr(CN('text:is-list-header'))
     @suppress_numbering.setter
     def suppress_numbering(self, value):
-        value = 'true' if value else 'false'
-        self.set_attr(CN('text:is-list-header'), value)
+        self.set_bool_attr(CN('text:is-list-header'), value)
 
 
 @register_class
@@ -273,19 +268,9 @@ class Section(GenericWrapper, _StyleNameMixin):
 
     @property
     def protected(self):
-        value = self.get_attr(CN('text:protected'))
-        if value:
-            return True if value == 'true' else False
-        else:
-            return False
-
+        return self.get_bool_attr(CN('text:protected'))
     @protected.setter
     def protected(self, value):
-        if value:
-            value = 'true'
-            # set a random password, guess!
-            key = random.sample(FNCHARS, 12)
-            self.set_attr(CN('text:protection-key'), key)
-        else:
-            value = 'false'
-        self.set_attr(CN('text:protected'), value)
+        self.set_bool_attr(CN('text:protected'), value)
+        if self.protected:
+            self.set_attr(CN('text:protection-key'), random_protection_key())

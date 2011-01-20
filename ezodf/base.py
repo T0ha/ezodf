@@ -122,6 +122,13 @@ class GenericWrapper:
             value = default
         return value
 
+    def get_bool_attr(self, key):
+        value = self.xmlnode.get(key)
+        if value:
+            return True if value == 'true' else False
+        else:
+            return False
+
     def set_attr(self, key, value):
         """ Set the `key` attribute of the xmlnode element to `value`.
 
@@ -132,6 +139,9 @@ class GenericWrapper:
             self.xmlnode.set(key, str(value))
         else:
             raise ValueError(value)
+
+    def set_bool_attr(self, key, value):
+        self.xmlnode.set(key, 'true' if value else 'false')
 
     ## List operations
 
