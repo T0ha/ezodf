@@ -39,11 +39,11 @@ class TestTableAttributes(unittest.TestCase):
         self.assertEqual(table.name, 'TABLE')
         self.assertEqual(table.get_attr(CN('table:name')), 'TABLE', 'wrong tag name')
 
-    def test_get_stylename(self):
+    def test_get_style_name(self):
         table = Table()
         self.assertIsNone(table.style_name)
 
-    def test_set_stylename(self):
+    def test_set_style_name(self):
         table = Table()
         table.style_name = 'STYLE'
         self.assertEqual(table.style_name, 'STYLE')
@@ -81,9 +81,9 @@ class TestTableAttributes(unittest.TestCase):
         self.assertTrue(table.print)
         self.assertEqual(table.get_attr(CN('table:print')), 'true', 'wrong tag name')
 
-    def test_if_table_class_is_registered(self):
+    def test_if_Table_class_is_registered(self):
         table = wrap(etree.XML(TESTTABLE))
-        self.assertEqual(table.TAG, CN('table:table'), 'table class is not registered')
+        self.assertEqual(table.TAG, CN('table:table'), 'Table class is not registered')
 
 if __name__=='__main__':
     unittest.main()
