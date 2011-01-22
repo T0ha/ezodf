@@ -7,14 +7,17 @@
 # License: GPLv3
 
 import zipfile
+import os
 
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
-from .xmlns import subelement, CN, etree, wrap
+from .xmlns import subelement, CN, etree, wrap, ALL_NSMAP
 from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
 from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
-from .flatxmlfile import FlatXMLDocument
+from .caching import SimpleObserver
+
+from . import body # register body classes
 
 class InvalidFiletypeError(TypeError):
     pass
@@ -57,13 +60,100 @@ def _new_doc_from_template(filename, templatename):
     else:
         raise IOError('File does not exist or it is not a zipfile: %s' % templatename)
 
-class PackagedDocument:
+
+class _BaseDocument:
+    def __init__(self):
+        self.backup = True
+        self._save_listener = SimpleObserver()
+
+    def register_save_listener(self, listener_method):
+        self._save_listener.register(listener_method)
+
+    def saveas(self, filename):
+        self.docname = filename
+        self.save()
+
+    def save(self):
+        if self.docname is None:
+            raise IOError('No filename specified!')
+        # inform save listener about saving event
+        self._save_listener.update()
+
+        # set modification date to now
+        self.meta.touch()
+        self.meta.inc_editing_cycles()
+
+    @property
+    def application_body_tag(self):
+        return CN(MIMETYPE_BODYTAG_MAP[self.mimetype])
+
+
+class FlatXMLDocument(_BaseDocument):
+    """ OpenDocument contained in a single XML file. """
+    TAG = CN('office:document')
+
+    def __init__(self, filetype='odt', filename=None, xmlnode=None):
+        super(FlatXMLDocument, self).__init__()
+        self.docname=filename
+        self.mimetype = MIMETYPES[filetype]
+        self.doctype = filetype
+
+        if xmlnode is None: # new document
+            self.xmlnode = etree.Element(self.TAG, nsmap=ALL_NSMAP)
+        elif xmlnode.tag == self.TAG:
+            self.xmlnode = xmlnode
+            self.mimetype = xmlnode.get(CN('office:mimetype')) # required
+        else:
+            raise ValueError("Unexpected root tag: %s" % self.xmlnode.tag)
+
+        if self.mimetype not in frozenset(MIMETYPES.values()):
+            raise TypeError("Unsupported mimetype: %s" % self.mimetype)
+
+        self._setup()
+
+    def _setup(self):
+        self.meta = OfficeDocumentMeta(subelement(self.xmlnode, CN('office:document-meta')))
+        self.styles = wrap(subelement(self.xmlnode, CN('office:settings')))
+        self.scripts = wrap(subelement(self.xmlnode, CN('office:scripts')))
+        self.fonts = wrap(subelement(self.xmlnode, CN('office:font-face-decls')))
+        self.styles = wrap(subelement(self.xmlnode, CN('office:styles')))
+        self.automatic_styles = wrap(subelement(self.xmlnode, CN('office:automatic-styles')))
+        self.master_styles = wrap(subelement(self.xmlnode, CN('office:master-styles')))
+        self.body = self.get_application_body(self.application_body_tag)
+
+    def get_application_body(self, bodytag):
+        # The office:body element is just frame element for the real document content:
+        # office:text, office:spreadsheet, office:presentation, office:drawing
+        office_body = subelement(self.xmlnode, CN('office:body'))
+        application_body = subelement(office_body, bodytag)
+        return wrap(application_body)
+
+    def save(self):
+        super(FlatXMLDocument, self).save()
+        if os.path.exists(self.docname) and self.backup:
+            self._backupfile(self.docname)
+        self._writefile(self.docname)
+
+    def _backupfile(self, filename):
+        bakfilename = filename+'.bak'
+        # remove existing backupfile
+        if os.path.exists(bakfilename):
+            os.remove(bakfilename)
+        os.rename(filename, bakfilename)
+
+    def _writefile(self, filename):
+        with open(filename, 'wb') as fp:
+            fp.write(etree.tostring(self.xmlnode,
+                                    xml_declaration=True,
+                                    encoding='UTF-8'))
+
+class PackagedDocument(_BaseDocument):
     """ OpenDocument as package in a zipfile.
     """
     def __init__(self, filemanager, mimetype):
+        super(PackagedDocument, self).__init__()
         self.filemanager = fm = FileManager() if filemanager is None else filemanager
         self.docname = fm.zipname
-        self.backup = True
 
         # add doctype to manifest
         self.filemanager.manifest.add('/', mimetype)
@@ -83,17 +173,6 @@ class PackagedDocument:
 
         self.body = self.content.get_application_body(self.application_body_tag)
 
-    @property
-    def application_body_tag(self):
-        return CN(MIMETYPE_BODYTAG_MAP[self.mimetype])
-
     def save(self):
-        if self.docname is None:
-            raise IOError('No filename specified!')
-        self.meta.touch() # set modification date to now
-        self.meta.inc_editing_cycles()
+        super(PackagedDocument, self).save()
         self.filemanager.save(self.docname, backup=self.backup)
-
-    def saveas(self, filename):
-        self.docname = filename
-        self.save()
