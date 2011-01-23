@@ -8,7 +8,7 @@
 
 from weakref import WeakSet
 
-class _SimpleObserver:
+class Observer:
     """ Simple implementation of the observer pattern for broadcasting messages
     to objects.
 
@@ -18,9 +18,8 @@ class _SimpleObserver:
     Because of the simple implementation of the algorithm it is neccessary to
     register the objects an not only the listener methods, because the methods of
     different objects of the same calss have the same 'id' and managing the
-    listeners in a WeakSet is not possible for different objects (you could only
-    manage one document at one python instance or just one table in one document
-    instance).
+    listeners in a WeakSet is not possible for different objects (you could
+    only manage one table in one document instance).
 
     Example for event: 'save'
         # module 'one'
@@ -29,12 +28,20 @@ class _SimpleObserver:
                 pass
 
         listener = Listener()
-        ODFObserver.subscribe('save', listener)
+        observer.subscribe('save', listener)
 
         # module 'two'
         # calls listener.on_save_handler(msg=None)
-        ODFObserver.broadcast('save', msg=None)
+        observer.broadcast('save', msg=None)
     """
+    # TODO: By one global observer-object, if more than one document is opened,
+    # the event is send to all documents, the receiver can not distingush if
+    # the sender is its own document-object or not.
+    # SOLVED: No global observer-object, every document has its own observer-object
+    # and objects have to know their own document-object to subscribe an events.
+    #
+    #    document.observer.subscribe('save', listener)
+    #    document.observer.broadcast('save', msg=None)
 
     def __init__(self):
         self._listeners = dict()
@@ -79,5 +86,3 @@ class _SimpleObserver:
             return len(self._listeners[event])
         except KeyError:
             return 0
-
-ODFObserver = _SimpleObserver()

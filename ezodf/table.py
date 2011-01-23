@@ -9,7 +9,6 @@
 from .xmlns import register_class, CN
 from .base import GenericWrapper
 from .protection import random_protection_key
-from .observer import ODFObserver
 
 class _StylenameMixin:
     @property
@@ -22,10 +21,6 @@ class _StylenameMixin:
 @register_class
 class Table(GenericWrapper, _StylenameMixin):
     TAG = CN('table:table')
-
-    def __init__(self, xmlnode=None):
-        super(Table, self).__init__(xmlnode=xmlnode)
-        ODFObserver.subscribe('save', self)
 
     @property
     def name(self):
@@ -49,12 +44,6 @@ class Table(GenericWrapper, _StylenameMixin):
     @print.setter
     def print(self, value):
         self.set_bool_attr(CN('table:print'), value)
-
-    def on_save_handler(self, msg):
-        """ Event handler called before saving the document.
-
-        This is neccessary for 'write-back' cache strategy.
-        """
 
 
 VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )
