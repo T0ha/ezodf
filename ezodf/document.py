@@ -15,7 +15,7 @@ from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
 from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
-from .caching import SimpleObserver
+from .observer import ODFObserver
 
 from . import body # register body classes
 
@@ -62,12 +62,12 @@ def _new_doc_from_template(filename, templatename):
 
 
 class _BaseDocument:
+    """
+    Broadcasting Events:
+        broadcast(event='save', msg=self): send before saving the document
+    """
     def __init__(self):
         self.backup = True
-        self._save_listener = SimpleObserver()
-
-    def register_save_listener(self, listener_method):
-        self._save_listener.register(listener_method)
 
     def saveas(self, filename):
         self.docname = filename
@@ -77,7 +77,7 @@ class _BaseDocument:
         if self.docname is None:
             raise IOError('No filename specified!')
         # inform save listener about saving event
-        self._save_listener.update()
+        ODFObserver.broadcast(event='save', msg=self)
 
         # set modification date to now
         self.meta.touch()
