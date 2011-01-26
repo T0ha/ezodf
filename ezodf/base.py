@@ -99,13 +99,13 @@ class GenericWrapper:
         """
         del self.xmlnode[int(index)]
 
-    def filter(self, kind):
-        """ Filter child nodes by `kind`. """
-        return filter(lambda e: e.kind == kind, iter(self))
-
     def findall(self, tag):
         """ Find all subelements by xml-tag (in Clark Notation). """
         return map(wrap, self.xmlnode.findall(tag))
+
+    def find(self, tag):
+        """ Find first subelements by xml-tag (in Clark Notation). """
+        return wrap(self.xmlnode.find(tag))
 
     ## Attribute access for the xmlnode element
 

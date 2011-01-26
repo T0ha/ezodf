@@ -26,6 +26,9 @@ from .document import opendoc, newdoc
 from .whitespaces import LineBreak, Tabulator, Spaces, SoftPageBreak
 from .text import Span, Paragraph, Heading, Section, Hyperlink
 from .text import List, ListHeader, ListItem, NumberedParagraph
+from .table import Table
+
+Sheet = Table
 
 def ezlist(items, header="", style_name=""):
     """ Create a simple list.

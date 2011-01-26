@@ -108,12 +108,6 @@ Methods
 
    Remove XML node at position `index`.
 
-.. method:: GenericWrapper.filter(kind)
-
-   :param str kind: class name of element to filter
-
-   Filter all child nodes by :attr:`~GenericWrapper.kind`.
-
 .. method:: GenericWrapper.findall(tag)
 
    :param str tag: tag name in Clark Notation

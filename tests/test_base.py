@@ -144,16 +144,6 @@ class TestBaseClass(unittest.TestCase):
         self.assertEqual(len(b), 3)
         self.assertEqual(b[2].get_attr('pos'), '3')
 
-    def test_filter_All(self):
-        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
-        result = list(b.filter('GenericWrapper'))
-        self.assertEqual(len(result), 4)
-
-    def test_filter_None(self):
-        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
-        result = list(b.filter('Unknown'))
-        self.assertEqual(len(result), 0)
-
     def test_findall_All(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         result = list(b.findall(GenericWrapper.TAG))
@@ -167,10 +157,12 @@ class TestBaseClass(unittest.TestCase):
     def test_findall_subelements(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA2))
         subelements = list(b.findall(CN('text:span')))
-        children = list(b.filter("Span"))
         self.assertEqual(len(subelements), 2)
-        self.assertEqual(len(children), 2)
 
+    def test_find(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        first_element = b.find(GenericWrapper.TAG)
+        self.assertEqual(first_element.get_attr('pos'), '0')
 
 if __name__=='__main__':
     unittest.main()

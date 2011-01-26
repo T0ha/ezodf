@@ -20,6 +20,23 @@ TESTTABLE = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" />
 """
 
+TABLE_5x3 = """
+<table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
+<table:table-row><table:table-cell /><table:table-cell /><table:table-cell /></table:table-row>
+<table:table-row><table:table-cell /><table:table-cell /><table:table-cell /></table:table-row>
+<table:table-row><table:table-cell /><table:table-cell /><table:table-cell /></table:table-row>
+<table:table-row><table:table-cell /><table:table-cell /><table:table-cell /></table:table-row>
+<table:table-row><table:table-cell /><table:table-cell /><table:table-cell /></table:table-row>
+</table:table>
+"""
+
+TABLE_REP_7x7 = """
+<table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
+<table:table-row><table:table-cell table:number-columns-repeated="7"/></table:table-row>
+<table:table-row table:number-rows-repeated="6"><table:table-cell table:number-columns-repeated="7" /></table:table-row>
+</table:table>
+"""
+
 class TestTableAttributes(unittest.TestCase):
     def test_has_TAG(self):
         table = Table()
@@ -31,7 +48,8 @@ class TestTableAttributes(unittest.TestCase):
 
     def test_get_name(self):
         table = Table()
-        self.assertIsNone(table.name)
+        name = table.name
+        self.assertTrue(isinstance(name, str))
 
     def test_set_name(self):
         table = Table()
@@ -84,6 +102,34 @@ class TestTableAttributes(unittest.TestCase):
     def test_if_Table_class_is_registered(self):
         table = wrap(etree.XML(TESTTABLE))
         self.assertEqual(table.TAG, CN('table:table'), 'Table class is not registered')
+
+class TestTableMethods(unittest.TestCase):
+    def test_nrows(self):
+        table = wrap(etree.XML(TABLE_5x3))
+        self.assertEqual(table.nrows(), 5)
+
+    def test_nrows_repeated(self):
+        table = wrap(etree.XML(TABLE_REP_7x7))
+        self.assertEqual(table.nrows(), 7)
+
+    def test_ncols(self):
+        table = wrap(etree.XML(TABLE_5x3))
+        self.assertEqual(table.ncols(), 3)
+
+    def test_ncols_repeated(self):
+        table = wrap(etree.XML(TABLE_REP_7x7))
+        self.assertEqual(table.ncols(), 7)
+
+    def test_init_row_cols(self):
+        table = Table(name="TEST", size=(7, 5))
+        self.assertEqual(table.nrows(), 7)
+        self.assertEqual(table.ncols(), 5)
+
+    def test_get_cell(self):
+        table = wrap(etree.XML(TABLE_REP_7x7))
+        cell = table.get_cell(1, 1)
+        self.assertEqual(cell.kind, 'TableCell')
+
 
 if __name__=='__main__':
     unittest.main()

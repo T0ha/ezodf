@@ -6,9 +6,10 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
-from .xmlns import register_class, CN
+from .xmlns import register_class, CN, wrap
 from .base import GenericWrapper
 from .protection import random_protection_key
+
 
 class _StylenameMixin:
     @property
@@ -18,9 +19,47 @@ class _StylenameMixin:
     def style_name(self, name):
         self.set_attr(CN('table:style-name'), name)
 
+
+class _VisibilityMixin:
+    VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )
+    @property
+    def visibility(self):
+        value = self.get_attr(CN('table:visibility'))
+        if value is None:
+            value = 'visible'
+        return value
+    @visibility.setter
+    def visibility(self, value):
+        if value not in self.VALID_VISIBILITY_STATES:
+            raise ValueError("allowed values are: 'visible', 'collapse', 'filter'")
+        self.set_attr(CN('table:visibility'), value)
+
+class _DefaultStyleNameMixin:
+    @property
+    def default_cell_style_name(self):
+        return self.get_attr(CN('table:default-cell-style-name'))
+    @default_cell_style_name.setter
+    def default_cell_style_name(self, value):
+        self.set_attr(CN('table:default-cell-style-name'), value)
+
 @register_class
 class Table(GenericWrapper, _StylenameMixin):
     TAG = CN('table:table')
+
+    def __init__(self, name='NEWTABLE', size=(10, 10), xmlnode=None):
+        super(Table, self).__init__(xmlnode=xmlnode)
+        self._cell_cache = {}
+        if xmlnode is None:
+            self.name = name
+            self._setup(size[0], size[1])
+
+    def _setup(self, nrows, ncols):
+        for row in range(nrows):
+            self.append(TableRow(ncols=ncols))
+        self._reset_cache()
+
+    def _reset_cache(self):
+        self._cell_cache.clear()
 
     @property
     def name(self):
@@ -45,12 +84,40 @@ class Table(GenericWrapper, _StylenameMixin):
     def print(self, value):
         self.set_bool_attr(CN('table:print'), value)
 
+    def nrows(self):
+        """ Count of table rows. """
+        # it's a method to shows that a call is expensive
+        count = 0
+        for row in self.findall(CN('table:table-row')):
+            count += row.rows_repeated
+        return count
 
-VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )
+    def ncols(self):
+        """ Count of table columns. """
+        # it's a method to shows that a call is expensive
+        first_row = self.find(CN('table:table-row'))
+        count = 0
+        if first_row is not None:
+            for cell in first_row:
+                count += cell.columns_repeated
+        return count
+
+    def get_cell(self, row, col):
+        return TableCell()
 
 @register_class
-class TableRow(GenericWrapper, _StylenameMixin):
+class TableRow(GenericWrapper, _StylenameMixin, _VisibilityMixin,
+               _DefaultStyleNameMixin):
     TAG = CN('table:table-row')
+
+    def __init__(self, ncols=10, xmlnode=None):
+        super(TableRow, self).__init__(xmlnode=xmlnode)
+        if xmlnode is None:
+            self._setup(ncols)
+
+    def _setup(self, ncols):
+        for col in range(ncols):
+            self.append(TableCell())
 
     @property
     def rows_repeated(self):
@@ -64,24 +131,22 @@ class TableRow(GenericWrapper, _StylenameMixin):
             raise ValueError("Number rows repeated should >= 1.")
         self.set_attr(CN('table:number-rows-repeated'), str(value))
 
-    @property
-    def default_cell_style_name(self):
-        return self.get_attr(CN('table:default-cell-style-name'))
-    @default_cell_style_name.setter
-    def default_cell_style_name(self, value):
-        self.set_attr(CN('table:default-cell-style-name'), value)
+@register_class
+class TableColumn(GenericWrapper, _StylenameMixin, _VisibilityMixin,
+                  _DefaultStyleNameMixin):
+    TAG = CN('table:table-column')
 
     @property
-    def visibility(self):
-        value = self.get_attr(CN('table:visibility'))
-        if value is None:
-            value = 'visible'
-        return value
-    @visibility.setter
-    def visibility(self, value):
-        if value not in VALID_VISIBILITY_STATES:
-            raise ValueError("allowed values are: 'visible', 'collapse', 'filter'")
-        self.set_attr(CN('table:visibility'), value)
+    def cols_repeated(self):
+        value = self.get_attr(CN('table:number-columns-repeated'))
+        value = int(value) if value is not None else 1
+        return max(1, value)
+    @cols_repeated.setter
+    def cols_repeated(self, value):
+        value = int(value)
+        if value < 1:
+            raise ValueError("Number cols repeated should >= 1.")
+        self.set_attr(CN('table:number-columns-repeated'), str(value))
 
 VALID_VALUE_TYPES = frozenset( ('float', 'percentage', 'currency', 'date', 'time',
                                 'boolean', 'string') )

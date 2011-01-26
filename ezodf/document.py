@@ -15,7 +15,6 @@ from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
 from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
-#from .observer import Observer
 
 from . import body # register body classes
 
@@ -68,7 +67,6 @@ class _BaseDocument:
     """
     def __init__(self):
         self.backup = True
-        # self.observer = Observer()
 
     def saveas(self, filename):
         self.docname = filename
@@ -77,8 +75,6 @@ class _BaseDocument:
     def save(self):
         if self.docname is None:
             raise IOError('No filename specified!')
-        # inform save listener about saving event
-        # self.observer.broadcast(event='save', msg=self)
 
         # set modification date to now
         self.meta.touch()
