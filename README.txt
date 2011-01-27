@@ -19,13 +19,12 @@ a simple example::
     odt.body.insert_before(paragraph, Heading("Chapter 1"))
     odt.save()
 
-    from ezodf import Sheet
+    from ezodf import Sheet, Cell
 
-    # this ODS example doesn't work yet
     ods = ezodf.newdoc(doctype='ods', filename='spreadsheet.ods')
     # document content resides in the body object
     sheet = ods.body.append(Sheet('SHEET'))
-    sheet[0, 0] = Paragraph("Textcell")
+    sheet[0, 0] = Cell("Textcell")
     ods.save()
 
 for more examples see: /examples folder

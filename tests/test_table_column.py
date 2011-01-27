@@ -33,15 +33,6 @@ class TestTableColumnAttributes(unittest.TestCase):
         table_col = wrap(etree.XML(TESTTABLECOLUMN))
         self.assertEqual(table_col.TAG, CN('table:table-column'), 'TableColumn class is not registered')
 
-    def test_default_cols_repeated(self):
-        table_col = TableColumn()
-        self.assertEqual(table_col.cols_repeated, 1)
-
-    def test_set_cols_repeated(self):
-        table_col = TableColumn()
-        table_col.cols_repeated = 2
-        self.assertEqual(table_col.cols_repeated, 2)
-
     def test_get_style_name(self):
         table_col = TableColumn()
         self.assertIsNone(table_col.style_name)

@@ -33,17 +33,6 @@ class TestCoverdTableCellAttributes(unittest.TestCase):
         cell = wrap(etree.XML(COVERED_TABLE_CELL))
         self.assertEqual(cell.TAG, CN('table:covered-table-cell'), 'class is not registered')
 
-    def test_default_columns_repeated(self):
-        cell = CoveredTableCell()
-        self.assertEqual(cell.columns_repeated, 1)
-
-    def test_set_columns_repeated(self):
-        cell = CoveredTableCell()
-        cell.columns_repeated = 2
-        self.assertEqual(cell.columns_repeated, 2)
-        self.assertEqual(cell.get_attr(CN('table:number-columns-repeated')), '2',
-                         'wrong tag name')
-
     def test_get_style_name(self):
         cell = CoveredTableCell()
         self.assertIsNone(cell.style_name)
@@ -84,7 +73,7 @@ class TestCoverdTableCellAttributes(unittest.TestCase):
         cell = CoveredTableCell()
         cell.value_type = 'string'
         self.assertEqual(cell.value_type, 'string')
-        self.assertEqual(cell.get_attr(CN('table:value-type')), 'string',
+        self.assertEqual(cell.get_attr(CN('office:value-type')), 'string',
                          'wrong tag name')
 
     def test_check_valid_value_types(self):
@@ -98,27 +87,36 @@ class TestCoverdTableCellAttributes(unittest.TestCase):
         with self.assertRaises(ValueError):
             cell.value_type = 'invalid'
 
-    def test_current_string_value(self):
-        cell = CoveredTableCell()
-        # default type is string
-        cell.current_value = 'text'
-        self.assertEqual(cell.value_type, 'string')
-        self.assertEqual(cell.current_value, 'text')
-
     def test_current_float_value(self):
         cell = CoveredTableCell()
         # set type explicit else type is string
         cell.value_type = 'float'
         cell.current_value = 100.
         self.assertEqual(cell.value_type, 'float')
-        self.assertEqual(cell.current_value, '100.0')
+        self.assertEqual(cell.current_value, 100.0)
+
+    def test_set_display_form(self):
+        cell = CoveredTableCell()
+        cell.value_type = 'float'
+        cell.current_value = 100.
+        cell.display_form = "100,00"
+        self.assertEqual(cell.plaintext(), "100,00")
+
+    def test_replace_display_form(self):
+        cell = CoveredTableCell()
+        cell.value_type = 'float'
+        cell.current_value = 100.
+        cell.display_form = "100,00"
+        self.assertEqual(cell.plaintext(), "100,00")
+        cell.display_form = "200,00"
+        self.assertEqual(cell.plaintext(), "200,00")
 
     def test_set_current_value(self):
         cell = CoveredTableCell()
         cell.value_type = 'string'
         cell.set_current_value('100', 'float')
         self.assertEqual(cell.value_type, 'float')
-        self.assertEqual(cell.current_value, '100')
+        self.assertEqual(cell.current_value, 100.)
 
     def test_get_currency(self):
         cell = CoveredTableCell()
@@ -138,6 +136,24 @@ class TestCoverdTableCellAttributes(unittest.TestCase):
         cell = CoveredTableCell()
         cell.protected = True
         self.assertTrue(cell.protected)
+
+    def test_init_no_args(self):
+        cell = CoveredTableCell()
+        self.assertEqual(cell.value_type, None)
+        self.assertEqual(cell.current_value, None)
+        self.assertEqual(cell.plaintext(), "")
+
+    def test_init_value_without_type(self):
+        cell = CoveredTableCell(value=100)
+        self.assertEqual(cell.value_type, 'string')
+        self.assertEqual(cell.current_value, '100')
+        self.assertEqual(cell.plaintext(), "100")
+
+    def test_init_type_without_value(self):
+        cell = CoveredTableCell(value_type='float')
+        self.assertEqual(cell.value_type, 'float')
+        self.assertEqual(cell.current_value, None)
+        self.assertEqual(cell.plaintext(), "")
 
 TABLE_CELL = """
 <table:table-cell xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" />
@@ -164,6 +180,31 @@ class TestTableCellAttributes(unittest.TestCase):
         cell = TableCell()
         cell.span = (2, 3)
         self.assertEqual(cell.span, (2, 3))
+
+class TestCellStringContent(unittest.TestCase):
+    def test_set_string_error(self):
+        cell = TableCell()
+        cell.value_type = 'string'
+        with self.assertRaises(TypeError):
+            cell.current_value = 'test'
+
+    def test_set_display_form_for_strings_raises_error(self):
+        cell = TableCell()
+        with self.assertRaises(TypeError):
+            cell.display_form = 'test'
+
+    def test_set_new_string(self):
+        cell = TableCell()
+        cell.append_text('test')
+        self.assertEqual(cell.plaintext(), 'test')
+        self.assertEqual(cell.current_value, 'test')
+
+    def test_append_two_strings(self):
+        cell = TableCell()
+        cell.append_text('test1')
+        cell.append_text('test2')
+        self.assertEqual(cell.plaintext(), 'test1\ntest2')
+        self.assertEqual(cell.current_value, 'test1\ntest2')
 
 if __name__=='__main__':
     unittest.main()

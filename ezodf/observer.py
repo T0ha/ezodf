@@ -15,7 +15,7 @@ class Observer:
     For every event the subscriber object need an event handler called 'on_event_handler'
     accepting the parameter 'msg'.
 
-    Because of the simple implementation of the algorithm it is neccessary to
+    Because of the simple implementation of the algorithm it is necessary to
     register the objects an not only the listener methods, because the methods of
     different objects of the same calss have the same 'id' and managing the
     listeners in a WeakSet is not possible for different objects (you could
@@ -35,7 +35,7 @@ class Observer:
         observer.broadcast('save', msg=None)
     """
     # TODO: By one global observer-object, if more than one document is opened,
-    # the event is send to all documents, the receiver can not distingush if
+    # the event is send to all documents, the receiver can not distinguish if
     # the sender is its own document-object or not.
     # SOLVED: No global observer-object, every document has its own observer-object
     # and objects have to know their own document-object to subscribe an events.

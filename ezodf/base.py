@@ -105,7 +105,8 @@ class GenericWrapper:
 
     def find(self, tag):
         """ Find first subelements by xml-tag (in Clark Notation). """
-        return wrap(self.xmlnode.find(tag))
+        found = self.xmlnode.find(tag)
+        return wrap(found) if found is not None else None
 
     ## Attribute access for the xmlnode element
 
@@ -170,6 +171,9 @@ class GenericWrapper:
         :param GenericWrapper child: child to remove
         """
         self.xmlnode.remove(child.xmlnode)
+
+    def replace(self, child, newchild):
+        self.xmlnode.replace(child.xmlnode, newchild.xmlnode)
 
     def clear(self):
         """ Remove all content from node. """

@@ -6,12 +6,34 @@
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
 
+import re
+import copy
+
 from .xmlns import register_class, CN, wrap
 from .base import GenericWrapper
 from .protection import random_protection_key
+from .text import Paragraph
 
+CELL_ADDRESS = re.compile('^([A-Z]+)(\d+)$')
 
-class _StylenameMixin:
+def address_to_index(address):
+    def column_name_to_index(colname):
+        index = 0
+        power = 1
+        base = ord('A') - 1
+        for char in reversed(colname):
+            index += (ord(char) - base) * power
+            power *= 26
+        return index - 1
+
+    res = CELL_ADDRESS.match(address)
+    if res:
+        column_name, row_name = res.groups()
+        return (int(row_name)-1, column_name_to_index(column_name))
+    else:
+        raise ValueError('Invalid cell address: %s' % address)
+
+class _StylenNameMixin:
     @property
     def style_name(self):
         return self.get_attr(CN('table:style-name'))
@@ -19,6 +41,13 @@ class _StylenameMixin:
     def style_name(self, name):
         self.set_attr(CN('table:style-name'), name)
 
+class _DefaultCellStyleNameMixin:
+    @property
+    def default_cell_style_name(self):
+        return self.get_attr(CN('table:default-cell-style-name'))
+    @default_cell_style_name.setter
+    def default_cell_style_name(self, value):
+        self.set_attr(CN('table:default-cell-style-name'), value)
 
 class _VisibilityMixin:
     VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )
@@ -34,16 +63,17 @@ class _VisibilityMixin:
             raise ValueError("allowed values are: 'visible', 'collapse', 'filter'")
         self.set_attr(CN('table:visibility'), value)
 
-class _DefaultStyleNameMixin:
+class _NumberColumnsRepeatedMixin:
     @property
-    def default_cell_style_name(self):
-        return self.get_attr(CN('table:default-cell-style-name'))
-    @default_cell_style_name.setter
-    def default_cell_style_name(self, value):
-        self.set_attr(CN('table:default-cell-style-name'), value)
+    def columns_repeated(self):
+        value = self.get_attr(CN('table:number-columns-repeated'))
+        value = int(value) if value is not None else 1
+        return max(1, value)
+    def clear_columns_repeated(self):
+        del self.xmlnode.attrib[CN('table:number-columns-repeated')]
 
 @register_class
-class Table(GenericWrapper, _StylenameMixin):
+class Table(GenericWrapper, _StylenNameMixin):
     TAG = CN('table:table')
 
     def __init__(self, name='NEWTABLE', size=(10, 10), xmlnode=None):
@@ -52,6 +82,8 @@ class Table(GenericWrapper, _StylenameMixin):
         if xmlnode is None:
             self.name = name
             self._setup(size[0], size[1])
+        else:
+            self._expand_repeated_table_content()
 
     def _setup(self, nrows, ncols):
         for row in range(nrows):
@@ -60,6 +92,47 @@ class Table(GenericWrapper, _StylenameMixin):
 
     def _reset_cache(self):
         self._cell_cache.clear()
+
+    def _expand_repeated_table_content(self):
+
+        def expand_element(count, element, parent):
+            index = parent.index(element)
+            while count > 1:
+                clone = copy.deepcopy(element)
+                parent.insert(index, clone)
+                count -= 1
+
+        def expand_cells(row):
+            cells = list(iter(row))
+            # no iterator because we change the content of the row
+            for cell in cells:
+                count = cell.columns_repeated
+                if count > 1:
+                    cell.clear_columns_repeated()
+                    expand_element(count, cell.xmlnode, parent=row.xmlnode)
+
+        def expand_row(row):
+            count = row.rows_repeated
+            row.clear_rows_repeated()
+            rowelement = row.xmlnode
+            expand_element(count, row.xmlnode, parent=self.xmlnode)
+
+        for row in self.findall(TableRow.TAG):
+            expand_cells(row)
+            if row.rows_repeated > 1:
+                expand_row(row)
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.get_child(key)
+        elif isinstance(key, tuple):
+            # key => (row, column)
+            return self.get_cell_by_index(key)
+        elif isinstance(key, str):
+            # key => 'A1'
+            return self.get_cell_by_address(key)
+        else:
+            raise TypeError(str(type(key)))
 
     @property
     def name(self):
@@ -87,27 +160,47 @@ class Table(GenericWrapper, _StylenameMixin):
     def nrows(self):
         """ Count of table rows. """
         # it's a method to shows that a call is expensive
-        count = 0
-        for row in self.findall(CN('table:table-row')):
-            count += row.rows_repeated
-        return count
+        # assume that all repeated rows are expanded
+        return len(list(self.findall(TableRow.TAG)))
 
     def ncols(self):
         """ Count of table columns. """
         # it's a method to shows that a call is expensive
-        first_row = self.find(CN('table:table-row'))
-        count = 0
-        if first_row is not None:
-            for cell in first_row:
-                count += cell.columns_repeated
-        return count
+        # assume that all repeated columns are expanded
+        first_row = self.find(TableRow.TAG)
+        return 0 if first_row is None else len(first_row.xmlnode)
 
-    def get_cell(self, row, col):
-        return TableCell()
+
+    def get_cell_by_index(self, pos):
+        """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
+        try:
+            return self._cell_cache[pos]
+        except KeyError:
+            row, column = pos
+            if row < 0 or column < 0 :
+                raise IndexError('negative indices not allowed.')
+
+            first_row_index = self._get_index_of_first_row()
+            table_row = self.xmlnode[first_row_index+row]
+            cell = wrap(table_row[column])
+            self._cell_cache[pos] = cell
+            return cell
+
+    def _get_index_of_first_row(self):
+        first_row = self.xmlnode.find(TableRow.TAG)
+        if first_row is not None:
+            return self.xmlnode.index(first_row)
+        else:
+            return 0
+
+    def get_cell_by_address(self, address):
+        """ Get cell at position 'address' ('address' like 'A1'). """
+        pos = address_to_index(address)
+        return self.get_cell_by_index(pos)
 
 @register_class
-class TableRow(GenericWrapper, _StylenameMixin, _VisibilityMixin,
-               _DefaultStyleNameMixin):
+class TableRow(GenericWrapper, _StylenNameMixin, _VisibilityMixin,
+               _DefaultCellStyleNameMixin):
     TAG = CN('table:table-row')
 
     def __init__(self, ncols=10, xmlnode=None):
@@ -124,29 +217,15 @@ class TableRow(GenericWrapper, _StylenameMixin, _VisibilityMixin,
         value = self.get_attr(CN('table:number-rows-repeated'))
         value = int(value) if value is not None else 1
         return max(1, value)
-    @rows_repeated.setter
-    def rows_repeated(self, value):
-        value = int(value)
-        if value < 1:
-            raise ValueError("Number rows repeated should >= 1.")
-        self.set_attr(CN('table:number-rows-repeated'), str(value))
+
+    def clear_rows_repeated(self):
+        del self.xmlnode.attrib[CN('table:number-rows-repeated')]
 
 @register_class
-class TableColumn(GenericWrapper, _StylenameMixin, _VisibilityMixin,
-                  _DefaultStyleNameMixin):
+class TableColumn(GenericWrapper, _StylenNameMixin, _VisibilityMixin,
+                  _DefaultCellStyleNameMixin, _NumberColumnsRepeatedMixin):
     TAG = CN('table:table-column')
 
-    @property
-    def cols_repeated(self):
-        value = self.get_attr(CN('table:number-columns-repeated'))
-        value = int(value) if value is not None else 1
-        return max(1, value)
-    @cols_repeated.setter
-    def cols_repeated(self, value):
-        value = int(value)
-        if value < 1:
-            raise ValueError("Number cols repeated should >= 1.")
-        self.set_attr(CN('table:number-columns-repeated'), str(value))
 
 VALID_VALUE_TYPES = frozenset( ('float', 'percentage', 'currency', 'date', 'time',
                                 'boolean', 'string') )
@@ -160,22 +239,24 @@ TYPE_VALUE_MAP = {
     'boolean': CN('office:boolean-value'),
 }
 
+# These Classes are supported to read their plaintext content from the
+# cell-content.
+SUPPORTED_CELL_CONTENT = ("Paragraph", "Heading")
+
 @register_class
-class CoveredTableCell(GenericWrapper, _StylenameMixin):
+class CoveredTableCell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
     TAG = CN('table:covered-table-cell')
 
-    @property
-    def columns_repeated(self):
-        value = self.get_attr(CN('table:number-columns-repeated'))
-        value = int(value) if value is not None else 1
-        return max(1, value)
-
-    @columns_repeated.setter
-    def columns_repeated(self, value):
-        value = int(value)
-        if value < 1:
-            raise ValueError("Number columns repeated should >= 1.")
-        self.set_attr(CN('table:number-columns-repeated'), str(value))
+    def __init__(self, value=None, value_type=None, xmlnode=None):
+        super(CoveredTableCell, self).__init__(xmlnode=xmlnode)
+        if xmlnode is None:
+            if value is not None:
+                if value_type is None:
+                    value_type = 'string'
+                    value = str(value)
+                self.set_current_value(value, value_type)
+            elif value_type is not None:
+                self.value_type = value_type
 
     @property
     def content_validation_name(self):
@@ -193,31 +274,63 @@ class CoveredTableCell(GenericWrapper, _StylenameMixin):
 
     @property
     def value_type(self):
-        return self.get_attr(CN('table:value-type'))
+        return self.get_attr(CN('office:value-type'))
     @value_type.setter
     def value_type(self, value):
         if value not in VALID_VALUE_TYPES:
             raise ValueError(str(value))
-        self.set_attr(CN('table:value-type'), value)
+        self.set_attr(CN('office:value-type'), value)
 
     @property
     def current_value(self):
         t = self.value_type
         if  t is None:
             return None
+        elif t == 'string':
+            return self.plaintext()
         else:
-            tag = TYPE_VALUE_MAP[t]
-            return self.get_attr(tag)
+            result = self.get_attr(TYPE_VALUE_MAP[t])
+            if (result is not None) and t in ('float', 'percentage', 'currency'):
+                result = float(result)
+            return result
+
     @current_value.setter
     def current_value(self, value):
         t = self.value_type
-        if t is None:
-            self.value_type = t = 'string'
+        if (t is None) or (t == 'string'):
+            raise TypeError("for strings use append_text() or add Paragraph() " \
+                            "and Heading() objects to the cell content.")
         self.set_attr(TYPE_VALUE_MAP[t], str(value))
 
     def set_current_value(self, current_value, value_type):
         self.value_type = value_type
-        self.current_value = current_value
+        if value_type == 'string':
+            self.append_text(current_value)
+        else:
+            self.current_value = current_value
+
+    @property
+    def display_form(self):
+        return self.plaintext()
+    @display_form.setter
+    def display_form(self, text):
+        t = self.value_type
+        if t is None or t is 'string':
+            raise TypeError("not supported for value type 'None' and  'string'")
+        display_form = Paragraph(text)
+        first_paragraph = self.find(Paragraph.TAG)
+        if first_paragraph is None:
+            self.append(display_form)
+        else:
+            self.replace(first_paragraph, display_form)
+
+    def plaintext(self):
+        return "\n".join([p.plaintext() for p in iter(self)
+                          if p.kind in SUPPORTED_CELL_CONTENT])
+
+    def append_text(self, text):
+        self.value_type = 'string'
+        self.append(Paragraph(text))
 
     @property
     def currency(self):

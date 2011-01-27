@@ -164,5 +164,24 @@ class TestBaseClass(unittest.TestCase):
         first_element = b.find(GenericWrapper.TAG)
         self.assertEqual(first_element.get_attr('pos'), '0')
 
+    def test_find_None(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        found = b.find('test')
+        self.assertIsNone(found)
+
+    def test_replace_node(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        first_element = b.find(GenericWrapper.TAG)
+        replace = GenericWrapper()
+        replace.set_attr('pos', 'replaced')
+        b.replace(first_element, replace)
+        self.assertEqual(b[0].get_attr('pos'), 'replaced')
+
+    def test_replace_error(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        replace = GenericWrapper()
+        with self.assertRaises(ValueError):
+            b.replace(replace, replace)
+
 if __name__=='__main__':
     unittest.main()

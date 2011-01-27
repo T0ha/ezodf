@@ -33,30 +33,6 @@ class TestTableRowAttributes(unittest.TestCase):
         table_row = wrap(etree.XML(TESTTABLEROW))
         self.assertEqual(table_row.TAG, CN('table:table-row'), 'TableRow class is not registered')
 
-    def test_default_rows_repeated(self):
-        table_row = TableRow()
-        self.assertEqual(table_row.rows_repeated, 1)
-
-    def test_set_rows_repeated(self):
-        table_row = TableRow()
-        table_row.rows_repeated = 2
-        self.assertEqual(table_row.rows_repeated, 2)
-
-    def test_attribute_name(self):
-        table_row = TableRow()
-        table_row.rows_repeated = 2
-        self.assertEqual(table_row.get_attr(CN('table:number-rows-repeated')), '2')
-
-    def test_set_rows_repeated_type_error(self):
-        table_row = TableRow()
-        with self.assertRaises(TypeError):
-            table_row.rows_repeated = [0, 1]
-
-    def test_set_rows_repeated_value_error(self):
-        table_row = TableRow()
-        with self.assertRaises(ValueError):
-            table_row.rows_repeated = 0
-
     def test_get_style_name(self):
         table_row = TableRow()
         self.assertIsNone(table_row.style_name)
