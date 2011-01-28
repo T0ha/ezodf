@@ -348,43 +348,54 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
             return result
 
     def set_value(self, value, value_type=None, currency=None):
-        if value is None:
-            raise ValueError("invalid value 'None'.")
 
-        if value_type is None:
+        def check_value(value):
+            if value is None:
+                raise ValueError("invalid value 'None'.")
+
+        def check_value_type(value_type):
+            if value_type not in VALID_VALUE_TYPES:
+                raise TypeError(value_type)
+
+        def determine_value_type(value):
             if type(value) == bool:
                 value_type = 'boolean'
             elif isinstance(value, (float, int)):
                 value_type = 'float'
             else:
                 value_type = 'string'
+            return value_type
+
+        def convert(value, value_type):
+            if isinstance(value, GenericWrapper):
+                if value.kind not in SUPPORTED_CELL_CONTENT:
+                    raise TypeError('Unsupported object type: %s' % value.kind)
+            elif value_type == 'string':
+                value = Paragraph(str(value))
+            elif value_type == 'boolean':
+                value = 'true' if value else 'false'
+            else:
+                value = str(value)
+            return value
+
+        check_value(value)
 
         if isinstance(currency, str):
             value_type = 'currency'
+            self.set_attr(CN('office:currency'), currency)
 
-        if value_type not in VALID_VALUE_TYPES:
-            raise TypeError(value_type)
+        if value_type is None:
+            value_type = determine_value_type(value)
 
-        if value_type == 'string' and not isinstance(value, GenericWrapper):
-            value = Paragraph(str(value))
+        check_value_type(value_type)
+        value = convert(value, value_type)
 
         if isinstance(value, GenericWrapper):
             value_type = 'string'
-            if value.kind not in SUPPORTED_CELL_CONTENT:
-                raise TypeError('Unsupported object type: %s' % value.kind)
-        elif value_type == 'boolean':
-            value = 'true' if value else 'false'
-        else:
-            value = str(value)
-
-        if value_type == 'string':
             self.append(value)
         else:
             self.set_attr(TYPE_VALUE_MAP[value_type], value)
         self._set_value_type(value_type)
-
-        if value_type == 'currency' and isinstance(currency, str):
-            self.set_attr(CN('office:currency'), currency)
 
     def _set_value_type(self, value_type):
         self.set_attr(CN('office:value-type'), value_type)
