@@ -170,12 +170,12 @@ class TestTableContentExpansion(unittest.TestCase):
         for row in range(self.table.nrows()):
             for col in range(ncols):
                 cell = self.table[row, col]
-                cell.set_current_value(row*ncols + col, 'float')
+                cell.set_value(row*ncols + col, 'float')
 
         for row in range(self.table.nrows()):
             for col in range(ncols):
                 cell = self.table[row, col]
-                self.assertEqual(row*ncols + col, int(cell.current_value))
+                self.assertEqual(row*ncols + col, int(cell.value))
 
 
 TABLE_WITH_DIFFERENT_CELL_TYPES = """
@@ -297,7 +297,7 @@ class TestTableContentAccess(unittest.TestCase):
     def test_cell_C3_with_float_content(self):
         cell = self.table['C3']
         self.assertEqual(cell.value_type, "float")
-        self.assertEqual(cell.current_value, 1.5)
+        self.assertEqual(cell.value, 1.5)
         self.assertEqual(cell.display_form, "1,5")
         self.assertIsNone(cell.currency)
 
@@ -305,21 +305,21 @@ class TestTableContentAccess(unittest.TestCase):
         # but ints are also floats
         cell = self.table['C4']
         self.assertEqual(cell.value_type, "float")
-        self.assertEqual(cell.current_value, 100.)
+        self.assertEqual(cell.value, 100.)
         self.assertEqual(cell.display_form, "100")
         self.assertIsNone(cell.currency)
 
     def test_cell_B5_with_percent_content(self):
         cell = self.table['B5']
         self.assertEqual(cell.value_type, "percentage")
-        self.assertEqual(cell.current_value, 0.18)
+        self.assertEqual(cell.value, 0.18)
         self.assertEqual(cell.display_form, "18,00%")
         self.assertIsNone(cell.currency)
 
     def test_cell_B6_with_currency_content(self):
         cell = self.table['B6']
         self.assertEqual(cell.value_type, "currency")
-        self.assertEqual(cell.current_value, 1000.)
+        self.assertEqual(cell.value, 1000.)
         self.assertEqual(cell.currency, 'EUR')
         self.assertEqual(cell.display_form, "1.000,00 €")
 
@@ -388,11 +388,11 @@ class TestRowColumnAccess(unittest.TestCase):
         self.table = Table(xmlnode=etree.XML(TABLE_ROW_COL_ACCESS))
 
     def test_get_row_1_by_index(self):
-        values = [cell.current_value for cell in self.table.row(1)]
+        values = [cell.value for cell in self.table.row(1)]
         self.assertEqual(values, [5., 6., 7., 8.])
 
     def test_get_row_1_by_address(self):
-        values = [cell.current_value for cell in self.table.row('A2')]
+        values = [cell.value for cell in self.table.row('A2')]
         self.assertEqual(values, [5., 6., 7., 8.])
 
     def test_row_index_error(self):
@@ -404,11 +404,11 @@ class TestRowColumnAccess(unittest.TestCase):
             self.table.row(-1)
 
     def test_get_column_1_by_index(self):
-        values = [cell.current_value for cell in self.table.column(1)]
+        values = [cell.value for cell in self.table.column(1)]
         self.assertEqual(values, [2., 6., 10., 14.])
 
     def test_get_column_1_by_address(self):
-        values = [cell.current_value for cell in self.table.column('B2')]
+        values = [cell.value for cell in self.table.column('B2')]
         self.assertEqual(values, [2., 6., 10., 14.])
 
     def test_column_index_error(self):

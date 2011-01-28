@@ -277,6 +277,8 @@ class TableColumn(GenericWrapper, _StylenNameMixin, _VisibilityMixin,
 
 VALID_VALUE_TYPES = frozenset( ('float', 'percentage', 'currency', 'date', 'time',
                                 'boolean', 'string') )
+NUMERIC_TYPES = frozenset( ('float', 'percentage', 'currency') )
+
 TYPE_VALUE_MAP = {
     'string': CN('office:string-value'),
     'float': CN('office:value'),
@@ -300,16 +302,15 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
 
     TAG = CN('table:table-cell')
 
-    def __init__(self, value=None, value_type=None, xmlnode=None):
+    def __init__(self, value=None, value_type=None, style_name=None, xmlnode=None):
         super(Cell, self).__init__(xmlnode=xmlnode)
         if xmlnode is None:
+            if style_name is not None:
+                self.style_name = style_name
             if value is not None:
-                if value_type is None:
-                    value_type = 'string'
-                    value = str(value)
-                self.set_current_value(value, value_type)
+                self.set_value(value, value_type)
             elif value_type is not None:
-                self.value_type = value_type
+                self._set_value_type(value_type)
 
     @property
     def content_validation_name(self):
@@ -328,14 +329,9 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
     @property
     def value_type(self):
         return self.get_attr(CN('office:value-type'))
-    @value_type.setter
-    def value_type(self, value):
-        if value not in VALID_VALUE_TYPES:
-            raise ValueError(str(value))
-        self.set_attr(CN('office:value-type'), value)
 
     @property
-    def current_value(self):
+    def value(self):
         t = self.value_type
         if  t is None:
             return None
@@ -343,24 +339,55 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
             return self.plaintext()
         else:
             result = self.get_attr(TYPE_VALUE_MAP[t])
-            if (result is not None) and t in ('float', 'percentage', 'currency'):
+            if result is None:
+                pass
+            elif t in NUMERIC_TYPES:
                 result = float(result)
+            elif t == 'boolean':
+                result = True if result == 'true' else False
             return result
 
-    @current_value.setter
-    def current_value(self, value):
-        t = self.value_type
-        if (t is None) or (t == 'string'):
-            raise TypeError("for strings use append_text() or add Paragraph() " \
-                            "and Heading() objects to the cell content.")
-        self.set_attr(TYPE_VALUE_MAP[t], str(value))
+    def set_value(self, value, value_type=None, currency=None):
+        if value is None:
+            raise ValueError("invalid value 'None'.")
 
-    def set_current_value(self, current_value, value_type):
-        self.value_type = value_type
-        if value_type == 'string':
-            self.append_text(current_value)
+        if value_type is None:
+            if type(value) == bool:
+                value_type = 'boolean'
+            elif isinstance(value, (float, int)):
+                value_type = 'float'
+            else:
+                value_type = 'string'
+
+        if isinstance(currency, str):
+            value_type = 'currency'
+
+        if value_type not in VALID_VALUE_TYPES:
+            raise TypeError(value_type)
+
+        if value_type == 'string' and not isinstance(value, GenericWrapper):
+            value = Paragraph(str(value))
+
+        if isinstance(value, GenericWrapper):
+            value_type = 'string'
+            if value.kind not in SUPPORTED_CELL_CONTENT:
+                raise TypeError('Unsupported object type: %s' % value.kind)
+        elif value_type == 'boolean':
+            value = 'true' if value else 'false'
         else:
-            self.current_value = current_value
+            value = str(value)
+
+        if value_type == 'string':
+            self.append(value)
+        else:
+            self.set_attr(TYPE_VALUE_MAP[value_type], value)
+        self._set_value_type(value_type)
+
+        if value_type == 'currency' and isinstance(currency, str):
+            self.set_attr(CN('office:currency'), currency)
+
+    def _set_value_type(self, value_type):
+        self.set_attr(CN('office:value-type'), value_type)
 
     @property
     def display_form(self):
@@ -368,7 +395,7 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
     @display_form.setter
     def display_form(self, text):
         t = self.value_type
-        if t is None or t is 'string':
+        if t is None or t == 'string':
             raise TypeError("not supported for value type 'None' and  'string'")
         display_form = Paragraph(text)
         first_paragraph = self.find(Paragraph.TAG)
@@ -382,16 +409,12 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
                           if p.kind in SUPPORTED_CELL_CONTENT])
 
     def append_text(self, text):
-        self.value_type = 'string'
+        self._set_value_type('string')
         self.append(Paragraph(text))
 
     @property
     def currency(self):
         return self.get_attr(CN('office:currency'))
-    @currency.setter
-    def currency(self, value):
-        self.value_type = 'currency'
-        self.set_attr(CN('office:currency'), value)
 
     @property
     def protected(self):
