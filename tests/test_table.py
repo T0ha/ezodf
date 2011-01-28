@@ -14,7 +14,7 @@ import unittest
 from ezodf.xmlns import CN, etree, wrap
 
 # objects to test
-from ezodf.table import Table, address_to_index
+from ezodf.table import Table, address_to_index, Cell
 
 TESTTABLE = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" />
@@ -278,7 +278,7 @@ class TestTableContentAccess(unittest.TestCase):
 
     def test_access_cell_by_index(self):
         cell = self.table[0, 0]
-        self.assertEqual(cell.kind, "TableCell")
+        self.assertEqual(cell.kind, "Cell")
 
     def test_access_cell_by_reference(self):
         cell = self.table['B1']
@@ -287,17 +287,137 @@ class TestTableContentAccess(unittest.TestCase):
     def test_cell_B1_with_one_line_text_content(self):
         cell = self.table['B1']
         self.assertEqual(cell.plaintext(), "CellB1")
+        self.assertIsNone(cell.currency)
 
     def test_cell_B2_with_two_lines_text_content(self):
         cell = self.table['B2']
         self.assertEqual(cell.plaintext(), "CellB2\nmulti-line")
+        self.assertIsNone(cell.currency)
 
     def test_cell_C3_with_float_content(self):
         cell = self.table['C3']
         self.assertEqual(cell.value_type, "float")
         self.assertEqual(cell.current_value, 1.5)
         self.assertEqual(cell.display_form, "1,5")
+        self.assertIsNone(cell.currency)
 
+    def test_cell_C4_with_int_content(self):
+        # but ints are also floats
+        cell = self.table['C4']
+        self.assertEqual(cell.value_type, "float")
+        self.assertEqual(cell.current_value, 100.)
+        self.assertEqual(cell.display_form, "100")
+        self.assertIsNone(cell.currency)
+
+    def test_cell_B5_with_percent_content(self):
+        cell = self.table['B5']
+        self.assertEqual(cell.value_type, "percentage")
+        self.assertEqual(cell.current_value, 0.18)
+        self.assertEqual(cell.display_form, "18,00%")
+        self.assertIsNone(cell.currency)
+
+    def test_cell_B6_with_currency_content(self):
+        cell = self.table['B6']
+        self.assertEqual(cell.value_type, "currency")
+        self.assertEqual(cell.current_value, 1000.)
+        self.assertEqual(cell.currency, 'EUR')
+        self.assertEqual(cell.display_form, "1.000,00 €")
+
+    def test_setting_cell_by_index(self):
+        self.table[0, 0] = Cell('Textcell')
+        cell = self.table['A1']
+        self.assertEqual(cell.plaintext(), "Textcell")
+
+    def test_setting_cell_by_address(self):
+        self.table['A1'] = Cell('Textcell')
+        cell = self.table[0, 0]
+        self.assertEqual(cell.plaintext(), "Textcell")
+
+    def test_set_cell_row_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table[10, 0] = Cell()
+
+    def test_set_cell_column_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table[0, 10] = Cell()
+
+    def test_set_cell_neg_row_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table[-1, 0] = Cell()
+
+    def test_set_cell_neg_column_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table[0, -1] = Cell()
+
+TABLE_ROW_COL_ACCESS = """
+<table:table
+ xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+ xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+ table:name="RowColAccess">
+
+<table:table-row>
+  <table:table-cell office:value-type="float" office:value="1" />
+  <table:table-cell office:value-type="float" office:value="2" />
+  <table:table-cell office:value-type="float" office:value="3" />
+  <table:table-cell office:value-type="float" office:value="4" />
+</table:table-row>
+<table:table-row>
+  <table:table-cell office:value-type="float" office:value="5" />
+  <table:table-cell office:value-type="float" office:value="6" />
+  <table:table-cell office:value-type="float" office:value="7" />
+  <table:table-cell office:value-type="float" office:value="8" />
+</table:table-row>
+<table:table-row>
+  <table:table-cell office:value-type="float" office:value="9" />
+  <table:table-cell office:value-type="float" office:value="10" />
+  <table:table-cell office:value-type="float" office:value="11" />
+  <table:table-cell office:value-type="float" office:value="12" />
+</table:table-row>
+<table:table-row>
+  <table:table-cell office:value-type="float" office:value="13" />
+  <table:table-cell office:value-type="float" office:value="14" />
+  <table:table-cell office:value-type="float" office:value="15" />
+  <table:table-cell office:value-type="float" office:value="16" />
+</table:table-row>
+</table:table>
+"""
+
+class TestRowColumnAccess(unittest.TestCase):
+    def setUp(self):
+        self.table = Table(xmlnode=etree.XML(TABLE_ROW_COL_ACCESS))
+
+    def test_get_row_1_by_index(self):
+        values = [cell.current_value for cell in self.table.row(1)]
+        self.assertEqual(values, [5., 6., 7., 8.])
+
+    def test_get_row_1_by_address(self):
+        values = [cell.current_value for cell in self.table.row('A2')]
+        self.assertEqual(values, [5., 6., 7., 8.])
+
+    def test_row_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table.row(4)
+
+    def test_row_neg_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table.row(-1)
+
+    def test_get_column_1_by_index(self):
+        values = [cell.current_value for cell in self.table.column(1)]
+        self.assertEqual(values, [2., 6., 10., 14.])
+
+    def test_get_column_1_by_address(self):
+        values = [cell.current_value for cell in self.table.column('B2')]
+        self.assertEqual(values, [2., 6., 10., 14.])
+
+    def test_column_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table.column(4)
+
+    def test_column_neg_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table.column(-1)
 
 if __name__=='__main__':
     unittest.main()

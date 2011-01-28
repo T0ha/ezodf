@@ -27,7 +27,7 @@ from .whitespaces import LineBreak, Tabulator, Spaces, SoftPageBreak
 from .text import Span, Paragraph, Heading, Section, Hyperlink
 from .text import List, ListHeader, ListItem, NumberedParagraph
 from .table import Table
-from .table import TableCell as Cell
+from .table import Cell
 
 Sheet = Table
 

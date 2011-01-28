@@ -95,27 +95,25 @@ class Table(GenericWrapper, _StylenNameMixin):
 
     def _expand_repeated_table_content(self):
 
-        def expand_element(count, element, parent):
-            index = parent.index(element)
+        def expand_element(count, element):
+            xmlnode = element.xmlnode
             while count > 1:
-                clone = copy.deepcopy(element)
-                parent.insert(index, clone)
+                clone = copy.deepcopy(xmlnode)
+                xmlnode.addnext(clone)
                 count -= 1
 
         def expand_cells(row):
-            cells = list(iter(row))
-            # no iterator because we change the content of the row
-            for cell in cells:
+            # convert to list, because we modify content of row
+            for cell in list(iter(row)):
                 count = cell.columns_repeated
                 if count > 1:
                     cell.clear_columns_repeated()
-                    expand_element(count, cell.xmlnode, parent=row.xmlnode)
+                    expand_element(count, cell)
 
         def expand_row(row):
             count = row.rows_repeated
             row.clear_rows_repeated()
-            rowelement = row.xmlnode
-            expand_element(count, row.xmlnode, parent=self.xmlnode)
+            expand_element(count, row)
 
         for row in self.findall(TableRow.TAG):
             expand_cells(row)
@@ -131,6 +129,18 @@ class Table(GenericWrapper, _StylenNameMixin):
         elif isinstance(key, str):
             # key => 'A1'
             return self.get_cell_by_address(key)
+        else:
+            raise TypeError(str(type(key)))
+
+    def __setitem__(self, key, value):
+        if isinstance(key, int):
+            return self.set_child(key, value)
+        elif isinstance(key, tuple):
+            # key => (row, column)
+            return self.set_cell_by_index(key, value)
+        elif isinstance(key, str):
+            # key => 'A1'
+            return self.set_cell_by_address(key, value)
         else:
             raise TypeError(str(type(key)))
 
@@ -180,11 +190,36 @@ class Table(GenericWrapper, _StylenNameMixin):
             if row < 0 or column < 0 :
                 raise IndexError('negative indices not allowed.')
 
-            first_row_index = self._get_index_of_first_row()
-            table_row = self.xmlnode[first_row_index+row]
-            cell = wrap(table_row[column])
-            self._cell_cache[pos] = cell
-            return cell
+            table_row = self._get_row_at_index(row)
+            return self._wrap(pos, table_row[column])
+
+    def _wrap(self, pos, xmlnode):
+        cell = wrap(xmlnode)
+        self._cell_cache[pos] = cell
+        return cell
+
+    def get_cell_by_address(self, address):
+        """ Get cell at position 'address' ('address' like 'A1'). """
+        pos = address_to_index(address)
+        return self.get_cell_by_index(pos)
+
+    def set_cell_by_index(self, pos, cell):
+        """ Set cell at position 'pos', where 'pos' is a tuple (row, column). """
+        if not isinstance(cell, Cell):
+            raise TypeError("invalid type of 'cell'.")
+        row, column = pos
+        if row < 0 or column < 0 :
+            raise IndexError('negative indices not allowed.')
+
+        # write-thru cache
+        table_row = self._get_row_at_index(row)
+        table_row[column] = cell.xmlnode
+        self._cell_cache[pos] = cell
+
+    def set_cell_by_address(self, address, cell):
+        """ Set cell at position 'address' ('address' like 'A1'). """
+        pos = address_to_index(address)
+        return self.set_cell_by_index(pos, cell)
 
     def _get_index_of_first_row(self):
         first_row = self.xmlnode.find(TableRow.TAG)
@@ -193,10 +228,23 @@ class Table(GenericWrapper, _StylenNameMixin):
         else:
             return 0
 
-    def get_cell_by_address(self, address):
-        """ Get cell at position 'address' ('address' like 'A1'). """
-        pos = address_to_index(address)
-        return self.get_cell_by_index(pos)
+    def _get_row_at_index(self, index):
+        first_row_index = self._get_index_of_first_row()
+        return self.xmlnode[first_row_index+index]
+
+    def row(self, index):
+        if isinstance(index, str):
+            index, column = address_to_index(index)
+        if index < 0:
+            raise IndexError('row index out of range: %s' % index)
+        return ( self._wrap((index, col), xmlnode) for col, xmlnode in enumerate(self._get_row_at_index(index)) )
+
+    def column(self, index):
+        if isinstance(index, str):
+            row, index = address_to_index(index)
+        if index < 0 or index >= self.ncols():
+            raise IndexError('row index out of range: %s' % index)
+        return ( self._wrap((xrow,index), row[index]) for xrow, row in enumerate(self.xmlnode.findall(TableRow.TAG)) )
 
 @register_class
 class TableRow(GenericWrapper, _StylenNameMixin, _VisibilityMixin,
@@ -210,7 +258,7 @@ class TableRow(GenericWrapper, _StylenNameMixin, _VisibilityMixin,
 
     def _setup(self, ncols):
         for col in range(ncols):
-            self.append(TableCell())
+            self.append(Cell())
 
     @property
     def rows_repeated(self):
@@ -244,11 +292,16 @@ TYPE_VALUE_MAP = {
 SUPPORTED_CELL_CONTENT = ("Paragraph", "Heading")
 
 @register_class
-class CoveredTableCell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
-    TAG = CN('table:covered-table-cell')
+class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
+    CELL_ONLY_ATTRIBS = (CN('table:number-rows-spanned'),
+                         CN('table:number-columns-spanned'),
+                         CN('table:number-matrix-columns-spanned'),
+                         CN('table:number-matrix-rows-spanned'))
+
+    TAG = CN('table:table-cell')
 
     def __init__(self, value=None, value_type=None, xmlnode=None):
-        super(CoveredTableCell, self).__init__(xmlnode=xmlnode)
+        super(Cell, self).__init__(xmlnode=xmlnode)
         if xmlnode is None:
             if value is not None:
                 if value_type is None:
@@ -347,10 +400,6 @@ class CoveredTableCell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedM
     def protected(self, value):
         self.set_bool_attr(CN('table:protect'), value)
 
-@register_class
-class TableCell(CoveredTableCell):
-    TAG = CN('table:table-cell')
-
     @property
     def span(self):
         rows = self.get_attr(CN('table:number-rows-spanned'))
@@ -365,3 +414,29 @@ class TableCell(CoveredTableCell):
         cols = max(1, int(cols))
         self.set_attr(CN('table:number-rows-spanned'), str(rows))
         self.set_attr(CN('table:number-columns-spanned'), str(cols))
+
+    @property
+    def covered(self):
+        return self.xmlnode.tag == CN('table:covered-table-cell')
+    @covered.setter
+    def covered(self, value):
+        if value:
+            self.TAG = CN('table:covered-table-cell')
+            self.xmlnode.tag = self.TAG
+            self._remove_cell_only_attribs()
+        else:
+            self.TAG = CN('table:table-cell')
+            self.xmlnode.tag = self.TAG
+
+    def _remove_cell_only_attribs(self):
+        for key in self.CELL_ONLY_ATTRIBS:
+            if key in self.xmlnode.attrib:
+                del self.xmlnode.attrib[key]
+
+@register_class
+class CoveredCell(Cell):
+    TAG = CN('table:covered-table-cell')
+
+    @property
+    def kind(self):
+        return 'Cell'
