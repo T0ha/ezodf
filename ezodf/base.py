@@ -101,7 +101,7 @@ class GenericWrapper:
 
     def findall(self, tag):
         """ Find all subelements by xml-tag (in Clark Notation). """
-        return map(wrap, self.xmlnode.findall(tag))
+        return (wrap(xmlnode) for xmlnode in self.xmlnode.findall(tag))
 
     def find(self, tag):
         """ Find first subelements by xml-tag (in Clark Notation). """

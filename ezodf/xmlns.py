@@ -7,6 +7,7 @@
 # License: GPLv3
 
 from lxml import etree
+from weakref import WeakKeyDictionary
 
 from .const import ALL_NSMAP
 
@@ -91,7 +92,7 @@ class _ClassRegistry:
             cls = self._classmap['GenericWrapper']
         return cls(xmlnode=element)
 
+
 _class_registry = _ClassRegistry()
 register_class = _class_registry.register
 wrap = _class_registry.wrap
-

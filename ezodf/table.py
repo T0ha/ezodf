@@ -11,6 +11,7 @@ import copy
 from datetime import timedelta, date
 
 from .xmlns import register_class, CN, wrap
+from . import wrapcache
 from .base import GenericWrapper
 from .protection import random_protection_key
 from .text import Paragraph, Span
@@ -89,9 +90,10 @@ class Table(GenericWrapper, _StylenNameMixin):
     def _setup(self, nrows, ncols):
         for row in range(nrows):
             self.append(TableRow(ncols=ncols))
-        self._reset_cache()
+        wrapcache.add(self)
+        self._reset_cell_cache()
 
-    def _reset_cache(self):
+    def _reset_cell_cache(self):
         self._cell_cache.clear()
 
     def _expand_repeated_table_content(self):

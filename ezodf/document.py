@@ -75,6 +75,7 @@ class _BaseDocument:
     def save(self):
         if self.docname is None:
             raise IOError('No filename specified!')
+        self.body.restructure_before_saving()
 
         # set modification date to now
         self.meta.touch()
