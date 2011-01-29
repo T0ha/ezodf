@@ -8,11 +8,12 @@
 
 import re
 import copy
+from datetime import timedelta, date
 
 from .xmlns import register_class, CN, wrap
 from .base import GenericWrapper
 from .protection import random_protection_key
-from .text import Paragraph
+from .text import Paragraph, Span
 
 CELL_ADDRESS = re.compile('^([A-Z]+)(\d+)$')
 
@@ -169,17 +170,18 @@ class Table(GenericWrapper, _StylenNameMixin):
 
     def nrows(self):
         """ Count of table rows. """
-        # it's a method to shows that a call is expensive
         # assume that all repeated rows are expanded
         return len(list(self.findall(TableRow.TAG)))
 
     def ncols(self):
         """ Count of table columns. """
-        # it's a method to shows that a call is expensive
         # assume that all repeated columns are expanded
         first_row = self.find(TableRow.TAG)
         return 0 if first_row is None else len(first_row.xmlnode)
 
+    def clear(self):
+        super(Table, self).clear()
+        self._reset_cache()
 
     def get_cell_by_index(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
@@ -194,6 +196,13 @@ class Table(GenericWrapper, _StylenNameMixin):
             return self._wrap(pos, table_row[column])
 
     def _wrap(self, pos, xmlnode):
+        try:
+            # if possible return same wrapper to preserve caches
+            cell = self._cell_cache[pos]
+            if cell.xmlnode is xmlnode:
+                return cell
+        except KeyError:
+            pass
         cell = wrap(xmlnode)
         self._cell_cache[pos] = cell
         return cell
@@ -332,11 +341,15 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
 
     @property
     def value(self):
+        try:
+            return self._value
+        except AttributeError:
+            pass
         t = self.value_type
         if  t is None:
             return None
         elif t == 'string':
-            return self.plaintext()
+            result = self.plaintext()
         else:
             result = self.get_attr(TYPE_VALUE_MAP[t])
             if result is None:
@@ -345,17 +358,22 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
                 result = float(result)
             elif t == 'boolean':
                 result = True if result == 'true' else False
-            return result
+        self._set_cached_value(result)
+        return result
 
     def set_value(self, value, value_type=None, currency=None):
 
-        def check_value(value):
+        def is_valid_value(value):
+            result = True
             if value is None:
-                raise ValueError("invalid value 'None'.")
+                result = False
+            elif isinstance(value, GenericWrapper):
+                if value.kind not in SUPPORTED_CELL_CONTENT:
+                    result = False
+            return result
 
-        def check_value_type(value_type):
-            if value_type not in VALID_VALUE_TYPES:
-                raise TypeError(value_type)
+        def is_valid_type(value_type):
+            return True if value_type in VALID_VALUE_TYPES else False
 
         def determine_value_type(value):
             if type(value) == bool:
@@ -368,8 +386,7 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
 
         def convert(value, value_type):
             if isinstance(value, GenericWrapper):
-                if value.kind not in SUPPORTED_CELL_CONTENT:
-                    raise TypeError('Unsupported object type: %s' % value.kind)
+                pass
             elif value_type == 'string':
                 value = Paragraph(str(value))
             elif value_type == 'boolean':
@@ -378,18 +395,20 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
                 value = str(value)
             return value
 
-        check_value(value)
-
+        if not is_valid_value(value):
+            raise ValueError("invalid value: %s" % str(value))
         if isinstance(currency, str):
             value_type = 'currency'
-            self.set_attr(CN('office:currency'), currency)
-
         if value_type is None:
             value_type = determine_value_type(value)
+        if not is_valid_type(value_type):
+            raise TypeError(value_type)
 
-        check_value_type(value_type)
         value = convert(value, value_type)
+        self._clear_old_value()
+        self._set_new_value(value, value_type, currency)
 
+    def _set_new_value(self, value, value_type, currency):
         if isinstance(value, GenericWrapper):
             value_type = 'string'
             self.append(value)
@@ -397,8 +416,35 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
             self.set_attr(TYPE_VALUE_MAP[value_type], value)
         self._set_value_type(value_type)
 
+        if currency and (value_type == 'currency'):
+            self.set_attr(CN('office:currency'), currency)
+
     def _set_value_type(self, value_type):
         self.set_attr(CN('office:value-type'), value_type)
+
+    def _clear_old_value(self):
+        self._clear_value_attribute(self.value_type)
+        self._clear_content()
+        self._delete_cached_value()
+
+    def _clear_content(self):
+        xmlnode = self.xmlnode
+        while len(xmlnode) > 0:
+            del xmlnode[0]
+
+    def _clear_value_attribute(self, value_type):
+        try:
+            attribute_name = TYPE_VALUE_MAP[value_type]
+            del self.xmlnode.attrib[attribute_name]
+        except KeyError:
+            pass
+
+    def _delete_cached_value(self):
+        if hasattr(self, '_value'):
+            del self._value
+
+    def _set_cached_value(self, value):
+        self._value = value
 
     @property
     def display_form(self):
@@ -419,9 +465,17 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
         return "\n".join([p.plaintext() for p in iter(self)
                           if p.kind in SUPPORTED_CELL_CONTENT])
 
-    def append_text(self, text):
-        self._set_value_type('string')
-        self.append(Paragraph(text))
+    def append_text(self, text, style_name=None):
+        if self.value_type != 'string':
+            raise TypeError('invalid cell type: %s' % self.value_type)
+        try:
+            last_child = self.get_child(-1)
+            if last_child.kind in ("Paragraph", "Heading"):
+                last_child.append(Span(text, style_name=style_name))
+                return
+        except IndexError:
+            pass
+        self.append(Paragraph(text, style_name=style_name))
 
     @property
     def currency(self):
@@ -457,12 +511,12 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
         if value:
             self.TAG = CN('table:covered-table-cell')
             self.xmlnode.tag = self.TAG
-            self._remove_cell_only_attribs()
+            self._remove_exclusive_cell_attributes()
         else:
             self.TAG = CN('table:table-cell')
             self.xmlnode.tag = self.TAG
 
-    def _remove_cell_only_attribs(self):
+    def _remove_exclusive_cell_attributes(self):
         for key in self.CELL_ONLY_ATTRIBS:
             if key in self.xmlnode.attrib:
                 del self.xmlnode.attrib[key]

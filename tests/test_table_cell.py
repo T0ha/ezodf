@@ -7,7 +7,6 @@
 # License: GPLv3
 
 # Standard Library
-import sys
 import unittest
 
 # trusted or separately tested modules
@@ -162,17 +161,32 @@ class TestCellContent(unittest.TestCase):
             cell.set_value('', value_type='invalid')
 
     def test_set_new_string(self):
-        cell = Cell()
+        cell = Cell(value_type='string')
         cell.append_text('test')
         self.assertEqual(cell.plaintext(), 'test')
         self.assertEqual(cell.value, 'test')
 
+    def test_append_text_accept_style_name(self):
+        cell = Cell('Text')
+        cell.append_text('Text', style_name='test')
+        self.assertEqual(cell.value, 'TextText')
+
     def test_append_two_strings(self):
-        cell = Cell()
-        cell.append_text('test1')
+        cell = Cell('test1')
         cell.append_text('test2')
+        self.assertEqual(cell.plaintext(), 'test1test2')
+        self.assertEqual(cell.value, 'test1test2')
+
+    def test_append_two_paragraphs(self):
+        cell = Cell('test1')
+        cell.append(Paragraph('test2'))
         self.assertEqual(cell.plaintext(), 'test1\ntest2')
         self.assertEqual(cell.value, 'test1\ntest2')
+
+    def test_append_text_error(self):
+        cell = Cell(1.)
+        with self.assertRaises(TypeError):
+            cell.append_text('test')
 
     def test_set_float_with_type(self):
         cell = Cell()
@@ -233,6 +247,18 @@ class TestCellContent(unittest.TestCase):
         with self.assertRaises(ValueError):
             cell.set_value(None)
 
+    def test_set_time_value(self):
+        cell = Cell()
+        cell.set_value('PT0H05M00,0000S', 'time')
+        self.assertEqual(cell.value_type, 'time')
+        self.assertEqual(cell.value, 'PT0H05M00,0000S')
+
+    def test_set_date_value(self):
+        cell = Cell()
+        cell.set_value('2011-01-29T12:00:00', 'date')
+        self.assertEqual(cell.value_type, 'date')
+        self.assertEqual(cell.value, '2011-01-29T12:00:00')
+
 class TestCellCreation(unittest.TestCase):
     def test_init_no_args(self):
         cell = Cell()
@@ -280,6 +306,16 @@ class TestCellCreation(unittest.TestCase):
         cell = Cell(False)
         self.assertEqual(cell.value_type, 'boolean')
         self.assertEqual(cell.value, False)
+
+    def test_time_value(self):
+        cell = Cell('PT0H05M00,0000S', 'time')
+        self.assertEqual(cell.value_type, 'time')
+        self.assertEqual(cell.value, 'PT0H05M00,0000S')
+
+    def test_date_value(self):
+        cell = Cell('2011-01-29T12:00:01', 'date')
+        self.assertEqual(cell.value_type, 'date')
+        self.assertEqual(cell.value, '2011-01-29T12:00:01')
 
     def test_wrapped_object(self):
         cell = Cell(Paragraph('text'))
