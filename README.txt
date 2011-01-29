@@ -12,19 +12,17 @@ a simple example::
 
     odt = ezodf.newdoc(doctype='odt', filename='text.odt')
     paragraph = Paragraph("This is a paragraph. ")
-    # document content resides in the body object
-    odt.body.append(paragraph)
-    paragraph.append_text("This is another sentence.\nNormal usage of line breaks.")
-    # insert new heading before 'paragraph'
+    odt.body += paragraph
+    paragraph.append_text("for two a lines \n use line breaks.")
     odt.body.insert_before(paragraph, Heading("Chapter 1"))
     odt.save()
 
     from ezodf import Sheet, Cell
 
     ods = ezodf.newdoc(doctype='ods', filename='spreadsheet.ods')
-    # document content resides in the body object
-    sheet = ods.body.append(Sheet('SHEET'))
-    sheet[0, 0] = Cell("Textcell")
+    ods.sheets += Sheet('SHEET')
+    sheet = ods.sheets[0]
+    sheet['A1'] = Cell("Textcell")
     ods.save()
 
 for more examples see: /examples folder

@@ -56,6 +56,10 @@ class GenericWrapper:
     def __delitem__(self, index):
         self.del_child(index)
 
+    def __iadd__(self, other):
+        self.append(other)
+        return self
+
     def index(self, child):
         """ Get numeric index of `child`.
 

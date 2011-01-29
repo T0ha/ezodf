@@ -85,6 +85,12 @@ class _BaseDocument:
     def application_body_tag(self):
         return CN(MIMETYPE_BODYTAG_MAP[self.mimetype])
 
+    def _create_shortcuts(self, body):
+        # shortcuts into the body object
+        if hasattr(body, 'sheets'):
+            self.sheets = body.sheets
+        if hasattr(body, 'pages'):
+            self.pages = body.pages
 
 class FlatXMLDocument(_BaseDocument):
     """ OpenDocument contained in a single XML file. """
@@ -108,6 +114,8 @@ class FlatXMLDocument(_BaseDocument):
             raise TypeError("Unsupported mimetype: %s" % self.mimetype)
 
         self._setup()
+        self._create_shortcuts(self.body)
+
 
     def _setup(self):
         self.meta = OfficeDocumentMeta(subelement(self.xmlnode, CN('office:document-meta')))
@@ -170,6 +178,7 @@ class PackagedDocument(_BaseDocument):
         fm.register('content.xml', self.content, 'text/xml')
 
         self.body = self.content.get_application_body(self.application_body_tag)
+        self._create_shortcuts(self.body)
 
     def save(self):
         super(PackagedDocument, self).save()

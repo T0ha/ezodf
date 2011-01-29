@@ -131,6 +131,14 @@ class TestBaseClass(unittest.TestCase):
         b.append(newitem)
         self.assertEqual(b[pos].get_attr('name'), 'newitem')
 
+    def test_iadd(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        pos = len(b)
+        newitem = GenericWrapper()
+        newitem.set_attr('name', 'newitem')
+        b += newitem
+        self.assertEqual(b[pos].get_attr('name'), 'newitem')
+
     def test_insert_before(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         newitem = GenericWrapper()
