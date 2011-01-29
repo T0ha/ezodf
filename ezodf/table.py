@@ -196,13 +196,6 @@ class Table(GenericWrapper, _StylenNameMixin):
             return self._wrap(pos, table_row[column])
 
     def _wrap(self, pos, xmlnode):
-        try:
-            # if possible return same wrapper to preserve caches
-            cell = self._cell_cache[pos]
-            if cell.xmlnode is xmlnode:
-                return cell
-        except KeyError:
-            pass
         cell = wrap(xmlnode)
         self._cell_cache[pos] = cell
         return cell
@@ -358,7 +351,6 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
                 result = float(result)
             elif t == 'boolean':
                 result = True if result == 'true' else False
-        self._set_cached_value(result)
         return result
 
     def set_value(self, value, value_type=None, currency=None):
@@ -425,7 +417,6 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
     def _clear_old_value(self):
         self._clear_value_attribute(self.value_type)
         self._clear_content()
-        self._delete_cached_value()
 
     def _clear_content(self):
         xmlnode = self.xmlnode
@@ -438,13 +429,6 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
             del self.xmlnode.attrib[attribute_name]
         except KeyError:
             pass
-
-    def _delete_cached_value(self):
-        if hasattr(self, '_value'):
-            del self._value
-
-    def _set_cached_value(self, value):
-        self._value = value
 
     @property
     def display_form(self):
