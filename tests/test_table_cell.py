@@ -14,7 +14,7 @@ from ezodf.xmlns import CN, etree, wrap
 from ezodf.text import Paragraph
 
 # objects to test
-from ezodf.table import Cell, CoveredCell
+from ezodf.cells import Cell, CoveredCell
 
 COVERED_TABLE_CELL = """
 <table:covered-table-cell xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" />

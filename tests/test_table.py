@@ -14,7 +14,8 @@ import unittest
 from ezodf.xmlns import CN, etree, wrap
 
 # objects to test
-from ezodf.table import Table, address_to_index, Cell
+from ezodf.cells import Cell
+from ezodf.table import Table, address_to_index
 
 TESTTABLE = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" />
