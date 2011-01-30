@@ -10,7 +10,7 @@ import re
 import copy
 from datetime import timedelta, date
 
-from .xmlns import register_class, CN, wrap
+from .xmlns import register_class, CN, wrap, etree
 from . import wrapcache
 from .base import GenericWrapper
 from .protection import random_protection_key
@@ -88,6 +88,10 @@ class Table(GenericWrapper, _StylenNameMixin):
             self._expand_repeated_table_content()
 
     def _setup(self, nrows, ncols):
+        if nrows < 1:
+            raise ValueError('nrows has to be >= 1.')
+        if ncols < 1:
+            raise ValueError('ncols has to be >= 1.')
         for row in range(nrows):
             self.append(TableRow(ncols=ncols))
         wrapcache.add(self)
@@ -181,9 +185,10 @@ class Table(GenericWrapper, _StylenNameMixin):
         first_row = self.find(TableRow.TAG)
         return 0 if first_row is None else len(first_row.xmlnode)
 
-    def clear(self):
+    def clear(self, size=(10, 10)):
         super(Table, self).clear()
-        self._reset_cache()
+        nrows, ncols = size
+        self._setup(nrows, ncols)
 
     def get_cell_by_index(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
@@ -243,12 +248,90 @@ class Table(GenericWrapper, _StylenNameMixin):
             raise IndexError('row index out of range: %s' % index)
         return ( self._wrap((index, col), xmlnode) for col, xmlnode in enumerate(self._get_row_at_index(index)) )
 
+    def rows(self):
+        for xmlrow in self._xmlrows():
+            yield (wrap(xmlcell) for xmlcell in xmlrow)
+
+    def _xmlrows(self):
+        return self.xmlnode.findall(TableRow.TAG)
+
     def column(self, index):
         if isinstance(index, str):
             row, index = address_to_index(index)
         if index < 0 or index >= self.ncols():
             raise IndexError('row index out of range: %s' % index)
         return ( self._wrap((xrow,index), row[index]) for xrow, row in enumerate(self.xmlnode.findall(TableRow.TAG)) )
+
+    def append_rows(self, count=1):
+        if count < 1:
+            raise ValueError("count: %d" % count)
+
+        ncols = self.ncols()
+        for index in range(count):
+            newrow = TableRow(ncols=ncols)
+            self.xmlnode.append(newrow.xmlnode)
+
+    def insert_rows(self, index, count=1):
+        # CAUTION: this will break refernces in formulas!
+        if index < 0 or index >= self.nrows():
+            raise IndexError("index: %d" % index)
+        if count < 1:
+            raise ValueError("count: %d" % count)
+        first_row_index = self._get_index_of_first_row()
+        ncols = self.ncols()
+        for pos in range(count):
+            newrow = TableRow(ncols=ncols)
+            self.xmlnode.insert(first_row_index + index + pos, newrow.xmlnode)
+        self._reset_cell_cache()
+
+    def delete_rows(self, index, count=1):
+        # CAUTION: this will break refernces in formulas!
+        if count < 1:
+            raise ValueError("count: %d" % count)
+        nrows = self.nrows()
+        if index < 0 or index >= nrows:
+            raise IndexError("index: %d" % index)
+        if (index+count-1) >= nrows:
+            raise IndexError("index+count: %d" % (index+count))
+
+        delete_index = self._get_index_of_first_row() + index
+        for pos in range(count):
+            del self.xmlnode[delete_index]
+        self._reset_cell_cache()
+
+    def append_columns(self, count=1):
+        if count < 1:
+            raise ValueError("count: %d" % count)
+        for xmlrow in self._xmlrows():
+            for x in range(count):
+                xmlrow.append(etree.Element(Cell.TAG))
+
+    def insert_columns(self, index, count=1):
+        # CAUTION: this will break refernces in formulas!
+        if index < 0 or index >= self.nrows():
+            raise IndexError("index: %d" % index)
+        if count < 1:
+            raise ValueError("count: %d" % count)
+
+        for xmlrow in self._xmlrows():
+            for x in range(count):
+                xmlrow.insert(index, etree.Element(Cell.TAG))
+        self._reset_cell_cache()
+
+    def delete_columns(self, index, count=1):
+        # CAUTION: this will break refernces in formulas!
+        if count < 1:
+            raise ValueError("count: %d" % count)
+        ncols = self.ncols()
+        if index < 0 or index >= ncols:
+            raise IndexError("index: %d" % index)
+        if (index+count-1) >= ncols:
+            raise IndexError("index+count: %d" % (index+count))
+
+        for xmlrow in self._xmlrows():
+            for x in range(count):
+                del xmlrow[index]
+        self._reset_cell_cache()
 
 @register_class
 class TableRow(GenericWrapper, _StylenNameMixin, _VisibilityMixin,

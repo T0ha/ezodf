@@ -2,11 +2,11 @@
 NEWS
 ====
 
-Version 0.1.0 - 02 January 2011
+Version 0.2.1 - xx February 2011
 
-  * Pre-Alpha version
-  * open/saveas ODF documents
-  * modify meta data
+  * Alpha version
+  * added basic spreadsheet support
+  * Spreadsheet: added sheet and cell-content management
 
 Version 0.2.0 - 18 January 2011
 
@@ -16,3 +16,9 @@ Version 0.2.0 - 18 January 2011
   * open documents - ezodf.opendoc(filename)
   * create new documents - ezdof.newdoc(doctype, filename, template)
   * Text: added Paragraph, Heading, Span, Hyperlink, List, Section objects
+
+Version 0.1.0 - 02 January 2011
+
+  * Pre-Alpha version
+  * open/saveas ODF documents
+  * modify meta data

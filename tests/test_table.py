@@ -125,6 +125,19 @@ class TestTableMethods(unittest.TestCase):
         self.assertEqual(table.nrows(), 7)
         self.assertEqual(table.ncols(), 5)
 
+    def test_clear(self):
+        table = Table(name="TEST", size=(7, 5))
+        table.clear(size=(8, 10))
+        self.assertIsNone(table.name)
+        self.assertEqual(table.ncols(), 10)
+        self.assertEqual(table.nrows(), 8)
+
+    def test_setup_error(self):
+        with self.assertRaises(ValueError):
+            Table(size=(1, 0))
+        with self.assertRaises(ValueError):
+            Table(size=(0, 1))
+
 class TestAddress2Index(unittest.TestCase):
     def test_A1(self):
         self.assertEqual(address_to_index('A1'), (0, 0))
@@ -157,7 +170,7 @@ TABLE_COMP = """
 </table:table>
 """
 
-class TestTableContentExpansion(unittest.TestCase):
+class TestTableContent(unittest.TestCase):
     def setUp(self):
         self.table = Table(xmlnode=etree.XML(TABLE_COMP))
 
@@ -260,6 +273,10 @@ class TestTableContentAccess(unittest.TestCase):
         self.assertEqual(self.table.ncols(), 3)
         self.assertEqual(self.table.nrows(), 6)
 
+    def test_first_row_index(self):
+        first_row_index = self.table._get_index_of_first_row()
+        self.assertEqual(first_row_index, 3)
+
     def test_row_index_error(self):
         with self.assertRaises(IndexError):
             self.table[6, 0]
@@ -348,6 +365,15 @@ class TestTableContentAccess(unittest.TestCase):
     def test_set_cell_neg_column_index_error(self):
         with self.assertRaises(IndexError):
             self.table[0, -1] = Cell()
+
+    def test_iter_rows(self):
+        nrows = self.table.nrows()
+        ncols = self.table.ncols()
+        for row in self.table.rows():
+            cells = list(row)
+            self.assertEqual(len(cells), ncols)
+            nrows -= 1
+        self.assertEqual(nrows, 0)
 
 TABLE_ROW_COL_ACCESS = """
 <table:table

@@ -7,22 +7,20 @@ Abstract
 
 a simple example::
 
-    import ezodf
-    from ezodf import Paragraph, Heading
+    from ezodf import newdoc, Paragraph, Heading, Sheet
 
-    odt = ezodf.newdoc(doctype='odt', filename='text.odt')
-    paragraph = Paragraph("This is a paragraph. ")
-    odt.body += paragraph
-    paragraph.append_text("for two a lines \n use line breaks.")
-    odt.body.insert_before(paragraph, Heading("Chapter 1"))
+    odt = newdoc(doctype='odt', filename='text.odt')
+    odt.body += Heading("Chapter 1")
+    odt.body += Paragraph("This is a paragraph.")
     odt.save()
 
-    from ezodf import Sheet, Cell
-
-    ods = ezodf.newdoc(doctype='ods', filename='spreadsheet.ods')
-    ods.sheets += Sheet('SHEET')
-    sheet = ods.sheets[0]
-    sheet['A1'] = Cell("Textcell")
+    ods = newdoc(doctype='ods', filename='spreadsheet.ods')
+    sheet = Sheet('SHEET', size=(10, 10))
+    ods.sheets += sheet
+    sheet['A1'].set_value("cell with text")
+    sheet['B2'].set_value(3.141592)
+    sheet['C3'].set_value(100, currency='USD')
+    pi = sheet[1, 1].value
     ods.save()
 
 for more examples see: /examples folder
