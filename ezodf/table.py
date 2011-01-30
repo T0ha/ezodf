@@ -71,7 +71,7 @@ class _NumberColumnsRepeatedMixin:
         value = self.get_attr(CN('table:number-columns-repeated'))
         value = int(value) if value is not None else 1
         return max(1, value)
-    def clear_columns_repeated(self):
+    def clear_columns_repeated_attribute(self):
         del self.xmlnode.attrib[CN('table:number-columns-repeated')]
 
 @register_class
@@ -83,15 +83,19 @@ class Table(GenericWrapper, _StylenNameMixin):
         self._cell_cache = {}
         if xmlnode is None:
             self.name = name
-            self._setup(size[0], size[1])
+            self._setup(size)
         else:
             self._expand_repeated_table_content()
 
-    def _setup(self, nrows, ncols):
-        if nrows < 1:
-            raise ValueError('nrows has to be >= 1.')
-        if ncols < 1:
-            raise ValueError('ncols has to be >= 1.')
+    def _setup(self, size):
+        def validate_parameter(nrows, ncols):
+            if nrows < 1:
+                raise ValueError('nrows has to be >= 1.')
+            if ncols < 1:
+                raise ValueError('ncols has to be >= 1.')
+
+        nrows, ncols = size
+        validate_parameter(nrows, ncols)
         for row in range(nrows):
             self.append(TableRow(ncols=ncols))
         wrapcache.add(self)
@@ -114,12 +118,12 @@ class Table(GenericWrapper, _StylenNameMixin):
             for cell in list(iter(row)):
                 count = cell.columns_repeated
                 if count > 1:
-                    cell.clear_columns_repeated()
+                    cell.clear_columns_repeated_attribute()
                     expand_element(count, cell)
 
         def expand_row(row):
             count = row.rows_repeated
-            row.clear_rows_repeated()
+            row.clear_rows_repeated_attribute()
             expand_element(count, row)
 
         for row in self.findall(TableRow.TAG):
@@ -187,8 +191,7 @@ class Table(GenericWrapper, _StylenNameMixin):
 
     def clear(self, size=(10, 10)):
         super(Table, self).clear()
-        nrows, ncols = size
-        self._setup(nrows, ncols)
+        self._setup(size)
 
     def get_cell_by_index(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
@@ -220,7 +223,6 @@ class Table(GenericWrapper, _StylenNameMixin):
         if row < 0 or column < 0 :
             raise IndexError('negative indices not allowed.')
 
-        # write-thru cache
         table_row = self._get_row_at_index(row)
         table_row[column] = cell.xmlnode
         self._cell_cache[pos] = cell
@@ -246,7 +248,8 @@ class Table(GenericWrapper, _StylenNameMixin):
             index, column = address_to_index(index)
         if index < 0:
             raise IndexError('row index out of range: %s' % index)
-        return ( self._wrap((index, col), xmlnode) for col, xmlnode in enumerate(self._get_row_at_index(index)) )
+        return ( self._wrap((index, col), xmlnode) for col, xmlnode in \
+                 enumerate(self._get_row_at_index(index)) )
 
     def rows(self):
         for xmlrow in self._xmlrows():
@@ -260,76 +263,80 @@ class Table(GenericWrapper, _StylenNameMixin):
             row, index = address_to_index(index)
         if index < 0 or index >= self.ncols():
             raise IndexError('row index out of range: %s' % index)
-        return ( self._wrap((xrow,index), row[index]) for xrow, row in enumerate(self.xmlnode.findall(TableRow.TAG)) )
+        return ( self._wrap((xrow,index), row[index]) for xrow, row in \
+                 enumerate(self.xmlnode.findall(TableRow.TAG)) )
 
     def append_rows(self, count=1):
-        if count < 1:
-            raise ValueError("count: %d" % count)
-
+        Table._validate_count_parameter(count)
         ncols = self.ncols()
         for index in range(count):
-            newrow = TableRow(ncols=ncols)
-            self.xmlnode.append(newrow.xmlnode)
+            self.xmlnode.append(Table._new_xmlrow(ncols))
+
+    @staticmethod
+    def _new_xmlrow(count):
+        xmlrow = etree.Element(TableRow.TAG)
+        for _ in range(count):
+            xmlrow.append(etree.Element(Cell.TAG))
+        return xmlrow
 
     def insert_rows(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        if index < 0 or index >= self.nrows():
-            raise IndexError("index: %d" % index)
+        Table._validate_insert_parameters(index, count, self.nrows())
+        index += self._get_index_of_first_row()
+        ncols = self.ncols()
+        for _ in range(count):
+            self.xmlnode.insert(index, Table._new_xmlrow(ncols))
+        self._reset_cell_cache()
+
+    @staticmethod
+    def _validate_insert_parameters(index, insert_count, element_count):
+        Table._validate_index_parameter(index, element_count)
+        Table._validate_count_parameter(insert_count)
+
+    @staticmethod
+    def _validate_count_parameter(count):
         if count < 1:
             raise ValueError("count: %d" % count)
-        first_row_index = self._get_index_of_first_row()
-        ncols = self.ncols()
-        for pos in range(count):
-            newrow = TableRow(ncols=ncols)
-            self.xmlnode.insert(first_row_index + index + pos, newrow.xmlnode)
-        self._reset_cell_cache()
+
+    @staticmethod
+    def _validate_index_parameter(index, element_count):
+        if index < 0 or index >= element_count:
+            raise IndexError("index: %d" % index)
 
     def delete_rows(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        if count < 1:
-            raise ValueError("count: %d" % count)
-        nrows = self.nrows()
-        if index < 0 or index >= nrows:
-            raise IndexError("index: %d" % index)
-        if (index+count-1) >= nrows:
-            raise IndexError("index+count: %d" % (index+count))
-
-        delete_index = self._get_index_of_first_row() + index
-        for pos in range(count):
-            del self.xmlnode[delete_index]
+        Table._validate_delete_parameters(index, count, self.nrows())
+        index += self._get_index_of_first_row()
+        for _ in range(count):
+            del self.xmlnode[index]
         self._reset_cell_cache()
 
+    @staticmethod
+    def _validate_delete_parameters(index, delete_count, element_count):
+        Table._validate_index_parameter(index, element_count)
+        Table._validate_count_parameter(delete_count)
+        if (index+delete_count-1) >= element_count:
+            raise IndexError("index+count: %d" % (index+delete_count))
+
     def append_columns(self, count=1):
-        if count < 1:
-            raise ValueError("count: %d" % count)
+        Table._validate_count_parameter(count)
         for xmlrow in self._xmlrows():
-            for x in range(count):
+            for _ in range(count):
                 xmlrow.append(etree.Element(Cell.TAG))
 
     def insert_columns(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        if index < 0 or index >= self.nrows():
-            raise IndexError("index: %d" % index)
-        if count < 1:
-            raise ValueError("count: %d" % count)
-
+        Table._validate_insert_parameters(index, count, self.ncols())
         for xmlrow in self._xmlrows():
-            for x in range(count):
+            for _ in range(count):
                 xmlrow.insert(index, etree.Element(Cell.TAG))
         self._reset_cell_cache()
 
     def delete_columns(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        if count < 1:
-            raise ValueError("count: %d" % count)
-        ncols = self.ncols()
-        if index < 0 or index >= ncols:
-            raise IndexError("index: %d" % index)
-        if (index+count-1) >= ncols:
-            raise IndexError("index+count: %d" % (index+count))
-
+        Table._validate_delete_parameters(index, count, self.ncols())
         for xmlrow in self._xmlrows():
-            for x in range(count):
+            for _ in range(count):
                 del xmlrow[index]
         self._reset_cell_cache()
 
@@ -353,7 +360,7 @@ class TableRow(GenericWrapper, _StylenNameMixin, _VisibilityMixin,
         value = int(value) if value is not None else 1
         return max(1, value)
 
-    def clear_rows_repeated(self):
+    def clear_rows_repeated_attribute(self):
         del self.xmlnode.attrib[CN('table:number-rows-repeated')]
 
 @register_class
@@ -419,23 +426,22 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
 
     @property
     def value(self):
-        try:
-            return self._value
-        except AttributeError:
-            pass
+        def convert(value, value_type):
+            if value is None:
+                pass
+            elif value_type in NUMERIC_TYPES:
+                value = float(value)
+            elif value_type == 'boolean':
+                value = True if value == 'true' else False
+            return value
+
         t = self.value_type
         if  t is None:
-            return None
+            result = None
         elif t == 'string':
             result = self.plaintext()
         else:
-            result = self.get_attr(TYPE_VALUE_MAP[t])
-            if result is None:
-                pass
-            elif t in NUMERIC_TYPES:
-                result = float(result)
-            elif t == 'boolean':
-                result = True if result == 'true' else False
+            result = convert(self.xmlnode.get(TYPE_VALUE_MAP[t]), t)
         return result
 
     def set_value(self, value, value_type=None, currency=None):
@@ -505,7 +511,7 @@ class Cell(GenericWrapper, _StylenNameMixin, _NumberColumnsRepeatedMixin):
 
     def _clear_content(self):
         xmlnode = self.xmlnode
-        while len(xmlnode) > 0:
+        for _ in range(len(xmlnode)):
             del xmlnode[0]
 
     def _clear_value_attribute(self, value_type):

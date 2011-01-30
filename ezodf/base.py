@@ -9,7 +9,6 @@
 from .xmlns import etree, register_class, wrap
 
 def safelen(text):
-    # can handle `None` as input
     return len(text) if text else 0
 
 @register_class
@@ -26,7 +25,6 @@ class GenericWrapper:
         return map(wrap, self.xmlnode.iterchildren())
 
     def __len__(self):
-        """ Get count of children """
         return len(self.xmlnode)
 
     @property
@@ -61,46 +59,26 @@ class GenericWrapper:
         return self
 
     def index(self, child):
-        """ Get numeric index of `child`.
-
-        :param GenericWrapper child: get index for this child
-        :returns: int
-        """
+        """ Get numeric index of `child`. """
         return self.xmlnode.index(child.xmlnode)
 
     def insert(self, index, child):
-        """ Insert child at position `index`.
-
-        :param int index: insert position for child
-        :param GenericWrapper child: child to insert
-        :returns: GenericWrapper child
-        """
+        """ Insert child at position `index`. """
         self.xmlnode.insert(int(index), child.xmlnode)
         return child # pass through
 
     def get_child(self, index):
-        """ Get children at `index` as wrapped object.
-
-        :param int index: child position
-        :returns: GenericWrapper
-        """
+        """ Get children at `index` as wrapped object. """
         xmlelement = self.xmlnode[int(index)]
         return wrap(xmlelement)
 
     def set_child(self, index, element):
-        """ Set (replace) the child at position `index` by element.
-
-        :param int index: child position
-        :param GenericWrapper element: new child node
-        """
+        """ Set (replace) the child at position `index` by element. """
         found = self.xmlnode[int(index)]
         self.xmlnode.replace(found, element.xmlnode)
 
     def del_child(self, index):
-        """ Delete child at position `index`.
-
-        :param int index: child position
-        """
+        """ Delete child at position `index`. """
         del self.xmlnode[int(index)]
 
     def findall(self, tag):
@@ -117,10 +95,6 @@ class GenericWrapper:
     def get_attr(self, key, default=None):
         """ Get the `key` attribute value of the xmlnode element or `default`
         if `key` does not exist.
-
-        :param str key: name of key
-        :param default: default value if `key` not found
-        :return: str
         """
         value = self.xmlnode.get(key)
         if value is None:
@@ -135,11 +109,7 @@ class GenericWrapper:
             return False
 
     def set_attr(self, key, value):
-        """ Set the `key` attribute of the xmlnode element to `value`.
-
-        :param str key: name of key
-        :param value: value for key
-        """
+        """ Set the `key` attribute of the xmlnode element to `value`. """
         if value:
             self.xmlnode.set(key, str(value))
         else:
@@ -151,29 +121,18 @@ class GenericWrapper:
     ## List operations
 
     def append(self, child):
-        """ Append `child` as to node.
-
-        :param GenericWrapper child: child to append
-        """
+        """ Append `child` as to node. """
         self.xmlnode.append(child.xmlnode)
         return child # pass through
 
     def insert_before(self, target, child):
-        """ Insert `child` before to `target`.
-
-        :param GenericWrapper target: target node
-        :param GenericWrapper child: new object
-        :returns: GenericWrapper child
-        """
+        """ Insert `child` before to `target`. """
         position = self.index(target)
         self.insert(position, child)
         return child # pass through
 
     def remove(self, child):
-        """ Remove `child` object from node.
-
-        :param GenericWrapper child: child to remove
-        """
+        """ Remove `child` object from node. """
         self.xmlnode.remove(child.xmlnode)
 
     def replace(self, child, newchild):
@@ -188,12 +147,9 @@ class GenericWrapper:
     @property
     def textlen(self):
         """ Returns the character count of the plain text content as int. """
-        # default implementation, does not respect child elements
         return safelen(self.xmlnode.text)
 
     def plaintext(self):
         """ Get content of node as plain (unformatted) text string. """
-        # default implementation, does not respect child elements
         text = self.xmlnode.text
         return text if text else ""
-
