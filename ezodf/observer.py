@@ -62,10 +62,16 @@ class Observer:
         event_listeners.remove(listener_object)
 
     def broadcast(self, event, msg=None, root=None):
+        """ Broadcast an 'event' and submit 'msg' to the listeners event handler.
 
+        If the 'event' should only reach objects of one document, use the 'root'
+        parameter (get 'root' with the get_xmlroot() method) and only objects with
+        the same 'root' element receives the event.
+        """
+
+        event_handler_name = "on_%s_handler" % event
         def get_event_handler(listener):
-            return getattr(listener, get_event_handler.event_handler_name)
-        get_event_handler.event_handler_name = "on_%s_handler" % event
+            return getattr(listener, event_handler_name)
 
         def send_to_all(listener):
             handler = get_event_handler(listener)

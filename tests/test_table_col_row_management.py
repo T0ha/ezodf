@@ -3,7 +3,7 @@
 # Author:  mozman -- <mozman@gmx.at>
 # Purpose: test table row/column management
 # Created: 30.01.2011
-# Copyright (C) , Manfred Moitzi
+# Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
 # Standard Library
@@ -52,7 +52,7 @@ class TestTableRowManagement(unittest.TestCase):
         self.assertEqual(self.table.nrows(), 11)
         self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
 
-    def test_append_one_row_at_content_epiloge_data(self):
+    def test_append_one_row_to_table_with_content_epiloge(self):
         add_table_epilogue_content(self.table)
         self.table.append_rows(1)
         self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
@@ -60,6 +60,11 @@ class TestTableRowManagement(unittest.TestCase):
     def test_append_two_rows(self):
         self.table.append_rows(2)
         self.assertEqual(self.table.nrows(), 12)
+        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
+
+    def test_append_two_rows_to_table_with_content_epiloge(self):
+        add_table_epilogue_content(self.table)
+        self.table.append_rows(2)
         self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
 
     def test_append_zero_rows_value_error(self):
@@ -77,7 +82,6 @@ class TestTableRowManagement(unittest.TestCase):
         self.assertEqual(self.table[4, 0].value, 'checkmark4')
         self.assertIsNone(self.table[5, 0].value)
         self.assertEqual(self.table[6, 0].value, 'checkmark5')
-        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
 
     def test_insert_two_rows(self):
         self.table.insert_rows(index=5, count=2)
@@ -87,7 +91,6 @@ class TestTableRowManagement(unittest.TestCase):
         self.assertIsNone(self.table[5, 0].value)
         self.assertIsNone(self.table[6, 0].value)
         self.assertEqual(self.table[7, 0].value, 'checkmark5')
-        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
 
     def test_insert_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
