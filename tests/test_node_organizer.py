@@ -117,7 +117,7 @@ class TestPreludeEpilogueOrganizer(unittest.TestCase):
         tree = create_tree(tags)
 
         no = PreludeEpilogueOrganizer(PRELUDE_TAGS, EPILOGUE_TAGS)
-        no.reorg(tree)
+        no.reorder(tree)
         self.assertTrue(has_valid_structure(tree))
 
 if __name__=='__main__':

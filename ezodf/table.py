@@ -13,8 +13,8 @@ from .xmlns import register_class, CN, wrap, etree
 from . import wrapcache
 from .base import GenericWrapper
 from .protection import random_protection_key
-from .propertymixins import NumberColumnsRepeatedMixin, VisibilityMixin
-from .propertymixins import StylenNameMixin, DefaultCellStyleNameMixin
+from .propertymixins import TableNumberColumnsRepeatedMixin, TableVisibilityMixin
+from .propertymixins import TableStylenNameMixin, TableDefaultCellStyleNameMixin
 
 CELL_ADDRESS = re.compile('^([A-Z]+)(\d+)$')
 
@@ -36,7 +36,7 @@ def address_to_index(address):
         raise ValueError('Invalid cell address: %s' % address)
 
 @register_class
-class Table(GenericWrapper, StylenNameMixin):
+class Table(GenericWrapper, TableStylenNameMixin):
     TAG = CN('table:table')
 
     def __init__(self, name='NEWTABLE', size=(10, 10), xmlnode=None):
@@ -303,8 +303,8 @@ class Table(GenericWrapper, StylenNameMixin):
         self._reset_cell_cache()
 
 @register_class
-class TableRow(GenericWrapper, StylenNameMixin, VisibilityMixin,
-               DefaultCellStyleNameMixin):
+class TableRow(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
+               TableDefaultCellStyleNameMixin):
     TAG = CN('table:table-row')
 
     def __init__(self, ncols=10, xmlnode=None):
@@ -326,6 +326,6 @@ class TableRow(GenericWrapper, StylenNameMixin, VisibilityMixin,
         del self.xmlnode.attrib[CN('table:number-rows-repeated')]
 
 @register_class
-class TableColumn(GenericWrapper, StylenNameMixin, VisibilityMixin,
-                  DefaultCellStyleNameMixin, NumberColumnsRepeatedMixin):
+class TableColumn(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
+                  TableDefaultCellStyleNameMixin, TableNumberColumnsRepeatedMixin):
     TAG = CN('table:table-column')

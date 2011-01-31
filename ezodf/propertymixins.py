@@ -8,7 +8,7 @@
 
 from .xmlns import CN
 
-class StylenNameMixin:
+class TableStylenNameMixin:
     @property
     def style_name(self):
         return self.get_attr(CN('table:style-name'))
@@ -16,7 +16,7 @@ class StylenNameMixin:
     def style_name(self, name):
         self.set_attr(CN('table:style-name'), name)
 
-class DefaultCellStyleNameMixin:
+class TableDefaultCellStyleNameMixin:
     @property
     def default_cell_style_name(self):
         return self.get_attr(CN('table:default-cell-style-name'))
@@ -24,7 +24,7 @@ class DefaultCellStyleNameMixin:
     def default_cell_style_name(self, value):
         self.set_attr(CN('table:default-cell-style-name'), value)
 
-class VisibilityMixin:
+class TableVisibilityMixin:
     VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )
     @property
     def visibility(self):
@@ -38,7 +38,7 @@ class VisibilityMixin:
             raise ValueError("allowed values are: 'visible', 'collapse', 'filter'")
         self.set_attr(CN('table:visibility'), value)
 
-class NumberColumnsRepeatedMixin:
+class TableNumberColumnsRepeatedMixin:
     @property
     def columns_repeated(self):
         value = self.get_attr(CN('table:number-columns-repeated'))

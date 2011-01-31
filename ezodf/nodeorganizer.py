@@ -18,7 +18,7 @@ class PreludeEpilogueOrganizer:
         self.prelude_tags = prelude_tags
         self.epilogue_tags = epilogue_tags
 
-    def reorg(self, xmlnode):
+    def reorder(self, xmlnode):
         nodes = xmlnode.getchildren()
 
         prelude_nodes = self._extract_nodes(xmlnode, self.prelude_tags)
@@ -41,4 +41,3 @@ class PreludeEpilogueOrganizer:
     def _remove_children_from_node(xmlnode, children):
         for child in children:
             xmlnode.remove(child)
-
