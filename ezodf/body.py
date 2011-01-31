@@ -11,8 +11,7 @@ from .base import GenericWrapper
 from .sheets import Sheets
 
 class GenericBody(GenericWrapper):
-    def restructure_before_saving(self):
-        """ Hook to restructure XML node for OASIS compatibility. """
+    pass
 
 @register_class
 class TextBody(GenericBody):

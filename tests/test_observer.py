@@ -15,12 +15,26 @@ from ezodf.observer import Observer
 
 class Listener:
     msg = 'fail'
+    def __init__(self, xmlnode=None):
+        self.xmlnode = xmlnode
+    def on_save_handler(self, msg):
+        self.msg = 'ok'
+    def get_xmlroot(self):
+        return self.xmlnode
+
+class ListenerWithoutGetXMLRootMethod:
+    msg = 'fail'
     def on_save_handler(self, msg):
         self.msg = 'ok'
 
 class TestObserver(unittest.TestCase):
     def setUp(self):
         self.observer = Observer()
+
+    def test_can_subscribe_with_no_get_root(self):
+        listerner = ListenerWithoutGetXMLRootMethod()
+        self.observer.subscribe('save', listerner)
+        self.assertTrue(self.observer._has_listener('save'))
 
     def test_multiple_listeners(self):
         L1 = Listener()
@@ -73,6 +87,19 @@ class TestObserver(unittest.TestCase):
         del listener
         self.assertEqual(self.observer._count_listeners('save'), 0)
         self.observer.broadcast(event='save', msg=self)
+
+    def test_broadcast_to_different_roots(self):
+        root1 = object()
+        root2 = object()
+        listeners = [Listener(root1), Listener(root2), ListenerWithoutGetXMLRootMethod()]
+        for listener in listeners:
+            self.observer.subscribe('save', listener)
+
+        self.observer.broadcast(event='save', msg=self, root=root1)
+
+        self.assertEqual(listeners[0].msg, 'ok')
+        self.assertEqual(listeners[1].msg, 'fail')
+        self.assertEqual(listeners[2].msg, 'fail')
 
 if __name__=='__main__':
     unittest.main()

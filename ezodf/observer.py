@@ -23,25 +23,23 @@ class Observer:
 
     Example for event: 'save'
         # module 'one'
+        import observer
+
         class Listener:
             def on_save_handler(self, msg):
                 pass
+            def get_root(self):
+                return None
 
         listener = Listener()
+        # subscribe to the 'global observer'
         observer.subscribe('save', listener)
 
         # module 'two'
+        import observer
         # calls listener.on_save_handler(msg=None)
         observer.broadcast('save', msg=None)
     """
-    # TODO: By one global observer-object, if more than one document is opened,
-    # the event is send to all documents, the receiver can not distinguish if
-    # the sender is its own document-object or not.
-    # SOLVED: No global observer-object, every document has its own observer-object
-    # and objects have to know their own document-object to subscribe an events.
-    #
-    #    document.observer.subscribe('save', listener)
-    #    document.observer.broadcast('save', msg=None)
 
     def __init__(self):
         self._listeners = dict()
@@ -58,23 +56,41 @@ class Observer:
         event_listeners.add(listener_object)
 
     def unsubscribe(self, event, listener_object):
-        """ Unsubscribing for objects which will be destroyed is not neccessary,
-        just unsubscribe objects that should not receive further messages.
-        """
+        # Unsubscribing for objects which will be destroyed is not neccessary,
+        # just unsubscribe objects that should not receive further messages.
         event_listeners = self._listeners[event]
         event_listeners.remove(listener_object)
 
-    def broadcast(self, event, msg=None):
+    def broadcast(self, event, msg=None, root=None):
+
+        def get_event_handler(listener):
+            return getattr(listener, get_event_handler.event_handler_name)
+        get_event_handler.event_handler_name = "on_%s_handler" % event
+
+        def send_to_all(listener):
+            handler = get_event_handler(listener)
+            handler(msg=msg)
+
+        def send_to_root(listener):
+            try:
+                listener_root = listener.get_xmlroot()
+            except AttributeError:
+                return
+
+            if listener_root is root:
+                handler = get_event_handler(listener)
+                handler(msg=msg)
+
         try:
             event_listeners = self._listeners[event]
         except KeyError:
             # ok, because there is just no listener for this event
             # but mispelling of 'event' is an error trap
             return
-        event_handler_name = "on_%s_handler" % event
+
+        send = send_to_root if root else send_to_all
         for listener in event_listeners:
-            method = getattr(listener, event_handler_name)
-            method(msg=msg)
+            send(listener)
 
     def _has_listener(self, event):
         # just for testing
@@ -86,3 +102,9 @@ class Observer:
             return len(self._listeners[event])
         except KeyError:
             return 0
+
+_global_observer = Observer()
+
+subscribe = _global_observer.subscribe
+unsubscripe = _global_observer.unsubscribe
+broadcast = _global_observer.broadcast

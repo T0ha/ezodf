@@ -45,6 +45,13 @@ class GenericWrapper:
     def kind(self):
         return self.__class__.__name__
 
+    def get_xmlroot(self):
+        xmlroot = parent = self.xmlnode
+        while parent is not None:
+            xmlroot = parent
+            parent = parent.getparent()
+        return xmlroot
+
     ## Index operations
 
     def __getitem__(self, index):

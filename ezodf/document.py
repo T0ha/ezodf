@@ -15,8 +15,9 @@ from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
 from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
+from . import observer
 
-from . import body # register body classes
+from . import body # no used, but important to register body classes
 
 class InvalidFiletypeError(TypeError):
     pass
@@ -75,18 +76,17 @@ class _BaseDocument:
     def save(self):
         if self.docname is None:
             raise IOError('No filename specified!')
-        self.body.restructure_before_saving()
-
-        # set modification date to now
+        observer.broadcast('prepare_saving', root=self.body.get_xmlroot())
         self.meta.touch()
         self.meta.inc_editing_cycles()
+        self._saving_routine()
+        observer.broadcast('post_saving', root=self.body.get_xmlroot())
 
     @property
     def application_body_tag(self):
         return CN(MIMETYPE_BODYTAG_MAP[self.mimetype])
 
     def _create_shortcuts(self, body):
-        # shortcuts into the body object
         if hasattr(body, 'sheets'):
             self.sheets = body.sheets
         if hasattr(body, 'pages'):
@@ -134,8 +134,7 @@ class FlatXMLDocument(_BaseDocument):
         application_body = subelement(office_body, bodytag)
         return wrap(application_body)
 
-    def save(self):
-        super(FlatXMLDocument, self).save()
+    def _saving_routine(self):
         if os.path.exists(self.docname) and self.backup:
             self._backupfile(self.docname)
         self._writefile(self.docname)
@@ -180,6 +179,5 @@ class PackagedDocument(_BaseDocument):
         self.body = self.content.get_application_body(self.application_body_tag)
         self._create_shortcuts(self.body)
 
-    def save(self):
-        super(PackagedDocument, self).save()
+    def _saving_routine(self):
         self.filemanager.save(self.docname, backup=self.backup)

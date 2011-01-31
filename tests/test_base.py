@@ -191,5 +191,20 @@ class TestBaseClass(unittest.TestCase):
         with self.assertRaises(ValueError):
             b.replace(replace, replace)
 
+    def test_get_root_None(self):
+        b = GenericWrapper()
+        b.xmlnode = None
+        self.assertIsNone(b.get_xmlroot())
+
+    def test_get_root_no_children(self):
+        b = GenericWrapper()
+        self.assertEqual(b.get_xmlroot(), b.xmlnode)
+
+    def test_get_root_with_children(self):
+        b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
+        first_child = b[0]
+        xmlroot = first_child.get_xmlroot()
+        self.assertEqual(xmlroot.get('name'), 'root')
+
 if __name__=='__main__':
     unittest.main()

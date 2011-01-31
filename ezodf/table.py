@@ -194,11 +194,11 @@ class Table(GenericWrapper, StylenNameMixin):
         return self.set_cell_by_index(pos, cell)
 
     def _get_index_of_first_row(self):
-        first_row = self.xmlnode.find(TableRow.TAG)
+        first_row = self.xmlnode.find(CN('table:table-row'))
         if first_row is not None:
             return self.xmlnode.index(first_row)
         else:
-            return 0
+            raise IndexError('no rows in table')
 
     def _get_row_at_index(self, index):
         first_row_index = self._get_index_of_first_row()
@@ -217,7 +217,7 @@ class Table(GenericWrapper, StylenNameMixin):
             yield (wrap(xmlcell) for xmlcell in xmlrow)
 
     def _xmlrows(self):
-        return self.xmlnode.findall(TableRow.TAG)
+        return self.xmlnode.findall(CN('table:table-row'))
 
     def column(self, index):
         if isinstance(index, str):
@@ -225,17 +225,18 @@ class Table(GenericWrapper, StylenNameMixin):
         if index < 0 or index >= self.ncols():
             raise IndexError('row index out of range: %s' % index)
         return ( self._wrap((xrow,index), row[index]) for xrow, row in \
-                 enumerate(self.xmlnode.findall(TableRow.TAG)) )
+                 enumerate(self.xmlnode.findall(CN('table:table-row'))) )
 
     def append_rows(self, count=1):
         Table._validate_count_parameter(count)
         ncols = self.ncols()
+        last_xmlrow = self._xmlrows()[-1]
         for index in range(count):
-            self.xmlnode.append(Table._new_xmlrow(ncols))
+            last_xmlrow.addnext(Table._new_xmlrow(ncols))
 
     @staticmethod
     def _new_xmlrow(count):
-        xmlrow = etree.Element(TableRow.TAG)
+        xmlrow = etree.Element(CN('table:table-row'))
         for _ in range(count):
             xmlrow.append(etree.Element(CN('table:table-cell')))
         return xmlrow
