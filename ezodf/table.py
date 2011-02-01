@@ -95,11 +95,9 @@ class Table(GenericWrapper, TableStylenNameMixin):
     def __getitem__(self, key):
         if isinstance(key, int):
             return self.get_child(key)
-        elif isinstance(key, tuple):
-            # key => (row, column)
+        elif isinstance(key, tuple): # key => (row, column)
             return self.get_cell_by_index(key)
-        elif isinstance(key, str):
-            # key => 'A1'
+        elif isinstance(key, str): # key => 'A1'
             return self.get_cell_by_address(key)
         else:
             raise TypeError(str(type(key)))
@@ -107,11 +105,9 @@ class Table(GenericWrapper, TableStylenNameMixin):
     def __setitem__(self, key, value):
         if isinstance(key, int):
             return self.set_child(key, value)
-        elif isinstance(key, tuple):
-            # key => (row, column)
+        elif isinstance(key, tuple): # key => (row, column)
             return self.set_cell_by_index(key, value)
-        elif isinstance(key, str):
-            # key => 'A1'
+        elif isinstance(key, str): # key => 'A1'
             return self.set_cell_by_address(key, value)
         else:
             raise TypeError(str(type(key)))

@@ -14,13 +14,12 @@ from lxml import etree
 from ezodf.nodeorganizer import PreludeEpilogueOrganizer
 from ezodf.nodeorganizer import PreludeTagBlock
 from ezodf.nodeorganizer import EpilogueTagBlock
+from ezodf.nodeorganizer import NodeStructureChecker
 
 #all tags are single letter tags
 PRELUDE_TAGS = 'abc'
-TAGS = 'ghi'
 EPILOGUE_TAGS = 'xyz'
 
-ALLTAGS = list(chain(PRELUDE_TAGS, TAGS, EPILOGUE_TAGS))
 
 def get_n_random_tags(count, tags):
     return (random.choice(tags) for _ in range(count))
@@ -407,6 +406,42 @@ class TestEpilogueTagBlockInsertPositionBefore(unittest.TestCase):
         self.assertEqual(tb.insert_position_before('x'), 0)
         self.assertEqual(tb.insert_position_before('y'), 0)
         self.assertEqual(tb.insert_position_before('z'), 0)
+
+class TestNodeContentChecker(unittest.TestCase):
+    def test_valid_content(self):
+        node = create_tree('aabbccghixxyyzz')
+        validator = NodeStructureChecker(PRELUDE_TAGS, 'ghi', EPILOGUE_TAGS)
+        self.assertTrue(validator.is_valid(node))
+
+    def test_invalid_content(self):
+        node = create_tree('aabbccgHixxyyzz')
+        validator = NodeStructureChecker(PRELUDE_TAGS, 'ghi', EPILOGUE_TAGS)
+        self.assertFalse(validator.is_valid(node))
+
+    def test_valid_content_without_prelude(self):
+        node = create_tree('ghixxyyzz')
+        validator = NodeStructureChecker(PRELUDE_TAGS, 'ghi', EPILOGUE_TAGS)
+        self.assertTrue(validator.is_valid(node))
+
+    def test_valid_content_without_epilogue(self):
+        node = create_tree('aabbccghi')
+        validator = NodeStructureChecker(PRELUDE_TAGS, 'ghi', EPILOGUE_TAGS)
+        self.assertTrue(validator.is_valid(node))
+
+    def test_valid_content_only_midrange(self):
+        node = create_tree('ghi')
+        validator = NodeStructureChecker(PRELUDE_TAGS, 'ghi', EPILOGUE_TAGS)
+        self.assertTrue(validator.is_valid(node))
+
+    def test_valid_content_one_tag(self):
+        node = create_tree('g')
+        validator = NodeStructureChecker(PRELUDE_TAGS, 'ghi', EPILOGUE_TAGS)
+        self.assertTrue(validator.is_valid(node))
+
+    def test_valid_content_empty_tag(self):
+        node = create_tree('')
+        validator = NodeStructureChecker(PRELUDE_TAGS, 'ghi', EPILOGUE_TAGS)
+        self.assertTrue(validator.is_valid(node))
 
 if __name__=='__main__':
     unittest.main()

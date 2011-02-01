@@ -210,4 +210,3 @@ MIMETYPE_BODYTAG_MAP = {
     "application/vnd.oasis.opendocument.chart" : "office:chart",
     "application/vnd.oasis.opendocument.image" : "office:image",
 }
-
