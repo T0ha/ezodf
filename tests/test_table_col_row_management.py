@@ -158,10 +158,12 @@ class TestTableColumnManagement(unittest.TestCase):
     def test_append_one_column(self):
         self.table.append_columns(1)
         self.assertEqual(self.table.ncols(), 11)
+        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
 
     def test_append_two_columns(self):
         self.table.append_columns(2)
         self.assertEqual(self.table.ncols(), 12)
+        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
 
     def test_append_count_zero_error(self):
         with self.assertRaises(ValueError):
@@ -199,10 +201,6 @@ class TestTableColumnManagement(unittest.TestCase):
     def test_insert_cols_negative_index_error(self):
         with self.assertRaises(IndexError):
             self.table.insert_columns(-1, count=1)
-
-    def test_insert_cols_out_of_range_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table.insert_columns(10, count=1)
 
     def test_delete_one_column(self):
         self.table.delete_columns(5, count=1)

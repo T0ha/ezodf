@@ -112,7 +112,7 @@ TABLE_PRELUDE = [
     CN("office:forms"),
     CN("table:shapes")]
 TABLE_CONTENT = TABLE_COLUMNS + TABLE_ROWS
-TABLE_EPILOGUE = []
+
 
 # <office:spreadsheet>
 SPREADSHEET_PRELUDE = TABLE_TRACKED_CHANGES + TEXT_DECL + TABLE_DECL

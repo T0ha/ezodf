@@ -274,10 +274,6 @@ class TestTableContentAccess(unittest.TestCase):
         self.assertEqual(self.table.ncols(), 3)
         self.assertEqual(self.table.nrows(), 6)
 
-    def test_first_row_index(self):
-        first_row_index = self.table._get_index_of_first_row()
-        self.assertEqual(first_row_index, 3)
-
     def test_row_index_error(self):
         with self.assertRaises(IndexError):
             self.table[6, 0]
@@ -426,9 +422,9 @@ class TestRowColumnAccess(unittest.TestCase):
         with self.assertRaises(IndexError):
             self.table.row(4)
 
-    def test_row_neg_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table.row(-1)
+    def test_row_neg_index(self):
+        values = [cell.value for cell in self.table.row(-1)]
+        self.assertEqual(values, [13., 14., 15., 16.])
 
     def test_get_column_1_by_index(self):
         values = [cell.value for cell in self.table.column(1)]
@@ -442,9 +438,9 @@ class TestRowColumnAccess(unittest.TestCase):
         with self.assertRaises(IndexError):
             self.table.column(4)
 
-    def test_column_neg_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table.column(-1)
+    def test_column_neg_index(self):
+        values = [cell.value for cell in self.table.column(-1)]
+        self.assertEqual(values, [4., 8., 12., 16.])
 
 if __name__=='__main__':
     unittest.main()
