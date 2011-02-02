@@ -9,6 +9,8 @@
 from .xmlns import register_class, CN
 from .base import GenericWrapper
 from .sheets import Sheets
+from .nodeorganizer import EpilogueTagBlock
+from .nodestructuretags import TEXT_EPILOGUE
 
 class GenericBody(GenericWrapper):
     pass
@@ -16,6 +18,13 @@ class GenericBody(GenericWrapper):
 @register_class
 class TextBody(GenericBody):
     TAG = CN('office:text')
+    def __init__(self, xmlnode=None):
+        super(TextBody, self).__init__(xmlnode=xmlnode)
+        self._epilogue = EpilogueTagBlock(self.xmlnode, TEXT_EPILOGUE)
+
+    def append(self, child):
+        self.insert(self._epilogue.insert_position_before(), child)
+        return child
 
 @register_class
 class SpreadsheetBody(GenericBody):
