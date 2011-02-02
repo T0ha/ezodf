@@ -19,6 +19,10 @@ class TestEpilogueTagBlockBasics(unittest.TestCase):
         with self.assertRaises(ValueError):
             EpilogueTagBlock(None, '')
 
+    def test_no_epilogue_tags(self):
+        with self.assertRaises(ValueError):
+            EpilogueTagBlock(create_node('abc'), '')
+
     def test_unique_order_tags(self):
         with self.assertRaises(ValueError):
             EpilogueTagBlock(create_node('abc'), 'abcc')

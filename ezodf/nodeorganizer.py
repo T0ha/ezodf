@@ -52,6 +52,8 @@ class PreludeTagBlock:
             raise ValueError('xmlnode is None')
         self.xmlnode = xmlnode
         self.tags = tuple(tags)
+        if len(self.tags) == 0:
+            raise ValueError('no block-tags specified.')
         if len(self.tags) != len(set(self.tags)):
             raise ValueError('duplicate tags are not allowed.')
 
@@ -61,13 +63,12 @@ class PreludeTagBlock:
     def  _get_children(self):
         return self.xmlnode.getchildren()
 
+    def _iter_children(self):
+        return self.xmlnode.iterchildren()
+
     def _count_tags_in_block(self):
         if len(self.xmlnode) == 0 or len(self.tags) == 0:
             return 0
-
-        def remove_unmatched_tags(tag):
-            pos = tags.index(tag)
-            return tags[pos:]
 
         counter = 0
         tags = self.tags
@@ -81,10 +82,6 @@ class PreludeTagBlock:
                 except ValueError: # not in list
                     break
         return counter
-
-    def _iter_children(self):
-        return self.xmlnode.iterchildren()
-
 
     def tag_info(self, tag):
         self._check_for_valid_tag(tag)
@@ -101,7 +98,7 @@ class PreludeTagBlock:
             else:
                 return (-1, 0)
 
-        children =self._get_children()
+        children = self._get_children()
         prelude_count = self._count_tags_in_block()
         return get_pos_and_count(tag, children[:prelude_count])
 
@@ -127,11 +124,12 @@ class PreludeTagBlock:
         return self.tags[tagpos + 1]
 
     def insert_position_after(self, tag=None):
-        # tag=None -> insert before all epiloge tags
-        if tag is not None:
-            self._check_for_valid_tag(tag)
+        # tag=None -> insert after all prelude-tags
+        if tag is None:
+            tag = self.tags[-1]
+        self._check_for_valid_tag(tag)
 
-        if (tag == self.tags[-1]) or (tag is None):
+        if tag == self.tags[-1]:
             return self._count_tags_in_block()
         else:
             return self.insert_position_before(self._successor_tag(tag))
@@ -141,7 +139,7 @@ class EpilogueTagBlock(PreludeTagBlock):
         super(EpilogueTagBlock, self).__init__(xmlnode, reversed(tags))
 
     def _get_children(self):
-        return list(self.xmlnode.iterchildren(reversed=True))
+        return list(self._iter_children())
 
     def _iter_children(self):
         return self.xmlnode.iterchildren(reversed=True)
@@ -153,11 +151,12 @@ class EpilogueTagBlock(PreludeTagBlock):
         return (pos, count)
 
     def insert_position_before(self, tag=None):
-        # tag=None -> insert before all epiloge tags
-        if tag is not None:
-            self._check_for_valid_tag(tag)
+        # tag=None -> insert before all epiloge-tags
+        if tag is None:
+            tag = self.tags[-1]
+        self._check_for_valid_tag(tag)
 
-        if (tag == self.tags[-1]) or (tag is None):
+        if tag == self.tags[-1]:
             return len(self.xmlnode) - self._count_tags_in_block()
         else:
             return self.insert_position_after(self._successor_tag(tag))

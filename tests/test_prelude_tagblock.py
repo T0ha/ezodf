@@ -53,12 +53,7 @@ class TestCounter(unittest.TestCase):
         node = create_node(list('cc'))
         self.assertEqual(counter.count(node), 2)
 
-    def test_no_tags_1(self):
-        counter = CounterFacade(list(''))
-        node = create_node(list('aa'))
-        self.assertEqual(counter.count(node), 0)
-
-    def test_no_tags_2(self):
+    def test_no_tags(self):
         counter = CounterFacade(list('abc'))
         node = create_node(list(''))
         self.assertEqual(counter.count(node), 0)
@@ -78,6 +73,10 @@ class TestPreludeTagBlockBasics(unittest.TestCase):
     def test_xmlnode_is_none_error(self):
         with self.assertRaises(ValueError):
             PreludeTagBlock(None, '')
+
+    def test_no_prelude_tags(self):
+        with self.assertRaises(ValueError):
+            PreludeTagBlock(create_node('abc'), '')
 
     def test_unique_order_tags(self):
         with self.assertRaises(ValueError):
