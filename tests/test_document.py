@@ -12,7 +12,7 @@ import unittest
 import zipfile
 
 # trusted or separately tested modules
-from mytesttools import testdatafile
+from mytesttools import getdatafile
 from ezodf.filemanager import check_zipfile_for_oasis_validity
 
 # objects to test
@@ -30,9 +30,9 @@ def remove(filename):
 
 class TestDocumentCopy(unittest.TestCase):
     def open_and_saveas(self, filename, msg=""):
-        infile = testdatafile(filename)
+        infile = getdatafile(filename)
         names1 = get_zip_names(infile)
-        outfile = testdatafile('new.'+filename)
+        outfile = getdatafile('new.'+filename)
         odt = document.opendoc(infile)
         odt.saveas(outfile)
         names2 = get_zip_names(outfile)
@@ -45,7 +45,7 @@ class TestDocumentCopy(unittest.TestCase):
 
 class TestNewDocument(unittest.TestCase):
     def test_new_odt(self):
-        docname = testdatafile('new.odt')
+        docname = getdatafile('new.odt')
         doc = document.newdoc(doctype='odt', filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odt'])
         self.assertEqual(doc.docname, docname)
@@ -61,7 +61,7 @@ class TestNewDocument(unittest.TestCase):
         remove(docname)
 
     def test_new_ods(self):
-        docname = testdatafile('new.ods')
+        docname = getdatafile('new.ods')
         doc = document.newdoc(doctype='ods', filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['ods'])
         self.assertEqual(doc.docname, docname)
@@ -77,7 +77,7 @@ class TestNewDocument(unittest.TestCase):
         remove(docname)
 
     def test_new_odp(self):
-        docname = testdatafile('new.odp')
+        docname = getdatafile('new.odp')
         doc = document.newdoc(doctype='odp', filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odp'])
         self.assertEqual(doc.docname, docname)
@@ -93,7 +93,7 @@ class TestNewDocument(unittest.TestCase):
         remove(docname)
 
     def test_new_odg(self):
-        docname = testdatafile('new.odg')
+        docname = getdatafile('new.odg')
         doc = document.newdoc(doctype='odg', filename=docname)
         self.assertEqual(doc.mimetype, const.MIMETYPES['odg'])
         self.assertEqual(doc.docname, docname)

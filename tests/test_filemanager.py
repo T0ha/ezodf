@@ -13,7 +13,7 @@ import unittest
 import zipfile
 
 # trusted or separately tested modules
-from mytesttools import testdatafile, SPECFILE, SPECFILE_EXISTS
+from mytesttools import getdatafile, SPECFILE, SPECFILE_EXISTS
 
 # objects to test
 from ezodf import filemanager
@@ -87,7 +87,7 @@ class TestFileManager(unittest.TestCase):
             fm._copy_zip_to(zf)
             zf.close()
 
-        NEWSPEC = testdatafile('newspecs.odt')
+        NEWSPEC = getdatafile('newspecs.odt')
 
         specs = zipfile.ZipFile(SPECFILE)
         expectednames = specs.namelist()
@@ -111,7 +111,7 @@ class TestFileManager(unittest.TestCase):
 
     @unittest.skipUnless(SPECFILE_EXISTS, SPECFILE+" not found.")
     def test_save(self):
-        SAVENAME = testdatafile('specs.save.odt')
+        SAVENAME = getdatafile('specs.save.odt')
         fm = filemanager.FileManager(SPECFILE)
         # to use save you have to register at least the mimetype file
         mimetype = fm.get_bytes('mimetype')
