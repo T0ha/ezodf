@@ -12,33 +12,19 @@ import unittest
 
 # trusted or separately tested modules
 from ezodf.xmlns import etree, CN
+from ezodf.nodestructuretags import TABLE_PRELUDE
 
 # objects to test
 from ezodf.table import Table
 
-def add_table_epilogue_content(table):
-    table.xmlnode.append(etree.Element(CN('table:named-expressions')))
-    table.xmlnode.append(etree.Element(CN('table:database-ranges')))
-    table.xmlnode.append(etree.Element(CN('table:data-pilot-tables')))
-    table.xmlnode.append(etree.Element(CN('table:consolidation')))
-    table.xmlnode.append(etree.Element(CN('table:dde-links')))
-
-def has_valid_row_structure(table):
-    xmlnode = table.xmlnode
-    rows = xmlnode.findall(CN('table:table-row'))
-    valid = False
-    if rows:
-        first_row_index = xmlnode.index(rows[0])
-        last_row_index = xmlnode.index(rows[-1])
-        valid = table.nrows() == (last_row_index - first_row_index + 1)
-    return valid
+def add_table_prelude_content(table):
+    for tag in reversed(TABLE_PRELUDE):
+        table.xmlnode.insert(0, etree.Element(tag))
 
 class TestTableRowManagement(unittest.TestCase):
     def setUp(self):
         self.table = Table('TEST', size=(10, 10))
-        # with a FakeNode as first child => child-index != row-index
-        self.table.xmlnode.insert(0, etree.Element('FakeNode'))
-        # setup test data
+        add_table_prelude_content(self.table)
         for row in range(10):
             self.table[row,0].set_value('checkmark%d' % row )
             invoke_cache = self.table[row, 0]
@@ -50,22 +36,10 @@ class TestTableRowManagement(unittest.TestCase):
     def test_append_one_row(self):
         self.table.append_rows(1)
         self.assertEqual(self.table.nrows(), 11)
-        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
-
-    def test_append_one_row_to_table_with_content_epiloge(self):
-        add_table_epilogue_content(self.table)
-        self.table.append_rows(1)
-        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
 
     def test_append_two_rows(self):
         self.table.append_rows(2)
         self.assertEqual(self.table.nrows(), 12)
-        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
-
-    def test_append_two_rows_to_table_with_content_epiloge(self):
-        add_table_epilogue_content(self.table)
-        self.table.append_rows(2)
-        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
 
     def test_append_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -77,7 +51,13 @@ class TestTableRowManagement(unittest.TestCase):
 
     def test_insert_one_row(self):
         self.table.insert_rows(index=5, count=1)
+        self.chk_insert_one_row()
 
+    def test_insert_one_row_neg_index(self):
+        self.table.insert_rows(index=-5, count=1)
+        self.chk_insert_one_row()
+
+    def chk_insert_one_row(self):
         self.assertEqual(self.table.nrows(), 11)
         self.assertEqual(self.table[4, 0].value, 'checkmark4')
         self.assertIsNone(self.table[5, 0].value)
@@ -85,7 +65,13 @@ class TestTableRowManagement(unittest.TestCase):
 
     def test_insert_two_rows(self):
         self.table.insert_rows(index=5, count=2)
+        self.chk_insert_two_rows()
 
+    def test_insert_two_rows_neg_index(self):
+        self.table.insert_rows(index=-5, count=2)
+        self.chk_insert_two_rows()
+
+    def chk_insert_two_rows(self):
         self.assertEqual(self.table.nrows(), 12)
         self.assertEqual(self.table[4, 0].value, 'checkmark4')
         self.assertIsNone(self.table[5, 0].value)
@@ -100,24 +86,32 @@ class TestTableRowManagement(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.table.insert_rows(0, count=-1)
 
-    def test_insert_rows_negative_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table.insert_rows(-1, count=1)
-
     def test_insert_rows_out_of_range_index_error(self):
         with self.assertRaises(IndexError):
             self.table.insert_rows(10, count=1)
 
     def test_delete_one_row(self):
         self.table.delete_rows(index=5, count=1)
+        self.chk_delete_one_row()
 
+    def test_delete_one_row_neg_index(self):
+        self.table.delete_rows(index=-5, count=1)
+        self.chk_delete_one_row()
+
+    def chk_delete_one_row(self):
         self.assertEqual(self.table.nrows(), 9)
         self.assertEqual(self.table[4, 0].value, 'checkmark4')
         self.assertEqual(self.table[5, 0].value, 'checkmark6')
 
     def test_delete_two_rows(self):
         self.table.delete_rows(index=5, count=2)
+        self.chk_delete_two_rows()
 
+    def test_delete_two_rows_neg_index(self):
+        self.table.delete_rows(index=-5, count=2)
+        self.chk_delete_two_rows()
+
+    def chk_delete_two_rows(self):
         self.assertEqual(self.table.nrows(), 8)
         self.assertEqual(self.table[4, 0].value, 'checkmark4')
         self.assertEqual(self.table[5, 0].value, 'checkmark7')
@@ -134,10 +128,6 @@ class TestTableRowManagement(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.table.delete_rows(0, count=-1)
 
-    def test_delete_rows_negative_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table.delete_rows(-1, count=1)
-
     def test_delete_rows_index_out_of_range_error(self):
         with self.assertRaises(IndexError):
             self.table.delete_rows(10, count=1)
@@ -150,20 +140,27 @@ class TestTableRowManagement(unittest.TestCase):
 class TestTableColumnManagement(unittest.TestCase):
     def setUp(self):
         self.table = Table('TEST', size=(10, 10))
-        # setup test data
-        for col in range(10):
+        add_table_prelude_content(self.table)
+
+        for col in range(self.table.nrows()):
             self.table[0, col].set_value('checkmark%d' % col )
             invoke_cache = self.table[0, col]
+
+        for col in range(self.table.ncols()):
+            column_info = self.table.column_info(col)
+            column_info.style_name = 'c%d' % col
 
     def test_append_one_column(self):
         self.table.append_columns(1)
         self.assertEqual(self.table.ncols(), 11)
-        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
+        column_info = self.table.column_info(10)
+        self.assertEqual(column_info.kind, "TableColumn")
 
     def test_append_two_columns(self):
         self.table.append_columns(2)
         self.assertEqual(self.table.ncols(), 12)
-        self.assertTrue(has_valid_row_structure(self.table), 'invalid row structure')
+        column_info = self.table.column_info(11)
+        self.assertEqual(column_info.kind, "TableColumn")
 
     def test_append_count_zero_error(self):
         with self.assertRaises(ValueError):
@@ -175,11 +172,19 @@ class TestTableColumnManagement(unittest.TestCase):
 
     def test_insert_one_column(self):
         self.table.insert_columns(5, count=1)
+        self.chk_insert_one_column()
 
+    def test_insert_one_column_neg_index(self):
+        self.table.insert_columns(-5, count=1)
+        self.chk_insert_one_column()
+
+    def chk_insert_one_column(self):
         self.assertEqual(self.table.ncols(), 11)
         self.assertEqual(self.table[0, 4].value, 'checkmark4')
         self.assertIsNone(self.table[0, 5].value)
         self.assertEqual(self.table[0, 6].value, 'checkmark5')
+        self.assertEqual(self.table.column_info(4).style_name, 'c4')
+        self.assertEqual(self.table.column_info(6).style_name, 'c5')
 
     def test_insert_two_columns(self):
         self.table.insert_columns(5, count=2)
@@ -189,6 +194,8 @@ class TestTableColumnManagement(unittest.TestCase):
         self.assertIsNone(self.table[0, 5].value)
         self.assertIsNone(self.table[0, 6].value)
         self.assertEqual(self.table[0, 7].value, 'checkmark5')
+        self.assertEqual(self.table.column_info(4).style_name, 'c4')
+        self.assertEqual(self.table.column_info(7).style_name, 'c5')
 
     def test_insert_zero_cols_value_error(self):
         with self.assertRaises(ValueError):
@@ -198,23 +205,36 @@ class TestTableColumnManagement(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.table.insert_columns(0, count=-1)
 
-    def test_insert_cols_negative_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table.insert_columns(-1, count=1)
-
     def test_delete_one_column(self):
         self.table.delete_columns(5, count=1)
+        self.chk_delete_one_column()
 
+    def test_delete_one_column_neg_index(self):
+        self.table.delete_columns(-5, count=1)
+        self.chk_delete_one_column()
+
+    def chk_delete_one_column(self):
         self.assertEqual(self.table.ncols(), 9)
         self.assertEqual(self.table[0, 4].value, 'checkmark4')
         self.assertEqual(self.table[0, 5].value, 'checkmark6')
+        self.assertEqual(self.table.column_info(4).style_name, 'c4')
+        self.assertEqual(self.table.column_info(5).style_name, 'c6')
 
     def test_delete_two_columns(self):
         self.table.delete_columns(5, count=2)
+        self.chk_delete_two_columns()
 
+    def test_delete_two_columns_neg_index(self):
+        self.table.delete_columns(-5, count=2)
+        self.chk_delete_two_columns()
+
+    def chk_delete_two_columns(self):
         self.assertEqual(self.table.ncols(), 8)
         self.assertEqual(self.table[0, 4].value, 'checkmark4')
         self.assertEqual(self.table[0, 5].value, 'checkmark7')
+        self.assertEqual(self.table.column_info(4).style_name, 'c4')
+        self.assertEqual(self.table.column_info(5).style_name, 'c7')
+
 
     def test_delete_last_column(self):
         self.table.delete_columns(index=9)
@@ -227,10 +247,6 @@ class TestTableColumnManagement(unittest.TestCase):
     def test_delete_negative_cols_value_error(self):
         with self.assertRaises(ValueError):
             self.table.delete_columns(0, count=-1)
-
-    def test_delete_cols_negative_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table.delete_columns(-1, count=1)
 
     def test_delete_cols_index_out_of_range_error(self):
         with self.assertRaises(IndexError):

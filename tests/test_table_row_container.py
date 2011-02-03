@@ -83,18 +83,23 @@ class TestTableRowContainer(unittest.TestCase):
 
     def test_neg_row_index_error(self):
         self.container.reset(size=(10, 10))
-        with self.assertRaises(IndexError):
-            self.container.get_cell((-1, 0))
+        self.container.set_cell((9, 0), setdata('neg(9,0)'))
+        self.assertEqual('neg(9,0)', getdata(self.container.get_cell((-1, 0))))
 
     def test_col_index_error(self):
         self.container.reset(size=(10, 10))
         with self.assertRaises(IndexError):
             self.container.get_cell((0, 10))
 
-    def test_neg_col_index_error(self):
+    def test_neg_col_index(self):
         self.container.reset(size=(10, 10))
-        with self.assertRaises(IndexError):
-            self.container.get_cell((0, -1))
+        self.container.set_cell((0, 9), setdata('neg(0,9)'))
+        self.assertEqual('neg(0,9)', getdata(self.container.get_cell((0, -1))))
+
+    def test_get_table_row(self):
+        self.container.reset(size=(10, 10))
+        table_row = self.container.get_table_row(0)
+        self.assertEqual(table_row.tag, CN('table:table-row'))
 
 class TestTableRowContainer_GetRowColumns(unittest.TestCase):
     def test_get_row(self):
@@ -115,9 +120,11 @@ class TestTableRowContainer_GetRowColumns(unittest.TestCase):
 
 TABLE_10x10 = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
-<table:table-row table:number-rows-repeated="10">
-  <table:table-cell table:number-columns-repeated="10"/>
-</table:table-row>
+<table:table-rows>
+  <table:table-row table:number-rows-repeated="10">
+    <table:table-cell table:number-columns-repeated="10"/>
+  </table:table-row>
+</table:table-rows>
 </table:table>
 """
 
@@ -147,22 +154,35 @@ class TestRowManagement(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.container.append_rows(0)
 
-    def test_append_negative_rows_value_error(self):
+    def _test_append_negative_rows_value_error(self):
         with self.assertRaises(ValueError):
             self.container.append_rows(-1)
 
     def test_insert_one_row(self):
         self.container.insert_rows(index=5, count=1)
+        self.chk_insert_one_row()
 
+    def test_insert_one_row_neg_index(self):
+        self.container.insert_rows(index=-5, count=1)
+        self.chk_insert_one_row()
+
+    def chk_insert_one_row(self):
         self.assertEqual(self.container.nrows(), 11)
         self.assertEqual(getdata(self.container.get_cell((4, 0))), 'checkmark4')
         self.assertIsNone(getdata(self.container.get_cell((5, 0))))
         self.assertEqual(getdata(self.container.get_cell((6, 0))), 'checkmark5')
         self.assertTrue(self.container.is_consistent())
 
+
     def test_insert_two_rows(self):
         self.container.insert_rows(index=5, count=2)
+        self.chk_insert_two_rows()
 
+    def test_insert_two_rows_neg_index(self):
+        self.container.insert_rows(index=-5, count=2)
+        self.chk_insert_two_rows()
+
+    def chk_insert_two_rows(self):
         self.assertEqual(self.container.nrows(), 12)
         self.assertEqual(getdata(self.container.get_cell((4, 0))), 'checkmark4')
         self.assertIsNone(getdata(self.container.get_cell((5, 0))))
@@ -178,17 +198,19 @@ class TestRowManagement(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.container.insert_rows(0, count=-1)
 
-    def test_insert_rows_negative_index_error(self):
-        with self.assertRaises(IndexError):
-            self.container.insert_rows(-1, count=1)
-
     def test_insert_rows_out_of_range_index_error(self):
         with self.assertRaises(IndexError):
             self.container.insert_rows(10, count=1)
 
     def test_delete_one_row(self):
         self.container.delete_rows(index=5, count=1)
+        self.chk_delete_one_row()
 
+    def test_delete_one_row_neg_index(self):
+        self.container.delete_rows(index=-5, count=1)
+        self.chk_delete_one_row()
+
+    def chk_delete_one_row(self):
         self.assertEqual(self.container.nrows(), 9)
         self.assertEqual(getdata(self.container.get_cell((4, 0))), 'checkmark4')
         self.assertEqual(getdata(self.container.get_cell((5, 0))), 'checkmark6')
@@ -196,7 +218,13 @@ class TestRowManagement(unittest.TestCase):
 
     def test_delete_two_rows(self):
         self.container.delete_rows(index=5, count=2)
+        self.chk_delete_two_rows()
 
+    def test_delete_two_rows_neg_index(self):
+        self.container.delete_rows(index=-5, count=2)
+        self.chk_delete_two_rows()
+
+    def chk_delete_two_rows(self):
         self.assertEqual(self.container.nrows(), 8)
         self.assertEqual(getdata(self.container.get_cell((4, 0))), 'checkmark4')
         self.assertEqual(getdata(self.container.get_cell((5, 0))), 'checkmark7')
@@ -214,10 +242,6 @@ class TestRowManagement(unittest.TestCase):
     def test_delete_negative_rows_value_error(self):
         with self.assertRaises(ValueError):
             self.container.delete_rows(0, count=-1)
-
-    def test_delete_rows_negative_index_error(self):
-        with self.assertRaises(IndexError):
-            self.container.delete_rows(-1, count=1)
 
     def test_delete_rows_index_out_of_range_error(self):
         with self.assertRaises(IndexError):
@@ -254,7 +278,13 @@ class TestColumnManagement(unittest.TestCase):
 
     def test_insert_one_column(self):
         self.container.insert_columns(5, count=1)
+        self.chk_insert_one_column()
 
+    def test_insert_one_column_neg_index(self):
+        self.container.insert_columns(-5, count=1)
+        self.chk_insert_one_column()
+
+    def chk_insert_one_column(self):
         self.assertEqual(self.container.ncols(), 11)
         self.assertEqual(getdata(self.container.get_cell((0, 4))), 'checkmark4')
         self.assertIsNone(getdata(self.container.get_cell((0, 5))))
@@ -263,7 +293,13 @@ class TestColumnManagement(unittest.TestCase):
 
     def test_insert_two_columns(self):
         self.container.insert_columns(5, count=2)
+        self.chk_insert_two_columns()
 
+    def test_insert_two_columns_neg_index(self):
+        self.container.insert_columns(-5, count=2)
+        self.chk_insert_two_columns()
+
+    def chk_insert_two_columns(self):
         self.assertEqual(self.container.ncols(), 12)
         self.assertEqual(getdata(self.container.get_cell((0, 4))), 'checkmark4')
         self.assertIsNone(getdata(self.container.get_cell((0, 5))))
@@ -279,21 +315,29 @@ class TestColumnManagement(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.container.insert_columns(0, count=-1)
 
-    def test_insert_cols_negative_index_error(self):
-        with self.assertRaises(IndexError):
-            self.container.insert_columns(-1, count=1)
-
     def test_delete_one_column(self):
         self.container.delete_columns(5, count=1)
+        self.chk_delete_one_column()
 
+    def test_delete_one_column_neg_index(self):
+        self.container.delete_columns(-5, count=1)
+        self.chk_delete_one_column()
+
+    def chk_delete_one_column(self):
         self.assertEqual(self.container.ncols(), 9)
         self.assertEqual(getdata(self.container.get_cell((0, 4))), 'checkmark4')
         self.assertEqual(getdata(self.container.get_cell((0, 5))), 'checkmark6')
         self.assertTrue(self.container.is_consistent())
 
-    def _test_delete_two_columns(self):
+    def test_delete_two_columns(self):
         self.container.delete_columns(5, count=2)
+        self.chk_delete_two_columns()
 
+    def test_delete_two_columns_neg_index(self):
+        self.container.delete_columns(-5, count=2)
+        self.chk_delete_two_columns()
+
+    def chk_delete_two_columns(self):
         self.assertEqual(self.container.ncols(), 8)
         self.assertEqual(getdata(self.container.get_cell((0, 4))), 'checkmark4')
         self.assertEqual(getdata(self.container.get_cell((0, 5))), 'checkmark7')
@@ -311,10 +355,6 @@ class TestColumnManagement(unittest.TestCase):
     def test_delete_negative_cols_value_error(self):
         with self.assertRaises(ValueError):
             self.container.delete_columns(0, count=-1)
-
-    def test_delete_cols_negative_index_error(self):
-        with self.assertRaises(IndexError):
-            self.container.delete_columns(-1, count=1)
 
     def test_delete_cols_index_out_of_range_error(self):
         with self.assertRaises(IndexError):

@@ -164,6 +164,7 @@ class TestAddress2Index(unittest.TestCase):
             address_to_index('a1')
         with self.assertRaises(ValueError):
             address_to_index('A1A')
+
 TABLE_COMP = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
 <table:table-row><table:table-cell table:number-columns-repeated="7"/></table:table-row>
@@ -192,150 +193,73 @@ class TestTableContent(unittest.TestCase):
                 self.assertEqual(row*ncols + col, int(cell.value))
 
 
-TABLE_WITH_DIFFERENT_CELL_TYPES = """
+SQUAREMATRIX = """
 <table:table
  xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
  xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
- table:name="Table1" table:style-name="ta1" table:print="false">
+ table:name="RowColAccess">
 
-<table:table-column table:style-name="co1" table:default-cell-style-name="Default"/>
-<table:table-column table:style-name="co2" table:default-cell-style-name="Default"/>
-<table:table-column table:style-name="co3" table:default-cell-style-name="Default"/>
+<table:table-columns>
+  <table:table-column table:style-name="c0" />
+  <table:table-column table:style-name="c1" />
+  <table:table-column table:style-name="c2" />
+  <table:table-column table:style-name="c3" />
+</table:table-columns>
 
-<table:table-row table:style-name="ro1">
-  <table:table-cell office:value-type="string">
-    <text:p>text</text:p>
-  </table:table-cell>
-  <table:table-cell office:value-type="string">
-    <text:p>CellB1</text:p>
-  </table:table-cell>
-  <table:table-cell/>
-</table:table-row>
-
-<table:table-row table:style-name="ro2">
-  <table:table-cell/>
-  <table:table-cell office:value-type="string">
-    <text:p>CellB2</text:p>
-    <text:p>multi-line</text:p>
-  </table:table-cell>
-  <table:table-cell/>
-</table:table-row>
-
-<table:table-row table:style-name="ro1">
-  <table:table-cell office:value-type="string">
-    <text:p>float</text:p>
-  </table:table-cell>
-  <table:table-cell/>
-  <table:table-cell office:value-type="float" office:value="1.5">
-    <text:p>1,5</text:p>
-   </table:table-cell>
-</table:table-row>
-
-<table:table-row table:style-name="ro1">
-  <table:table-cell office:value-type="string">
-    <text:p>int</text:p>
-  </table:table-cell>
-  <table:table-cell/>
-  <table:table-cell office:value-type="float" office:value="100">
-    <text:p>100</text:p>
-  </table:table-cell>
-</table:table-row>
-
-<table:table-row table:style-name="ro1">
-  <table:table-cell office:value-type="string">
-    <text:p>percent</text:p>
-  </table:table-cell>
-  <table:table-cell table:style-name="ce1" office:value-type="percentage" office:value="0.18">
-    <text:p>18,00%</text:p>
-  </table:table-cell>
-  <table:table-cell/>
-</table:table-row>
-
-<table:table-row table:style-name="ro1">
-  <table:table-cell office:value-type="string">
-    <text:p>currency</text:p>
-  </table:table-cell>
-  <table:table-cell table:style-name="ce2" office:value-type="currency" office:currency="EUR" office:value="1000">
-    <text:p>1.000,00 €</text:p>
-  </table:table-cell>
-  <table:table-cell/>
-</table:table-row>
-
+<table:table-rows>
+  <table:table-row table:style-name='r0'>
+    <table:table-cell office:value-type="float" office:value="1" />
+    <table:table-cell office:value-type="float" office:value="2" />
+    <table:table-cell office:value-type="float" office:value="3" />
+    <table:table-cell office:value-type="float" office:value="4" />
+  </table:table-row>
+  <table:table-row table:style-name='r1'>
+    <table:table-cell office:value-type="float" office:value="5" />
+    <table:table-cell office:value-type="float" office:value="6" />
+    <table:table-cell office:value-type="float" office:value="7" />
+    <table:table-cell office:value-type="float" office:value="8" />
+  </table:table-row>
+  <table:table-row table:style-name='r2'>
+    <table:table-cell office:value-type="float" office:value="9" />
+    <table:table-cell office:value-type="float" office:value="10" />
+    <table:table-cell office:value-type="float" office:value="11" />
+    <table:table-cell office:value-type="float" office:value="12" />
+  </table:table-row>
+  <table:table-row table:style-name='r3'>
+    <table:table-cell office:value-type="float" office:value="13" />
+    <table:table-cell office:value-type="float" office:value="14" />
+    <table:table-cell office:value-type="float" office:value="15" />
+    <table:table-cell office:value-type="float" office:value="16" />
+  </table:table-row>
+</table:table-rows>
 </table:table>
 """
 
 class TestTableContentAccess(unittest.TestCase):
     def setUp(self):
-        self.table = Table(xmlnode=etree.XML(TABLE_WITH_DIFFERENT_CELL_TYPES))
+        self.table = Table(xmlnode=etree.XML(SQUAREMATRIX))
 
     def test_metrics(self):
-        self.assertEqual(self.table.name, 'Table1')
-        self.assertEqual(self.table.ncols(), 3)
-        self.assertEqual(self.table.nrows(), 6)
+        self.assertEqual(self.table.name, 'RowColAccess')
+        self.assertEqual(self.table.ncols(), 4)
+        self.assertEqual(self.table.nrows(), 4)
 
-    def test_row_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table[6, 0]
-
-    def test_row_neg_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table[-1, 0]
+    def test_row_neg_index(self):
+        cell = self.table[-1, 0]
+        self.assertEqual(cell.value, 13.)
 
     def test_col_index_error(self):
         with self.assertRaises(IndexError):
-            self.table[0, 3]
-
-    def test_col_neg_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table[0, -3]
+            self.table[0, 4]
 
     def test_access_cell_by_index(self):
         cell = self.table[0, 0]
-        self.assertEqual(cell.kind, "Cell")
+        self.assertEqual(cell.value, 1.)
 
     def test_access_cell_by_reference(self):
         cell = self.table['B1']
-        self.assertEqual(cell.display_form, "CellB1")
-
-    def test_cell_B1_with_one_line_text_content(self):
-        cell = self.table['B1']
-        self.assertEqual(cell.plaintext(), "CellB1")
-        self.assertIsNone(cell.currency)
-
-    def test_cell_B2_with_two_lines_text_content(self):
-        cell = self.table['B2']
-        self.assertEqual(cell.plaintext(), "CellB2\nmulti-line")
-        self.assertIsNone(cell.currency)
-
-    def test_cell_C3_with_float_content(self):
-        cell = self.table['C3']
-        self.assertEqual(cell.value_type, "float")
-        self.assertEqual(cell.value, 1.5)
-        self.assertEqual(cell.display_form, "1,5")
-        self.assertIsNone(cell.currency)
-
-    def test_cell_C4_with_int_content(self):
-        # but ints are also floats
-        cell = self.table['C4']
-        self.assertEqual(cell.value_type, "float")
-        self.assertEqual(cell.value, 100.)
-        self.assertEqual(cell.display_form, "100")
-        self.assertIsNone(cell.currency)
-
-    def test_cell_B5_with_percent_content(self):
-        cell = self.table['B5']
-        self.assertEqual(cell.value_type, "percentage")
-        self.assertEqual(cell.value, 0.18)
-        self.assertEqual(cell.display_form, "18,00%")
-        self.assertIsNone(cell.currency)
-
-    def test_cell_B6_with_currency_content(self):
-        cell = self.table['B6']
-        self.assertEqual(cell.value_type, "currency")
-        self.assertEqual(cell.value, 1000.)
-        self.assertEqual(cell.currency, 'EUR')
-        self.assertEqual(cell.display_form, "1.000,00 €")
+        self.assertEqual(cell.value, 2.)
 
     def test_setting_cell_by_index(self):
         self.table[0, 0] = Cell('Textcell')
@@ -355,13 +279,15 @@ class TestTableContentAccess(unittest.TestCase):
         with self.assertRaises(IndexError):
             self.table[0, 10] = Cell()
 
-    def test_set_cell_neg_row_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table[-1, 0] = Cell()
+    def test_set_cell_neg_row_index(self):
+        self.table[-1, 0] = Cell('Textcell')
+        cell = self.table[3, 0]
+        self.assertEqual(cell.plaintext(), "Textcell")
 
-    def test_set_cell_neg_column_index_error(self):
-        with self.assertRaises(IndexError):
-            self.table[0, -1] = Cell()
+    def test_set_cell_neg_column_index(self):
+        self.table[0, -1] = Cell('Textcell')
+        cell = self.table[0, 3]
+        self.assertEqual(cell.plaintext(), "Textcell")
 
     def test_iter_rows(self):
         nrows = self.table.nrows()
@@ -372,43 +298,10 @@ class TestTableContentAccess(unittest.TestCase):
             nrows -= 1
         self.assertEqual(nrows, 0)
 
-TABLE_ROW_COL_ACCESS = """
-<table:table
- xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
- xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
- xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
- table:name="RowColAccess">
-
-<table:table-row>
-  <table:table-cell office:value-type="float" office:value="1" />
-  <table:table-cell office:value-type="float" office:value="2" />
-  <table:table-cell office:value-type="float" office:value="3" />
-  <table:table-cell office:value-type="float" office:value="4" />
-</table:table-row>
-<table:table-row>
-  <table:table-cell office:value-type="float" office:value="5" />
-  <table:table-cell office:value-type="float" office:value="6" />
-  <table:table-cell office:value-type="float" office:value="7" />
-  <table:table-cell office:value-type="float" office:value="8" />
-</table:table-row>
-<table:table-row>
-  <table:table-cell office:value-type="float" office:value="9" />
-  <table:table-cell office:value-type="float" office:value="10" />
-  <table:table-cell office:value-type="float" office:value="11" />
-  <table:table-cell office:value-type="float" office:value="12" />
-</table:table-row>
-<table:table-row>
-  <table:table-cell office:value-type="float" office:value="13" />
-  <table:table-cell office:value-type="float" office:value="14" />
-  <table:table-cell office:value-type="float" office:value="15" />
-  <table:table-cell office:value-type="float" office:value="16" />
-</table:table-row>
-</table:table>
-"""
 
 class TestRowColumnAccess(unittest.TestCase):
     def setUp(self):
-        self.table = Table(xmlnode=etree.XML(TABLE_ROW_COL_ACCESS))
+        self.table = Table(xmlnode=etree.XML(SQUAREMATRIX))
 
     def test_get_row_1_by_index(self):
         values = [cell.value for cell in self.table.row(1)]
@@ -441,6 +334,42 @@ class TestRowColumnAccess(unittest.TestCase):
     def test_column_neg_index(self):
         values = [cell.value for cell in self.table.column(-1)]
         self.assertEqual(values, [4., 8., 12., 16.])
+
+class TestRowColumnInfoAccess(unittest.TestCase):
+    def setUp(self):
+        self.table = Table(xmlnode=etree.XML(SQUAREMATRIX))
+
+    def test_get_row_info(self):
+        row_info = self.table.row_info(0)
+        self.assertEqual(row_info.style_name, 'r0')
+
+    def test_get_row_info_by_address(self):
+        row_info = self.table.row_info('C2')
+        self.assertEqual(row_info.style_name, 'r1')
+
+    def test_get_row_info_neg_index(self):
+        row_info = self.table.row_info(-1)
+        self.assertEqual(row_info.style_name, 'r3')
+
+    def test_get_row_info_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table.row_info(4)
+
+    def test_get_column_info(self):
+        column_info = self.table.column_info(0)
+        self.assertEqual(column_info.style_name, 'c0')
+
+    def test_get_column_info_by_address(self):
+        column_info = self.table.column_info('B3')
+        self.assertEqual(column_info.style_name, 'c1')
+
+    def test_get_column_info_neg_index(self):
+        column_info = self.table.column_info(-1)
+        self.assertEqual(column_info.style_name, 'c3')
+
+    def test_get_column_info_index_error(self):
+        with self.assertRaises(IndexError):
+            self.table.column_info(4)
 
 if __name__=='__main__':
     unittest.main()

@@ -13,9 +13,10 @@ from .xmlns import register_class, CN, wrap, etree
 from . import wrapcache
 from .base import GenericWrapper
 from .protection import random_protection_key
-from .propertymixins import TableNumberColumnsRepeatedMixin, TableVisibilityMixin
+from .propertymixins import TableVisibilityMixin
 from .propertymixins import TableStylenNameMixin, TableDefaultCellStyleNameMixin
 from .tablerowcontainer import TableRowContainer
+from .tablecolumncontainer import TableColumnContainer
 
 CELL_ADDRESS = re.compile('^([A-Z]+)(\d+)$')
 
@@ -42,12 +43,15 @@ class Table(GenericWrapper, TableStylenNameMixin):
 
     def __init__(self, name='NEWTABLE', size=(10, 10), xmlnode=None):
         super(Table, self).__init__(xmlnode=xmlnode)
-        self.cells = TableRowContainer(self.xmlnode)
+        self._rows = TableRowContainer(self.xmlnode)
+        self._columns = TableColumnContainer(self.xmlnode)
         if xmlnode is None:
             self.name = name
-            self.cells.reset(size)
+            self._rows.reset(size)
+            self._columns.reset(size[1])
         else:
-            self.cells.buildup()
+            self._rows.buildup()
+            self._columns.buildup()
         wrapcache.add(self)
 
     def __getitem__(self, key):
@@ -95,19 +99,20 @@ class Table(GenericWrapper, TableStylenNameMixin):
 
     def nrows(self):
         """ Count of table rows. """
-        return self.cells.nrows()
+        return self._rows.nrows()
 
     def ncols(self):
         """ Count of table columns. """
-        return self.cells.ncols()
+        return self._rows.ncols()
 
     def clear(self, size=(10, 10)):
         super(Table, self).clear()
-        self.cells.reset(size)
+        self._rows.reset(size)
+        self._columns.reset(size[1])
 
     def get_cell_by_index(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
-        return wrap(self.cells.get_cell(pos))
+        return wrap(self._rows.get_cell(pos))
 
     def get_cell_by_address(self, address):
         """ Get cell at position 'address' ('address' like 'A1'). """
@@ -118,7 +123,7 @@ class Table(GenericWrapper, TableStylenNameMixin):
         """ Set cell at position 'pos', where 'pos' is a tuple (row, column). """
         if not hasattr(cell, 'kind') or cell.kind != 'Cell':
             raise TypeError("invalid type of 'cell'.")
-        self.cells.set_cell(pos, cell.xmlnode)
+        self._rows.set_cell(pos, cell.xmlnode)
 
     def set_cell_by_address(self, address, cell):
         """ Set cell at position 'address' ('address' like 'A1'). """
@@ -128,38 +133,51 @@ class Table(GenericWrapper, TableStylenNameMixin):
     def row(self, index):
         if isinstance(index, str):
             index, column = address_to_index(index)
-        return (wrap(e) for e in self.cells.row(index))
+        return (wrap(e) for e in self._rows.row(index))
 
     def rows(self):
-        for xmlrow in self.cells.rows():
+        for xmlrow in self._rows.rows():
             yield (wrap(xmlcell) for xmlcell in xmlrow)
 
     def column(self, index):
         if isinstance(index, str):
             row, index = address_to_index(index)
-        return (wrap(e) for e in self.cells.column(index))
+        return (wrap(e) for e in self._rows.column(index))
+
+    def row_info(self, index):
+        if isinstance(index, str):
+            index, column = address_to_index(index)
+        return wrap(self._rows.get_table_row(index))
+
+    def column_info(self, index):
+        if isinstance(index, str):
+            row, index = address_to_index(index)
+        return wrap(self._columns.get_table_column(index))
 
     def append_rows(self, count=1):
-        self.cells.append_rows(count)
+        self._rows.append_rows(count)
 
     def insert_rows(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        self.cells.insert_rows(index, count)
+        self._rows.insert_rows(index, count)
 
     def delete_rows(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        self.cells.delete_rows(index, count)
+        self._rows.delete_rows(index, count)
 
     def append_columns(self, count=1):
-        self.cells.append_columns(count)
+        self._rows.append_columns(count)
+        self._columns.append(count)
 
     def insert_columns(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        self.cells.insert_columns(index, count)
+        self._rows.insert_columns(index, count)
+        self._columns.insert(index, count)
 
     def delete_columns(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        self.cells.delete_columns(index, count)
+        self._rows.delete_columns(index, count)
+        self._columns.delete(index, count)
 
 @register_class
 class TableRow(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
@@ -186,5 +204,5 @@ class TableRow(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
 
 @register_class
 class TableColumn(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
-                  TableDefaultCellStyleNameMixin, TableNumberColumnsRepeatedMixin):
+                  TableDefaultCellStyleNameMixin):
     TAG = CN('table:table-column')

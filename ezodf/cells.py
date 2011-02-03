@@ -9,7 +9,7 @@
 from .xmlns import register_class, CN
 from .base import GenericWrapper
 from .text import Paragraph, Span
-from .propertymixins import TableStylenNameMixin, TableNumberColumnsRepeatedMixin
+from .propertymixins import TableStylenNameMixin
 
 VALID_VALUE_TYPES = frozenset( ('float', 'percentage', 'currency', 'date', 'time',
                                 'boolean', 'string') )
@@ -30,7 +30,7 @@ TYPE_VALUE_MAP = {
 SUPPORTED_CELL_CONTENT = ("Paragraph", "Heading")
 
 @register_class
-class Cell(GenericWrapper, TableStylenNameMixin, TableNumberColumnsRepeatedMixin):
+class Cell(GenericWrapper, TableStylenNameMixin):
     CELL_ONLY_ATTRIBS = (CN('table:number-rows-spanned'),
                          CN('table:number-columns-spanned'),
                          CN('table:number-matrix-columns-spanned'),

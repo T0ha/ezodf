@@ -100,18 +100,23 @@ class TableRowContainer:
         return len(self._rows[0]) if self.nrows() > 0 else 0
 
     def get_cell(self, pos):
-        row, col = pos
-        self.check_neg_index(row, col)
+        row, col = self._get_row_col(pos)
         return self._rows[row][col]
 
     def set_cell(self, pos, element):
-        row, col = pos
-        self.check_neg_index(row, col)
+        row, col = self._get_row_col(pos)
         self._rows[row][col] = element
 
-    def check_neg_index(self, row, col):
-        if row < 0 or col < 0:
-            raise IndexError('negative indices not allowed.')
+    def _get_row_col(self, pos):
+        row, col = pos
+        if row < 0:
+            row += self.nrows()
+        if col < 0:
+            col += self.ncols()
+        return (row, col)
+
+    def get_table_row(self, index):
+        return self._rows[index]
 
     def row(self, index):
         return self._rows[index]
@@ -128,7 +133,7 @@ class TableRowContainer:
         if len(xmlrows) != len(self._rows):
             return False
         for row1, row2 in zip(self._rows, xmlrows):
-            if not row1 != row2:
+            if row1 != row2:
                 return False
         return True
 
@@ -144,8 +149,6 @@ class TableRowContainer:
     def insert_rows(self, index, count=1):
         if count < 1:
             raise ValueError('count < 1')
-        if index < 0:
-            raise IndexError('index < 0')
         for _ in range(count):
             newrow = self._buildrow(self.ncols())
             insert_row = self._rows[index]
@@ -156,11 +159,11 @@ class TableRowContainer:
         if count < 1:
             raise ValueError('count < 1')
         if index < 0:
-            raise IndexError('index < 0')
+            index += self.nrows()
 
         for _ in range(count):
             delete_row = self._rows.pop(index)
-            self.xmlnode.remove(delete_row)
+            delete_row.getparent().remove(delete_row)
 
     def append_columns(self, count=1):
         if count < 1:
@@ -173,7 +176,7 @@ class TableRowContainer:
         if count < 1:
             raise ValueError('count < 1')
         if index < 0:
-            raise IndexError('index')
+            index += self.ncols()
 
         for row in self._rows:
             for _ in range(count):
@@ -183,7 +186,7 @@ class TableRowContainer:
         if count < 1:
             raise ValueError('count < 1')
         if index < 0:
-            raise IndexError('index < 0')
+            index += self.ncols()
         for row in self._rows:
             for _ in range(count):
                 del row[index]
