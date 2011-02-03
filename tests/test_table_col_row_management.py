@@ -22,12 +22,15 @@ def add_table_prelude_content(table):
         table.xmlnode.insert(0, etree.Element(tag))
 
 class TestTableRowManagement(unittest.TestCase):
+    def cellvalue(self, row, col):
+        return self.table[row, col].value
+
     def setUp(self):
         self.table = Table('TEST', size=(10, 10))
         add_table_prelude_content(self.table)
         for row in range(10):
             self.table[row,0].set_value('checkmark%d' % row )
-            invoke_cache = self.table[row, 0]
+            invoke_cache = self.cellvalue(row, 0)
 
     def test_metrics(self):
         self.assertEqual(self.table.nrows(), 10)
@@ -59,9 +62,9 @@ class TestTableRowManagement(unittest.TestCase):
 
     def chk_insert_one_row(self):
         self.assertEqual(self.table.nrows(), 11)
-        self.assertEqual(self.table[4, 0].value, 'checkmark4')
-        self.assertIsNone(self.table[5, 0].value)
-        self.assertEqual(self.table[6, 0].value, 'checkmark5')
+        self.assertEqual(self.cellvalue(4, 0), 'checkmark4')
+        self.assertIsNone(self.cellvalue(5, 0))
+        self.assertEqual(self.cellvalue(6, 0), 'checkmark5')
 
     def test_insert_two_rows(self):
         self.table.insert_rows(index=5, count=2)
@@ -73,10 +76,10 @@ class TestTableRowManagement(unittest.TestCase):
 
     def chk_insert_two_rows(self):
         self.assertEqual(self.table.nrows(), 12)
-        self.assertEqual(self.table[4, 0].value, 'checkmark4')
-        self.assertIsNone(self.table[5, 0].value)
-        self.assertIsNone(self.table[6, 0].value)
-        self.assertEqual(self.table[7, 0].value, 'checkmark5')
+        self.assertEqual(self.cellvalue(4, 0), 'checkmark4')
+        self.assertIsNone(self.cellvalue(5, 0))
+        self.assertIsNone(self.cellvalue(6, 0))
+        self.assertEqual(self.cellvalue(7, 0), 'checkmark5')
 
     def test_insert_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -100,8 +103,8 @@ class TestTableRowManagement(unittest.TestCase):
 
     def chk_delete_one_row(self):
         self.assertEqual(self.table.nrows(), 9)
-        self.assertEqual(self.table[4, 0].value, 'checkmark4')
-        self.assertEqual(self.table[5, 0].value, 'checkmark6')
+        self.assertEqual(self.cellvalue(4, 0), 'checkmark4')
+        self.assertEqual(self.cellvalue(5, 0), 'checkmark6')
 
     def test_delete_two_rows(self):
         self.table.delete_rows(index=5, count=2)
@@ -113,8 +116,8 @@ class TestTableRowManagement(unittest.TestCase):
 
     def chk_delete_two_rows(self):
         self.assertEqual(self.table.nrows(), 8)
-        self.assertEqual(self.table[4, 0].value, 'checkmark4')
-        self.assertEqual(self.table[5, 0].value, 'checkmark7')
+        self.assertEqual(self.cellvalue(4, 0), 'checkmark4')
+        self.assertEqual(self.cellvalue(5, 0), 'checkmark7')
 
     def test_delete_last_row(self):
         self.table.delete_rows(index=9)
@@ -138,13 +141,19 @@ class TestTableRowManagement(unittest.TestCase):
             self.table.delete_rows(9, count=2)
 
 class TestTableColumnManagement(unittest.TestCase):
+    def colinfo(self, index):
+        return self.table.column_info(index).style_name
+
+    def cellvalue(self, row, col):
+        return self.table[row, col].value
+
     def setUp(self):
         self.table = Table('TEST', size=(10, 10))
         add_table_prelude_content(self.table)
 
         for col in range(self.table.nrows()):
             self.table[0, col].set_value('checkmark%d' % col )
-            invoke_cache = self.table[0, col]
+            invoke_cache = self.cellvalue(0, col)
 
         for col in range(self.table.ncols()):
             column_info = self.table.column_info(col)
@@ -180,22 +189,22 @@ class TestTableColumnManagement(unittest.TestCase):
 
     def chk_insert_one_column(self):
         self.assertEqual(self.table.ncols(), 11)
-        self.assertEqual(self.table[0, 4].value, 'checkmark4')
-        self.assertIsNone(self.table[0, 5].value)
-        self.assertEqual(self.table[0, 6].value, 'checkmark5')
-        self.assertEqual(self.table.column_info(4).style_name, 'c4')
-        self.assertEqual(self.table.column_info(6).style_name, 'c5')
+        self.assertEqual(self.cellvalue(0, 4), 'checkmark4')
+        self.assertIsNone(self.cellvalue(0, 5)) # inserted
+        self.assertEqual(self.cellvalue(0, 6), 'checkmark5')
+        self.assertEqual(self.colinfo(4), 'c4')
+        self.assertEqual(self.colinfo(6), 'c5')
 
     def test_insert_two_columns(self):
         self.table.insert_columns(5, count=2)
 
         self.assertEqual(self.table.ncols(), 12)
-        self.assertEqual(self.table[0, 4].value, 'checkmark4')
-        self.assertIsNone(self.table[0, 5].value)
-        self.assertIsNone(self.table[0, 6].value)
-        self.assertEqual(self.table[0, 7].value, 'checkmark5')
-        self.assertEqual(self.table.column_info(4).style_name, 'c4')
-        self.assertEqual(self.table.column_info(7).style_name, 'c5')
+        self.assertEqual(self.cellvalue(0, 4), 'checkmark4')
+        self.assertIsNone(self.cellvalue(0, 5)) # inserted
+        self.assertIsNone(self.cellvalue(0, 6)) # inserted
+        self.assertEqual(self.cellvalue(0, 7), 'checkmark5')
+        self.assertEqual(self.colinfo(4), 'c4')
+        self.assertEqual(self.colinfo(7), 'c5')
 
     def test_insert_zero_cols_value_error(self):
         with self.assertRaises(ValueError):
@@ -215,10 +224,10 @@ class TestTableColumnManagement(unittest.TestCase):
 
     def chk_delete_one_column(self):
         self.assertEqual(self.table.ncols(), 9)
-        self.assertEqual(self.table[0, 4].value, 'checkmark4')
-        self.assertEqual(self.table[0, 5].value, 'checkmark6')
-        self.assertEqual(self.table.column_info(4).style_name, 'c4')
-        self.assertEqual(self.table.column_info(5).style_name, 'c6')
+        self.assertEqual(self.cellvalue(0, 4), 'checkmark4')
+        self.assertEqual(self.cellvalue(0, 5), 'checkmark6')
+        self.assertEqual(self.colinfo(4), 'c4')
+        self.assertEqual(self.colinfo(5), 'c6')
 
     def test_delete_two_columns(self):
         self.table.delete_columns(5, count=2)
@@ -230,10 +239,10 @@ class TestTableColumnManagement(unittest.TestCase):
 
     def chk_delete_two_columns(self):
         self.assertEqual(self.table.ncols(), 8)
-        self.assertEqual(self.table[0, 4].value, 'checkmark4')
-        self.assertEqual(self.table[0, 5].value, 'checkmark7')
-        self.assertEqual(self.table.column_info(4).style_name, 'c4')
-        self.assertEqual(self.table.column_info(5).style_name, 'c7')
+        self.assertEqual(self.cellvalue(0, 4), 'checkmark4')
+        self.assertEqual(self.cellvalue(0, 5), 'checkmark7')
+        self.assertEqual(self.colinfo(4), 'c4')
+        self.assertEqual(self.colinfo(5), 'c7')
 
 
     def test_delete_last_column(self):

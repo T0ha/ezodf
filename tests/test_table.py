@@ -9,6 +9,7 @@
 # Standard Library
 import sys
 import unittest
+from itertools import chain
 
 # trusted or separately tested modules
 from ezodf.xmlns import CN, etree, wrap
@@ -20,6 +21,8 @@ from ezodf.table import Table, address_to_index
 TESTTABLE = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" />
 """
+def tofloats(values):
+    return [cell.value for cell in values]
 
 class TestTableAttributes(unittest.TestCase):
     def test_has_TAG(self):
@@ -289,15 +292,12 @@ class TestTableContentAccess(unittest.TestCase):
         cell = self.table[0, 3]
         self.assertEqual(cell.plaintext(), "Textcell")
 
-    def test_iter_rows(self):
+    def test_if_rows_generates_lists(self):
         nrows = self.table.nrows()
         ncols = self.table.ncols()
         for row in self.table.rows():
-            cells = list(row)
+            cells = row
             self.assertEqual(len(cells), ncols)
-            nrows -= 1
-        self.assertEqual(nrows, 0)
-
 
 class TestRowColumnAccess(unittest.TestCase):
     def setUp(self):
@@ -308,32 +308,38 @@ class TestRowColumnAccess(unittest.TestCase):
         self.assertEqual(values, [5., 6., 7., 8.])
 
     def test_get_row_1_by_address(self):
-        values = [cell.value for cell in self.table.row('A2')]
-        self.assertEqual(values, [5., 6., 7., 8.])
+        self.assertEqual(tofloats(self.table.row('A2')), [5., 6., 7., 8.])
+
+    def test_row_slice(self):
+        self.assertEqual(tofloats(self.table.row(1)[1:3]), [6., 7.])
 
     def test_row_index_error(self):
         with self.assertRaises(IndexError):
             self.table.row(4)
 
     def test_row_neg_index(self):
-        values = [cell.value for cell in self.table.row(-1)]
-        self.assertEqual(values, [13., 14., 15., 16.])
+        self.assertEqual(tofloats(self.table.row(-1)), [13., 14., 15., 16.])
 
     def test_get_column_1_by_index(self):
-        values = [cell.value for cell in self.table.column(1)]
-        self.assertEqual(values, [2., 6., 10., 14.])
+        self.assertEqual(tofloats(self.table.column(1)), [2., 6., 10., 14.])
 
     def test_get_column_1_by_address(self):
-        values = [cell.value for cell in self.table.column('B2')]
-        self.assertEqual(values, [2., 6., 10., 14.])
+        self.assertEqual(tofloats(self.table.column('B2')), [2., 6., 10., 14.])
+
+    def test_column_slice(self):
+        self.assertEqual(tofloats(self.table.column(1)[1:3]), [6., 10.])
 
     def test_column_index_error(self):
         with self.assertRaises(IndexError):
             self.table.column(4)
 
     def test_column_neg_index(self):
-        values = [cell.value for cell in self.table.column(-1)]
-        self.assertEqual(values, [4., 8., 12., 16.])
+        self.assertEqual(tofloats(self.table.column(-1)), [4., 8., 12., 16.])
+
+    def test_rows(self):
+        values = tofloats(chain(*self.table.rows()))
+        expected = [float(x) for x in range(1, 17)]
+        self.assertEqual(expected, values)
 
 class TestRowColumnInfoAccess(unittest.TestCase):
     def setUp(self):

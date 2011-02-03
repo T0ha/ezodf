@@ -133,16 +133,16 @@ class Table(GenericWrapper, TableStylenNameMixin):
     def row(self, index):
         if isinstance(index, str):
             index, column = address_to_index(index)
-        return (wrap(e) for e in self._rows.row(index))
+        return [wrap(e) for e in self._rows.row(index)]
 
     def rows(self):
-        for xmlrow in self._rows.rows():
-            yield (wrap(xmlcell) for xmlcell in xmlrow)
+        for index in range(self.ncols()):
+            yield self.row(index)
 
     def column(self, index):
         if isinstance(index, str):
             row, index = address_to_index(index)
-        return (wrap(e) for e in self._rows.column(index))
+        return [wrap(e) for e in self._rows.column(index)]
 
     def row_info(self, index):
         if isinstance(index, str):
