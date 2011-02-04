@@ -36,16 +36,16 @@ class Sheets:
         else:
             raise TypeError('key has invalid type.')
 
-    def __setitem__(self, key, value):
-        if not _is_table(value):
-            raise TypeError('value has to be a Table/Sheet.')
+    def __setitem__(self, key, sheet):
+        if not _is_table(sheet):
+            raise TypeError('sheet has to be a Table/Sheet.')
         if isinstance(key, int):
             oldsheet = self.sheet_by_index(key)
         elif isinstance(key, str):
             oldsheet = self.sheet_by_name(key)
         else:
             raise TypeError('key has invalid type.')
-        self.xmlnode.replace(oldsheet.xmlnode, value.xmlnode)
+        self.xmlnode.replace(oldsheet.xmlnode, sheet.xmlnode)
 
     def __delitem__(self, key):
         if isinstance(key, int):

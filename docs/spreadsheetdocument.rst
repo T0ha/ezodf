@@ -77,10 +77,13 @@ examples::
 Sheet Content Management
 ------------------------
 
-The sheet content is managed by the :class:`Table` class. You have access to the
-:class:`Cell` object by index or classic spreadsheet reference names (like ``A1``).
-All set/get methods operating on :class:`Cell` objects or lists of :class:`Cell`
-objects. All index or size tuples have the form (row, column).
+The sheet content is managed by the :class:`Table` class. You have access to
+the :class:`Cell` objects by (row, col) tuples as zero-based indices or classic
+spreadsheet references (like ``'A1'`` = (0, 0)). All getters returning :class:`Cell`
+objects or lists of :class:`Cell` objects, and all setters requires
+:class:`Cell` objects as input.
+
+All indices or size tuples are zero-based and have the form (row, column).
 
 Supported operations:
 
@@ -106,8 +109,14 @@ get/set table data::
     # get/set cells
     cell = table[0, 0]
     cell = table['A1']
+    # set as float
     if cell.value > 100.:
         table['A1'] = ezodf.Cell(100.)
+    # set as currency
+    table['B1'] = Cell(100, 'EUR')
+    # set as string
+    table['C1'] = Cell('Text')
+
     # get rows/columns
     for cell in table.column(0):
         print cell.value

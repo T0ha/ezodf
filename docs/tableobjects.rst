@@ -6,10 +6,10 @@ Table Objects
 Sheets Class
 ------------
 
-.. class:: Sheets(xmlbody)
+.. class:: Sheets
 
-   The :class:`Sheets` manages all :class:`Table` objects in an
-   spreadsheet-document. (`sheet` is a synonym for `table`)
+   The :class:`Sheets` manages all :class:`Table` objects in
+   spreadsheet-documents. (`sheet` is a synonym for `table`)
 
 .. warning::
 
@@ -21,50 +21,92 @@ Methods
 
 .. method:: Sheets.__len__()
 
-   Get count of sheets. (use `len(sheets)`)
+   Get count of sheets.
 
 .. method:: Sheets.__iter__()
 
-   Iterate over all :class:`Table` objects. (use `iter(sheets)`)
+   Iterate over all :class:`Table` objects.
 
 .. method:: Sheets.__getitem__(key)
 
-.. method:: Sheets.__setitem__(key, value)
+   Get sheet by `key`, `key` is either the numerical index of the sheet or
+   the name of the sheet.
+
+.. method:: Sheets.__setitem__(key, sheet)
+
+   Replace sheet `key` by `sheet`, `key` is either the numerical index of the
+   sheet or the name of the sheet.
 
 .. method:: Sheets.__delitem__(key)
 
+   Delete sheet by `key`, `key` is either the numerical index of the sheet or
+   the name of the sheet.
+
 .. method:: Sheets.__iadd__(sheet)
+
+   ``+=`` operator, alias for :meth:`~Sheets.append`.
 
 .. method:: Sheets.append(sheet)
 
+   Append `sheet` as last sheet of spreadsheet-document.
+
 .. method:: Sheets.index(sheet)
+
+   Get index of `sheet`.
 
 .. method:: Sheets.insert(index, sheet)
 
+   Insert `sheet` at position `index`.
+
 .. method:: Sheets.names()
+
+   Get list of sheet names.
 
 Table Class
 -----------
 
 .. class:: Table(name="NEWTABLE", size=(10, 10), xmlnode=None)
 
+   The :class:`Table` object represents a fixed sized table with `size[0]` rows
+   and `size[1]` columns. Every cell contains a :class:`Cell` object, even empty
+   cells (`value` and `value_type` of empty cells are `None`).
+
+   Reference cells by (row, col)-tuples or by classic spreadsheet cell references
+   like ``'A1'``. The letters represent the column (``'A'`` = column(0), ``'B'``
+   = column(1), ...), the numbers represent the row (``'1'`` = row(0), ``'2'``
+   = row(1), ...).
+
 Attributes
 ~~~~~~~~~~
 
 .. attribute:: Table.name (read/write)
 
+   Specifies the name of a table, should be unique.
+
 .. attribute:: Table.style_name (read/write)
+
+   References a table style.
 
 .. attribute:: Table.protected (read/write)
 
-.. attribute:: Table.print (read/write)
+   The :attr:`~Table.protected` attribute specifies whether or not a table is
+   protected from editing. If a table is protected, all of the table elements
+   and the cell elements with a :attr:`~Cell.protected` attribute set to `True`
+   are protected.
 
 Methods
 ~~~~~~~
 
 .. method:: Table.__getitem__(key)
 
-.. method:: Table.__setitem__(key, value)
+   Get cell by `key` as :class:`Cell` object, `key` is either a
+   (row, col)-tuple or a classic spreadsheet reference like ``'A1''``.
+
+.. method:: Table.__setitem__(key, cell)
+
+   Set cell referenced by `key` to `cell`, `cell` has to be a :class:`Cell`
+   object and `key` is either a (row, col)-tuple or a classic spreadsheet
+   reference like ``'A1''``.
 
 .. method:: Table.ncols()
 
@@ -143,7 +185,7 @@ Cell Class
 .. class:: Cell(value=None, value_type=None, currency=None, style_name=None, xmlnode=None)
 
    Creates a new cell object. If `value_type` is None, the type will be determined
-   by the type of `value`.
+   by the type of `value`. `value` and `value_type` of empty cells are `None`.
 
 ================ ===============================================================
 Value Type       Description
@@ -168,38 +210,95 @@ float/int             ``'float'``
 bool                  ``'boolean'``
 ===================== =======================
 
+examples for setting table values::
+
+    # set as float
+    table['A1'] = Cell(100.)
+    # set as currency
+    table['B1'] = Cell(100, currency='EUR')
+    # set as string
+    table['C1'] = Cell('Text')
+    # append text to string-cells
+    table['C1'].append_text('\nLine 2')
+
+example for getting cell values::
+
+    cell = Cell(3.141592)
+    pi = cell.value
+
 Attributes
 ~~~~~~~~~~
 
 .. attribute:: Cell.value (read)
 
+   Get converted cell values, numerical values as `float`, boolean values as
+   `bool` and all others as `str`.
+
 .. attribute:: Cell.value_type (read)
 
 .. attribute:: Cell.currency (read)
 
+   Get currency as `string`, if :attr:`Cell.value_type` is ``'currency'``
+   else `None`.
+
 .. attribute:: Cell.style_name (read/write)
 
+   References a table-cell style.
+
 .. attribute:: Cell.formula (read/write)
+
+   Formulas allow calculations to be performed within table cells. Typically,
+   the formula itself begins with an equal (=) sign and can include the following
+   components:
+
+   - Numbers
+   - Text
+   - Named ranges
+   - Operators
+   - Logical operators
+   - Function calls
+   - Addresses of cells that contain numbers
 
 .. attribute:: Cell.content_validation_name (read/write)
 
 .. attribute:: Cell.protected (read/write)
 
+   Protects the table cell. Users can not edit the content of a cell
+   that is marked as protected. This attribute is not related to the
+   :attr:`Table.protected` attribute for table elements.
+
 .. attribute:: Cell.span (read)
+
+   Get cell spanning as (row, col) tuple.
+
+   Specify the number of rows and columns that a cell spans.
+   When a cell covers another cell because of a column or row span value
+   greater than one, the :attr:`~Cell.covered` attribute of the covered
+   cell is `True`.
 
 .. attribute:: Cell.covered (read)
 
+   `True` if cell is covered by other cells.
+
 .. attribute:: Cell.display_form (read/write)
+
+   Display form of cell as `str`, set by other programs like LibreOffice or
+   OpenOffice. **ezodf** does not set the display form.
 
 Methods
 ~~~~~~~
 
 .. method:: Cell.set_value(value, value_type=None, currency=None)
 
+   Set new cell velues.
+
 .. method:: Cell.plaintext()
+
+   Get the plain text representation as `str`.
 
 .. method:: Cell.append_text()
 
+   Append text to cells of type ``'string'``.
 
 TableRow Class
 --------------
@@ -211,9 +310,19 @@ Attributes
 
 .. attribute:: TableRow.style_name (read/write)
 
+   References a table-row style.
+
 .. attribute:: TableRow.visibility (read/write)
 
+   Specifies whether the row is ``'visible'``, ``'filtered'``, or ``'collapsed'``.
+
+   Filtered and collapsed rows are not visible. Filtered rows are invisible,
+   because a filter is applied to the table that does not select the table
+   row. Collapsed rows have been made invisible by user directly.
+
 .. attribute:: TableRow.default_cell_style_name (read/write)
+
+   References the default table-cell style.
 
 TableColumn Class
 -----------------
@@ -222,6 +331,16 @@ TableColumn Class
 
 .. attribute:: TableColumn.style_name (read/write)
 
+   References a table-column style.
+
 .. attribute:: TableColumn.visibility (read/write)
 
+   Specifies whether the row is ``'visible'``, ``'filtered'``, or ``'collapsed'``.
+
+   Filtered and collapsed columns are not visible. Filtered columns are invisible,
+   because a filter is applied to the table that does not select the table
+   column. Collapsed columns have been made invisible by user directly.
+
 .. attribute:: TableColumn.default_cell_style_name (read/write)
+
+   References the default table-cell style.

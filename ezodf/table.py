@@ -64,13 +64,13 @@ class Table(GenericWrapper, TableStylenNameMixin):
         else:
             raise TypeError(str(type(key)))
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, cell):
         if isinstance(key, int):
-            return self.set_child(key, value)
+            return self.set_child(key, cell)
         elif isinstance(key, tuple): # key => (row, column)
-            return self.set_cell_by_index(key, value)
+            return self.set_cell_by_index(key, cell)
         elif isinstance(key, str): # key => 'A1'
-            return self.set_cell_by_address(key, value)
+            return self.set_cell_by_address(key, cell)
         else:
             raise TypeError(str(type(key)))
 
