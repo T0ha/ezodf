@@ -37,6 +37,10 @@ The target platform is Python 3.1+, no Python 2 support planned at this time.
 Installation
 ============
 
+with easy_install::
+
+    easy_install ezodf
+
 with pip::
 
     pip install ezodf

@@ -2,11 +2,11 @@
 NEWS
 ====
 
-Version 0.2.1 - xx February 2011
+Version 0.2.1 - 06 February 2011
 
   * Alpha version
   * added basic spreadsheet support
-  * Spreadsheet: added sheet and cell-content management
+  * Spreadsheet: added sheet, row, column and cell management
 
 Version 0.2.0 - 18 January 2011
 
