@@ -52,6 +52,7 @@ Contents
    styles.rst
    textdocument.rst
    spreadsheetdocument.rst
+   tableobjects.rst
    graphicsdocument.rst
    presentationdocument.rst
    howtos.rst

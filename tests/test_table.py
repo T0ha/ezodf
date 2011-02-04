@@ -129,12 +129,18 @@ class TestTableMethods(unittest.TestCase):
         self.assertEqual(table.nrows(), 7)
         self.assertEqual(table.ncols(), 5)
 
-    def test_clear(self):
+    def test_reset(self):
         table = Table(name="TEST", size=(7, 5))
-        table.clear(size=(8, 10))
+        table.reset(size=(8, 10))
         self.assertIsNone(table.name)
         self.assertEqual(table.ncols(), 10)
         self.assertEqual(table.nrows(), 8)
+
+    def test_clear_error(self):
+        table = Table(name="TEST")
+        with self.assertRaises(NotImplementedError):
+            table.clear()
+
 
     def test_setup_error(self):
         with self.assertRaises(ValueError):
@@ -339,6 +345,11 @@ class TestRowColumnAccess(unittest.TestCase):
     def test_rows(self):
         values = tofloats(chain(*self.table.rows()))
         expected = [float(x) for x in range(1, 17)]
+        self.assertEqual(expected, values)
+
+    def test_columns(self):
+        values = tofloats(chain(*self.table.columns()))
+        expected = [1., 5., 9., 13., 2., 6., 10., 14., 3., 7., 11., 15., 4., 8., 12., 16.]
         self.assertEqual(expected, values)
 
 class TestRowColumnInfoAccess(unittest.TestCase):

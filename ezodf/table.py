@@ -105,10 +105,13 @@ class Table(GenericWrapper, TableStylenNameMixin):
         """ Count of table columns. """
         return self._rows.ncols()
 
-    def clear(self, size=(10, 10)):
+    def reset(self, size=(10, 10)):
         super(Table, self).clear()
         self._rows.reset(size)
         self._columns.reset(size[1])
+
+    def clear(self):
+        raise NotImplementedError("for tables use the reset() method.")
 
     def get_cell_by_index(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
@@ -143,6 +146,10 @@ class Table(GenericWrapper, TableStylenNameMixin):
         if isinstance(index, str):
             row, index = address_to_index(index)
         return [wrap(e) for e in self._rows.column(index)]
+
+    def columns(self):
+        for index in range(self.ncols()):
+            yield self.column(index)
 
     def row_info(self, index):
         if isinstance(index, str):
@@ -180,8 +187,12 @@ class Table(GenericWrapper, TableStylenNameMixin):
         self._columns.delete(index, count)
 
 @register_class
-class TableRow(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
-               TableDefaultCellStyleNameMixin):
+class TableColumn(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
+                  TableDefaultCellStyleNameMixin):
+    TAG = CN('table:table-column')
+
+@register_class
+class TableRow(TableColumn):
     TAG = CN('table:table-row')
 
     def __init__(self, ncols=10, xmlnode=None):
@@ -193,16 +204,3 @@ class TableRow(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
         for col in range(ncols):
             self.xmlnode.append(etree.Element(CN('table:table-cell')))
 
-    @property
-    def rows_repeated(self):
-        value = self.get_attr(CN('table:number-rows-repeated'))
-        value = int(value) if value is not None else 1
-        return max(1, value)
-
-    def clear_rows_repeated_attribute(self):
-        del self.xmlnode.attrib[CN('table:number-rows-repeated')]
-
-@register_class
-class TableColumn(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
-                  TableDefaultCellStyleNameMixin):
-    TAG = CN('table:table-column')

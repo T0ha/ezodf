@@ -40,13 +40,13 @@ class TestCellAttributes(unittest.TestCase):
 
     def test_uncover_cell(self):
         cell = Cell()
-        cell.covered = False
+        cell._set_covered(False)
         self.assertFalse(cell.covered)
         self.assertEqual(cell.TAG, Cell.TAG)
 
     def test_cover_cell(self):
         cell = Cell()
-        cell.covered = True
+        cell._set_covered(True)
         self.assertTrue(cell.covered)
         self.assertEqual(cell.TAG, CoveredCell.TAG)
 
@@ -133,7 +133,7 @@ class TestCellAttributes(unittest.TestCase):
 
     def test_set_span(self):
         cell = Cell()
-        cell.span = (2, 3)
+        cell._set_span(( 2, 3) )
         self.assertEqual(cell.span, (2, 3))
 
 
@@ -141,6 +141,42 @@ class TestCellContent(unittest.TestCase):
     def test_get_default_value_type(self):
         cell = Cell()
         self.assertIsNone(cell.value_type)
+
+    def Test_init_with_string(self):
+        cell = Cell('text')
+        self.assertEqual(cell.value_type, 'string')
+        self.assertEqual(cell.value, 'text')
+
+    def Test_init_with_float(self):
+        cell = Cell(100.)
+        self.assertEqual(cell.value_type, 'float')
+        self.assertEqual(cell.value, 100.)
+
+    def Test_init_with_bool(self):
+        cell = Cell(True)
+        self.assertEqual(cell.value_type, 'boolean')
+        self.assertEqual(cell.value, True)
+
+    def Test_init_with_percentage(self):
+        cell = Cell(1., 'percentage')
+        self.assertEqual(cell.value_type, 'percentage')
+        self.assertEqual(cell.value, 1.)
+
+    def Test_init_with_currency(self):
+        cell = Cell(100., currency='EUR')
+        self.assertEqual(cell.value_type, 'currency')
+        self.assertEqual(cell.currency, 'EUR')
+        self.assertEqual(cell.value, 100.)
+
+    def Test_init_with_date(self):
+        cell = Cell('2011-01-01', 'date')
+        self.assertEqual(cell.value_type, 'date')
+        self.assertEqual(cell.value, '2011-01-01')
+
+    def Test_init_with_time(self):
+        cell = Cell('PT01H00M00,0000S', 'time')
+        self.assertEqual(cell.value_type, 'time')
+        self.assertEqual(cell.value, 'PT01H00M00,0000S')
 
     def test_check_valid_value_types(self):
         cell = Cell()

@@ -1,0 +1,27 @@
+
+IDEAS
+=====
+
+Spreadsheet
+-----------
+
+NumericalHarvester
+~~~~~~~~~~~~~~~~~~
+
+Collect numerical values from spreadsheets/tables as array.array() or
+numpy.array() objects.
+
+ignores following cell value types by intention:
+
+- date
+- time
+- string
+- boolean
+
+options:
+
+- replace ignored values by a default value
+- ignore float/percentage/currency
+- ignore hidden data
+- ignore incomplete rows/columns
+- autodetect harvest ranges

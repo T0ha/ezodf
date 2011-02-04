@@ -38,13 +38,13 @@ class Cell(GenericWrapper, TableStylenNameMixin):
 
     TAG = CN('table:table-cell')
 
-    def __init__(self, value=None, value_type=None, style_name=None, xmlnode=None):
+    def __init__(self, value=None, value_type=None, currency=None, style_name=None, xmlnode=None):
         super(Cell, self).__init__(xmlnode=xmlnode)
         if xmlnode is None:
             if style_name is not None:
                 self.style_name = style_name
             if value is not None:
-                self.set_value(value, value_type)
+                self.set_value(value, value_type, currency)
             elif value_type is not None:
                 self._set_value_type(value_type)
 
@@ -212,8 +212,8 @@ class Cell(GenericWrapper, TableStylenNameMixin):
         rows = 1 if rows is None else max(1, int(rows))
         cols = 1 if cols is None else max(1, int(cols))
         return (rows, cols)
-    @span.setter
-    def span(self, value):
+
+    def _set_span(self, value):
         rows, cols = value
         rows = max(1, int(rows))
         cols = max(1, int(cols))
@@ -223,8 +223,8 @@ class Cell(GenericWrapper, TableStylenNameMixin):
     @property
     def covered(self):
         return self.xmlnode.tag == CN('table:covered-table-cell')
-    @covered.setter
-    def covered(self, value):
+
+    def _set_covered(self, value):
         if value:
             self.TAG = CN('table:covered-table-cell')
             self.xmlnode.tag = self.TAG

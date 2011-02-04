@@ -56,8 +56,10 @@ class GenericWrapper:
 
     def __getitem__(self, index):
         return self.get_child(index)
+
     def __setitem__(self, index, element):
         self.set_child(index, element)
+
     def __delitem__(self, index):
         self.del_child(index)
 
