@@ -136,8 +136,6 @@ Spreadsheet Documents
 Managing Sheets
 ~~~~~~~~~~~~~~~
 
-.. _howtos_presentation:
-
 **How to add a new sheet?**
 
 Sheets are :class:`Sheet` objects and resides in the :attr:`sheets` attribute
@@ -185,10 +183,168 @@ You can get sheets by `index` or by `name`::
 
    doc.sheets[0] = Sheet('ReplaceFirstSheet')
 
-.. _howtos_sheet:
+**How to move a sheet?**
+
+To move a sheet in front of another sheet just insert the moving sheet::
+
+   sheet1 = doc.sheets[0]
+   sheet2 = doc.sheets[1]
+   # move sheet2 in front of sheet1
+   doc.sheets.insert(0, sheet2)
+
+You can insert a sheet as often you want, there is alway just one instance of
+the sheet in the document. You can also move a sheet to another document, but
+referenced styles will not be copied automatically::
+
+   sheet = doc1.sheets[0]
+   doc2.sheets.append(sheet)
+
+**How to copy a sheet?**
+
+Make a copy of the sheet and insert or append the copy::
+
+   duplicate = sheet.copy(newname='CopyOf'+sheet.name)
+   doc.sheets += duplicate
+
+**How to get all sheet names?**
+
+::
+
+   names = doc.sheets.names() # returns a generator object
+
+.. _howtos_sheet_geometry:
+
+Managing Sheet Geometry
+~~~~~~~~~~~~~~~~~~~~~~~
+
+**Prelude**
+
+::
+
+   sheet = doc.sheets[0]
+
+**How to get sheet metrics?**
+
+::
+
+   count_of_rows = sheet.nrows()
+   count_of_colmns = sheet.ncols()
+   name = sheet.name
+
+**How to insert/append new rows/columns?**
+
+.. warning::
+
+   insert operations break cell references in formulas
+
+Appending new empty rows/columns::
+
+   sheet.append_rows(2)
+   sheet.append_columns(3)
+
+Inserting new empty rows/columns at position `index`::
+
+   sheet.insert_rows(index=3, count=2)
+   sheet.insert_columns(index=3, count=2)
+
+**How to delete new rows/columns?**
+
+.. warning::
+
+    delete operations break cell references in formulas
+
+::
+
+   sheet.delete_rows(index=3, count=2)
+   sheet.delete_columns(index=3, count=2)
+
+.. _howtos_sheet_content:
 
 Managing Sheet Content
 ~~~~~~~~~~~~~~~~~~~~~~
+
+**Prelude**
+
+::
+
+   sheet = doc.sheets[0]
+
+**How to reference cells?**
+
+Cells are reference by a (row, column) tuple or by classsic spreadsheet
+references like ``'A1'`` for cell (0, 0), letters stands for
+columns, numbers stands for rows, and as you see the row/column index is zero-based,
+where classic references start with row = ``'1'`` and column = ``'A'``.
+
+**How to get the cell content?**
+
+The cell content is manged by the :class:`Cell` class::
+
+   cell = sheet['A1']
+   value = cell.value
+   value_type = cell.value_type
+
+   value = sheet['A1'].value
+
+- for ``'string'``, ``'date'`` and ``'time'``: you get `str` objects
+- for ``'float'``, ``'precentage'`` and ``'currency'``: you get `float` objects
+- for ``'boolean'``: you get `bool` objects
+
+**How to modify cell content?**
+
+::
+
+   # for str, float and bolean values, you can ignore the value_type
+   sheet['A1'].set_value('a string value')
+
+   # setting a currency
+   sheet['A1'].set_value(100, currency='EUR') # is equal to
+   sheet['A1'].set_value(100, 'currency', 'EUR')
+
+   # setting a date
+   sheet['A1'].set_value('2011-02-05', 'date')
+   sheet['A1'].set_value('2011-02-05T09:24:00', 'date') # /w time
+
+   # setting a time-period 1:10:05
+   sheet['A1'].set_value('PT01H10M05,0000S', 'date')
+
+to convert date/timeperiod values see :class:`TimeParser` class. Here just a few
+examples::
+
+   from ezodf.timeparser import TimeParser
+
+   date_object = TimeParser.parse('2011-02-05')
+   datetime_object = TimeParser.parse('2011-02-05T09:24:00')
+   timedelta_object = TimeParser.parse('PT01H10M05,0000S')
+
+   # timedelta to str: 'PThhHmmMss,ffffS'
+   time_period_str = str(TimeParser(timedelta_object))
+
+**How to get rows/columns?**
+
+::
+
+   row0 = sheet.row(0) # as list of Cell() objects
+   col0 = sheet.column(0) # as list of Cell() objects
+
+**How to iterate over rows/columns?**
+
+::
+
+   for row in sheet.rows():
+      print row # row is a list of Cell() objects
+
+   for column in sheet.columns():
+      print column # column is a list of Cell() objects
+
+**How about spreadsheet calculations?**
+
+**ezodf** has no calculation engine included, you can get/set formulas as strings,
+nothing more. So display form and cell value will not be updated if content is
+changed, and inserting/deleting rows/columns will also break cell references in
+formulas.
+
+.. _howtos_presentation:
 
 Presentation Documents
 ----------------------
@@ -211,7 +367,7 @@ In existing documents, you can use the included styles, you find the needed
 
 For new documents you can copy&paste styles from other documents:
 
-- style an object with LibreOffice or OpenOffice
+- style an object with `LibreOffice` or `OpenOffice`
 - save & unzip document
 - in content.xml: search styled object, search the associated automatic style,
   search for ``<style:style style:name="...">`` elements

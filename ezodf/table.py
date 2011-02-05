@@ -113,6 +113,13 @@ class Table(GenericWrapper, TableStylenNameMixin):
     def clear(self):
         raise NotImplementedError("for tables use the reset() method.")
 
+    def copy(self, newname=None):
+        newtable = Table(xmlnode=copy.deepcopy(self.xmlnode))
+        if newname is None:
+            newname = 'CopyOf' + self.name
+        newtable.name = newname
+        return newtable
+
     def get_cell_by_index(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
         return wrap(self._rows.get_cell(pos))

@@ -142,7 +142,7 @@ row and column management::
 
 .. warning::
 
-    insert/delete operations break cell refernces in formulas
+    insert/delete operations break cell references in formulas
 
 get row and column infos (see :class:`TableRow` and :class:`TableColumn`)::
 

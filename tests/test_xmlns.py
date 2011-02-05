@@ -89,7 +89,7 @@ style:class="text"/>"""
 
 class TestFakeElement(unittest.TestCase):
     def test_create_a_fake_element_with_namespaces(self):
-        fake = fakeelement(FAKE_ELEMENT)
+        fake = fake_element(FAKE_ELEMENT)
         self.assertEqual('GenericWrapper', fake.kind, "is not GenericWrapperClass")
         self.assertEqual(CN('office:fake'), fake.xmlnode.tag, "is not a <office:fake> element")
 

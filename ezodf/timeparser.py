@@ -16,9 +16,13 @@ DATE_FORMAT = "%Y-%m-%d"
 class TimeParser:
     duration_matcher = re.compile("^P(\d+Y)?(\d+M)?(\d+D)?(?:T(\d+H)?(\d+M)?(\d+(?:,\d+)?S)?)?$")
 
-    def __init__(self, timestr):
-        self.timestr = timestr
-        self.value = TimeParser.parse(timestr)
+    def __init__(self, time):
+        if isinstance(time, str):
+            self.timestr = time
+            self.value = TimeParser.parse(time)
+        else:
+            self.value = time
+            self.timestr = str(self)
 
     def __str__(self):
         if self.is_date:

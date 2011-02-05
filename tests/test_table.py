@@ -148,6 +148,20 @@ class TestTableMethods(unittest.TestCase):
         with self.assertRaises(ValueError):
             Table(size=(0, 1))
 
+    def test_copy_table_with_new_name(self):
+        table1 = Table(name='Test')
+        table1['A1'].set_value('marker')
+
+        table2 = table1.copy(newname='Copy of '+table1.name)
+
+        self.assertEqual('Copy of Test', table2.name, "table2 has wrong name.")
+        self.assertEqual('marker', table2['A1'].value, "marker not found in table2")
+
+    def test_copy_table_without_new_name(self):
+        table1 = Table(name='Test')
+        table2 = table1.copy()
+        self.assertEqual('CopyOfTest', table2.name, "table2 has wrong name.")
+
 class TestAddress2Index(unittest.TestCase):
     def test_A1(self):
         self.assertEqual(address_to_index('A1'), (0, 0))

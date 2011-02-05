@@ -150,6 +150,18 @@ class TestTimedelta(unittest.TestCase):
         p = TimeParser('PT1H00M00,0000S')
         self.assertEqual(str(p), 'PT01H00M00S')
 
+class TestSetTimeObjects(unittest.TestCase):
+    def test_set_timedelta(self):
+        p = TimeParser(timedelta(minutes=5))
+        self.assertEqual('PT00H05M00S', str(p))
+
+    def test_set_date(self):
+        p = TimeParser(date(2011, 2, 5))
+        self.assertEqual('2011-02-05', str(p))
+
+    def test_set_datetime(self):
+        p = TimeParser(datetime(2011, 2, 5, 12, 0, 0))
+        self.assertEqual('2011-02-05T12:00:00', str(p))
 
 if __name__=='__main__':
     unittest.main()
