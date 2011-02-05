@@ -100,12 +100,12 @@ Methods
 .. method:: Table.__getitem__(key)
 
    Get cell by `key` as :class:`Cell` object, `key` is either a
-   (row, col)-tuple or a classic spreadsheet reference like ``'A1''``.
+   (`row, col`) tuple or a classic spreadsheet reference like ``'A1''``.
 
 .. method:: Table.__setitem__(key, cell)
 
    Set cell referenced by `key` to `cell`, `cell` has to be a :class:`Cell`
-   object and `key` is either a (row, col)-tuple or a classic spreadsheet
+   object and `key` is either a (`row, col`) tuple or a classic spreadsheet
    reference like ``'A1''``.
 
 .. method:: Table.ncols()
@@ -150,12 +150,12 @@ Methods
 
 .. method:: Table.insert_rows(index, count=1)
 
-   Insert `count` empty rows at `index`. **CAUTION:** This operations breaks cell
+   Insert `count` empty rows at `index`. **CAUTION:** This operation breaks cell
    references in formulas
 
 .. method:: Table.delete_rows(index, count=1)
 
-   Delete `count` rows at `index`. **CAUTION:** This operations breaks cell
+   Delete `count` rows at `index`. **CAUTION:** This operation breaks cell
    references in formulas
 
 .. method:: Table.append_columns(count=1)
@@ -164,12 +164,12 @@ Methods
 
 .. method:: Table.insert_columns(index, count=1)
 
-   Insert `count` empty columns at `index`. **CAUTION:** This operations breaks
+   Insert `count` empty columns at `index`. **CAUTION:** This operation breaks
    cell references in formulas
 
 .. method:: Table.delete_columns(index, count=1)
 
-   Delete `count` columns at `index`. **CAUTION:** This operations breaks cell
+   Delete `count` columns at `index`. **CAUTION:** This operation breaks cell
    references in formulas
 
 Sheet Class
@@ -212,14 +212,18 @@ bool                  ``'boolean'``
 
 examples for setting table values::
 
-    # set as float
+    # create new cell as float
     table['A1'] = Cell(100.)
+    # or modify existing cell (preserves existing properties)
+    table['A1'].set_value(100.)
     # set as currency
-    table['B1'] = Cell(100, currency='EUR')
+    table['B1'].set_value(100, currency='EUR')
     # set as string
-    table['C1'] = Cell('Text')
+    table['C1'].set_value("Text")
     # append text to string-cells
-    table['C1'].append_text('\nLine 2')
+    table['C1'].append_text("\nLine 2")
+    # set as date
+    table['D1'].set_value("2011-02-05", 'date')
 
 example for getting cell values::
 

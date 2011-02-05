@@ -13,7 +13,7 @@ import unittest
 from mytesttools import in_XML
 
 # objects to test
-from ezodf.xmlns import XML, CN, etree
+from ezodf.xmlns import XML, CN, etree, fake_element
 
 class TestXMLNamespaces(unittest.TestCase):
     def test_split_prefix(self):
@@ -84,6 +84,14 @@ class TestNSParsing(unittest.TestCase):
                                'manifest:media-type="application/vnd.oasis.opendocument.text" '\
                                'manifest:version="1.2" '\
                                'manifest:full-path="/" />', result))
+FAKE_ELEMENT = """<office:fake style:name="Standard" style:family="paragraph"
+style:class="text"/>"""
+
+class TestFakeElement(unittest.TestCase):
+    def test_create_a_fake_element_with_namespaces(self):
+        fake = fakeelement(FAKE_ELEMENT)
+        self.assertEqual('GenericWrapper', fake.kind, "is not GenericWrapperClass")
+        self.assertEqual(CN('office:fake'), fake.xmlnode.tag, "is not a <office:fake> element")
 
 if __name__=='__main__':
     unittest.main()

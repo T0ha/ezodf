@@ -6,11 +6,19 @@ How-Tos
 General Document Management
 ---------------------------
 
-**How do I open an ODF document?**
+**How to open an ODF document?**
+
+::
+
+   doc = ezodf.opendoc(filename)
 
 see :ref:`opendoc`
 
-**How do I create a new ODF document?**
+**How to create a new ODF document?**
+
+::
+
+   doc = ezodf.newdoc(doctype, filename)
 
 see :ref:`newdoc`
 
@@ -20,7 +28,7 @@ All ODF objects, like :class:`~text.Paragraph` or :class:`~text.Heading`, reside
 in the :attr:`~document.PackagedDocument.body` attribute of the document object.
 All data management function are method calls of this object.
 
-**How do I append/insert ODF objects to a document?**
+**How to append/insert ODF objects to a document?**
 
 Use the :attr:`~document.PackagedDocument.body` attribute of the document object::
 
@@ -30,7 +38,7 @@ Use the :attr:`~document.PackagedDocument.body` attribute of the document object
     # insert object at 'position'
     doc.body.insert(0, Paragraph('New first paragraph.'))
 
-**How do I get ODF objects from a document?**
+**How to get ODF objects from a document?**
 
 1. You can iterate over all objects at the top-level of the body object::
 
@@ -57,19 +65,42 @@ Use the :attr:`~document.PackagedDocument.body` attribute of the document object
 
       paragraphs = doc.body.findall(CN('text:p'))
 
-**How do I get the position of an object?**
+**How to get the position of an object?**
 
-   Use the :func:`~base.GenericWrapper.index` method::
+::
 
-      pos = doc.body.index(p1)
+   pos = doc.body.index(p1)
 
-      # get the previous object of p1
-      prev = doc.body[pos-1]
+   # get the previous object of p1
+   prev = doc.body[pos-1]
 
 .. _howtos_text:
 
 Text Documents
 --------------
+
+**Prelude**
+
+::
+
+   # create a new text document
+   doc = ezodf.newdoc(doctype='odt', filename='text.odt')
+   # or open an existing text document
+   doc = ezodf.opendoc('text.odt')
+
+**How to add a heading?**
+
+Add :class:`~text.Heading` object to the :attr:`~document.PackagedDocument.body`
+attribute of the document::
+
+   doc.body.append(Heading('A text paragraph.')
+
+**How to add a text paragraph?**
+
+Add :class:`~text.Paragraph` object to the :attr:`~document.PackagedDocument.body`
+attribute of the document::
+
+   doc.body.append(Paragraph('A text paragraph.')
 
 **How to insert a page break?**
 
@@ -78,12 +109,86 @@ Add :class:`~whitespaces.SoftPageBreak` object to heading or paragraph::
    p = doc.body.append(Paragraph("some text"))
    p.append(SoftPageBreak())
 
+**How to create a simple list?**
+
+Use the :func:`ezodf.ezlist` function, creates unnumbered lists as default, use
+the `style_name` parameter to assign an new list-style::
+
+   ulist = ezodf.ezlist(['Point 1', 'Point 2', 'Point 3'])
+   doc.body.append(ulist)
+
 .. _howtos_spreadsheet:
 
 Spreadsheet Documents
 ---------------------
 
+**Prelude**
+
+::
+
+   # create a new spreadsheet document
+   doc = ezodf.newdoc(doctype='ods', filename='spreadsheet.ods')
+   # or open an existing spreadsheet document
+   doc = ezodf.opendoc('spreadsheet.ods')
+
+.. _howtos_sheets:
+
+Managing Sheets
+~~~~~~~~~~~~~~~
+
 .. _howtos_presentation:
+
+**How to add a new sheet?**
+
+Sheets are :class:`Sheet` objects and resides in the :attr:`sheets` attribute
+of the document::
+
+   # append new sheets at the end of the document
+   doc.sheets += Sheet('ANewSheet')
+   doc.sheets.append('AnotherSheet')
+   # or insert the new sheet at an arbitary position
+   doc.sheet.insert(1, Sheet('AsSecondSheet'))
+
+**How to get sheets from document?**
+
+You can get sheets by `index` or by `name`::
+
+   # get first sheet
+   sheet = doc.sheets[0]
+   # get last sheet
+   sheet = doc.sheets[-1]
+   # get sheet by name
+   sheet = doc.sheets['ANewSheet']
+
+   # iterate over sheets
+   for sheet in doc.sheets:
+      print sheet.name
+
+**How to get position of a sheet?**
+
+::
+
+   index = doc.sheets.index(sheet)
+
+   # get count of sheets
+   count = len(doc.sheets)
+
+**How to delete a sheet?**
+
+::
+
+   del doc.sheets[0]
+
+**How to replace a sheet?**
+
+::
+
+   doc.sheets[0] = Sheet('ReplaceFirstSheet')
+
+.. _howtos_sheet:
+
+Managing Sheet Content
+~~~~~~~~~~~~~~~~~~~~~~
 
 Presentation Documents
 ----------------------
@@ -97,6 +202,30 @@ Drawing Documents
 
 Style Management
 ----------------
+
+**How to use styles, while style-management is not implemented?**
+
+In existing documents, you can use the included styles, you find the needed
+``style:name`` attributes in `styles.xml` or `content.xml`, search for
+``<style:style style:name="...">`` elements.
+
+For new documents you can copy&paste styles from other documents:
+
+- style an object with LibreOffice or OpenOffice
+- save & unzip document
+- in content.xml: search styled object, search the associated automatic style,
+  search for ``<style:style style:name="...">`` elements
+- copy style-element (``<style:style> ... </style:style>``) to clipboard
+
+rest follows in Python, use a meaningful and unique ``style:name`` attribute::
+
+   doc.inject_style("""... insert clipboard content ...""")
+
+or use a document including styles as template: newdoc('odt', template='template.odt')
+
+to apply the style, just use the name associated by the `style:name` attribute::
+
+   doc.append(Paragraph("some text", style_name='...'))
 
 
 .. _lxml API Reference: http://codespeak.net/lxml/api/index.html

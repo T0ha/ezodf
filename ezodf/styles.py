@@ -92,6 +92,7 @@ class BaseStyle:
 
     def __getitem__(self, key):
         """ Get style attribute 'key'. """
+        return self.xmlnode.get(self.ATTRIBUTEMAP[key])
 
     def __setitem__(self, key, value):
         """ Set style attribute 'key' to 'value'. """

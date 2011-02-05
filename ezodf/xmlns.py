@@ -96,3 +96,16 @@ class _ClassRegistry:
 _class_registry = _ClassRegistry()
 register_class = _class_registry.register
 wrap = _class_registry.wrap
+
+WRAPNS = """<root
+{0}
+>
+%s
+</root>
+""".format(" ".join(
+    ['xmlns:%s ="%s"' % (key, value) for key, value in ALL_NSMAP.items()]
+    ))
+
+def fake_element(xmlcontent):
+    element = etree.XML(WRAPNS % xmlcontent)
+    return wrap(element[0])

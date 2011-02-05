@@ -14,6 +14,7 @@ import zipfile
 # trusted or separately tested modules
 from mytesttools import getdatafile
 from ezodf.filemanager import check_zipfile_for_oasis_validity
+from ezodf.xmlns import fake_element
 
 # objects to test
 from ezodf import document, const
@@ -43,6 +44,9 @@ class TestDocumentCopy(unittest.TestCase):
         for filename in ['empty.odt', 'empty.ods', 'empty.odg', 'empty.odp']:
             self.open_and_saveas(filename, "open and saveas faild on '%s'" % filename)
 
+FAKESTYLE = """<style:style style:name="Standard" style:family="paragraph"
+style:class="text"/>"""
+
 class TestNewDocument(unittest.TestCase):
     def test_new_odt(self):
         docname = getdatafile('new.odt')
@@ -59,6 +63,12 @@ class TestNewDocument(unittest.TestCase):
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.text"))
         remove(docname)
+
+    def test_add_faked_style(self):
+        doc = document.newdoc(doctype='odt')
+        doc.inject_style(FAKESTYLE)
+        style = doc.styles.styles['Standard']
+        self.assertEqual('Standard', style['name'], 'style name is not "Standard"')
 
     def test_new_ods(self):
         docname = getdatafile('new.ods')

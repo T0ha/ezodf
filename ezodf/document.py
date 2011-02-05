@@ -10,7 +10,7 @@ import zipfile
 import os
 
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
-from .xmlns import subelement, CN, etree, wrap, ALL_NSMAP
+from .xmlns import subelement, CN, etree, wrap, ALL_NSMAP, fake_element
 from .filemanager import FileManager
 from .meta import OfficeDocumentMeta
 from .styles import OfficeDocumentStyles
@@ -91,6 +91,10 @@ class _BaseDocument:
             self.sheets = body.sheets
         if hasattr(body, 'pages'):
             self.pages = body.pages
+
+    def inject_style(self, stylexmlstr, where="styles.xml"):
+        style = fake_element(stylexmlstr)
+        self.styles.styles.xmlnode.append(style.xmlnode)
 
 class FlatXMLDocument(_BaseDocument):
     """ OpenDocument contained in a single XML file. """
