@@ -79,7 +79,13 @@ class Table(GenericWrapper, TableStylenNameMixin):
         return self.get_attr(CN('table:name'))
     @name.setter
     def name(self, value):
-        return self.set_attr(CN('table:name'), value)
+        return self.set_attr(CN('table:name'), self._normalize_sheet_name(value))
+
+    @staticmethod
+    def _normalize_sheet_name(name):
+        for subst in "\t\r'\"":
+            name = name.replace(subst, ' ')
+        return name.strip()
 
     @property
     def protected(self):

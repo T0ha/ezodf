@@ -71,7 +71,7 @@ Table Class
    and `size[1]` columns. Every cell contains a :class:`Cell` object, even empty
    cells (`value` and `value_type` of empty cells are `None`).
 
-   Reference cells by (row, col)-tuples or by classic spreadsheet cell references
+   Reference cells by (row, col) tuples or by classic spreadsheet cell references
    like ``'A1'``. The letters represent the column (``'A'`` = column(0), ``'B'``
    = column(1), ...), the numbers represent the row (``'1'`` = row(0), ``'2'``
    = row(1), ...).
@@ -81,7 +81,7 @@ Attributes
 
 .. attribute:: Table.name (read/write)
 
-   Specifies the name of a table, should be unique.
+   Specifies the name of the table, should be unique, and can contain spaces.
 
 .. attribute:: Table.style_name (read/write)
 
@@ -118,7 +118,7 @@ Methods
 
 .. method:: Table.reset(size=(10, 10))
 
-   Delete table-content and set new table metrics.
+   Delete table content and set new table metrics.
 
 .. method:: Table.row(index)
 

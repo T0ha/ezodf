@@ -20,6 +20,7 @@ a simple example::
     sheet['A1'].set_value("cell with text")
     sheet['B2'].set_value(3.141592)
     sheet['C3'].set_value(100, currency='USD')
+    sheet['D4'].formula = "of:=SUM([.B2];[.C3])"
     pi = sheet[1, 1].value
     ods.save()
 

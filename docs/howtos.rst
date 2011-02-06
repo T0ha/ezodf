@@ -126,10 +126,12 @@ Spreadsheet Documents
 
 ::
 
+   from ezodf import newdoc, opendoc, Sheet
+
    # create a new spreadsheet document
-   doc = ezodf.newdoc(doctype='ods', filename='spreadsheet.ods')
+   doc = newdoc(doctype='ods', filename='spreadsheet.ods')
    # or open an existing spreadsheet document
-   doc = ezodf.opendoc('spreadsheet.ods')
+   doc = opendoc('spreadsheet.ods')
 
 .. _howtos_sheets:
 

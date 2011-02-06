@@ -11,8 +11,8 @@ grid consisting of rows and columns. Each cell contains alphanumeric text, numer
 values or formulas. A formula defines how the content of that cell is to be
 calculated from the contents of any other cell (or combination of cells) each
 time any cell is updated (**ezodf** has no calculation-engine included!).
-A pseudo third dimension to the matrix is sometimes applied as another layer,
-or layers/sheets, of two-dimensional data.
+A pseudo third dimension to the matrix is sometimes applied as another sheet,
+of two-dimensional data.
 
 Document Management
 -------------------
@@ -33,11 +33,11 @@ or open an existing document::
 Sheet Management
 ----------------
 
-A spreadsheet document should contain at least one :class:`Table` object, in the
+A spreadsheet document should contain at least one :class:`Table` object. In the
 context of a spreadsheet document I use **sheet** as synonym for the :class:`Table`
-class, which manages the sheet content. These sheets are accessable by the
-:class:`Sheets` attribute of the main spreadsheet document. All sheets should
-have unique names.
+class, which manages the sheet content. These sheets are accessible by the
+:attr:`sheets` attribute (:class:`Sheets` object) of the spreadsheet document.
+All sheets names should be unique, and can contain spaces.
 
 Supported operations:
 
@@ -80,8 +80,7 @@ Sheet Content Management
 The sheet content is managed by the :class:`Table` class. You have access to
 the :class:`Cell` objects by (row, col) tuples as zero-based indices or classic
 spreadsheet references (like ``'A1'`` = (0, 0)). All getters returning :class:`Cell`
-objects or lists of :class:`Cell` objects, and all setters requires
-:class:`Cell` objects as input.
+objects or lists of :class:`Cell` objects.
 
 All indices or size tuples are zero-based and have the form (row, column).
 
@@ -110,12 +109,12 @@ get/set table data::
     cell = table[0, 0]
     cell = table['A1']
     # set as float
-    if cell.value > 100.:
-        table['A1'] = ezodf.Cell(100.)
+    if table[0, 0].value > 100.:
+        table['A1'].set_value(100.)
     # set as currency
-    table['B1'] = Cell(100, 'EUR')
+    table['B1'].set_value(100, currency='EUR')
     # set as string
-    table['C1'] = Cell('Text')
+    table['C1'].set_value('Text')
 
     # get rows/columns
     for cell in table.column(0):

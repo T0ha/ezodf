@@ -44,6 +44,18 @@ class TestTableAttributes(unittest.TestCase):
         self.assertEqual(table.name, 'TABLE')
         self.assertEqual(table.get_attr(CN('table:name')), 'TABLE', 'wrong tag name')
 
+    def test_name_with_cr_and_tabs(self):
+        table = Table('table\tname\r  ')
+        self.assertEqual(table.name, 'table name', "table name not normalized")
+
+    def test_name_with_apostroph(self):
+        table = Table('"table name"')
+        self.assertEqual(table.name, 'table name', "table name not normalized")
+
+    def test_name_with_apostroph2(self):
+        table = Table("  table'name")
+        self.assertEqual(table.name, 'table name', "table name not normalized")
+
     def test_get_style_name(self):
         table = Table()
         self.assertIsNone(table.style_name)

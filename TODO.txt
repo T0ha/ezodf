@@ -27,29 +27,40 @@ Version 0.2.2
 -------------
 
   * Alpha
-  * odp - application/vnd.oasis.opendocument.presentation
+  * odg - application/vnd.oasis.opendocument.graphics
 
 Version 0.2.3
 -------------
 
   * Alpha
-  * odg - application/vnd.oasis.opendocument.graphics
+  * odp - application/vnd.oasis.opendocument.presentation
 
 Version 0.2.4
 -------------
 
-  * Alpha
-  * odc - application/vnd.oasis.opendocument.chart
+  * Beta
+  * basic style management
 
 Version 0.2.5
 -------------
 
-  * Alpha
+  * Beta
+  * odc - application/vnd.oasis.opendocument.chart
+
+Version 0.2.6
+-------------
+
+  * Beta
   * odf - application/vnd.oasis.opendocument.formula
 
 Version 0.3.0
 -------------
 
-  * Beta
-  * basic style management
+  * Release
+
+Version 0.3.1
+-------------
+
+  * refinements
+  * bugfixes
 
