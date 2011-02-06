@@ -129,6 +129,9 @@ TABLE_10x10 = """
 """
 
 class TestRowManagement(unittest.TestCase):
+    def getvalue(self, pos):
+        return getdata(self.container.get_cell(pos))
+
     def setUp(self):
         self.container = TableRowContainer(etree.XML(TABLE_10x10))
         for row in range(10):
@@ -136,19 +139,23 @@ class TestRowManagement(unittest.TestCase):
             invoke_cache = self.container.get_cell((row, 0))
 
     def test_metrics(self):
-        self.assertEqual(self.container.nrows(), 10)
-        self.assertEqual(self.container.ncols(), 10)
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(10, self.container.nrows(), "expected 10 rows")
+        self.assertEqual(10, self.container.ncols(), "expected 10 columns")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_append_one_row(self):
         self.container.append_rows(1)
-        self.assertEqual(self.container.nrows(), 11)
-        self.assertTrue(self.container.is_consistent())
+
+        self.assertEqual(11, self.container.nrows(), "expected 11 rows")
+        self.assertEqual('checkmark9', self.getvalue((9, 0)), "new rows not appended, row 9 is corrupt!")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_append_two_rows(self):
         self.container.append_rows(2)
-        self.assertEqual(self.container.nrows(), 12)
-        self.assertTrue(self.container.is_consistent())
+
+        self.assertEqual(12, self.container.nrows(), "expected 12 rows")
+        self.assertEqual('checkmark9', self.getvalue((9, 0)), "new rows not appended, row 9 is corrupt!")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_append_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -168,10 +175,10 @@ class TestRowManagement(unittest.TestCase):
 
     def chk_insert_one_row(self):
         self.assertEqual(self.container.nrows(), 11)
-        self.assertEqual(getdata(self.container.get_cell((4, 0))), 'checkmark4')
-        self.assertIsNone(getdata(self.container.get_cell((5, 0))))
-        self.assertEqual(getdata(self.container.get_cell((6, 0))), 'checkmark5')
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual('checkmark4', self.getvalue((4, 0)), "expected checkmark4 in row 4")
+        self.assertIsNone(self.getvalue((5, 0)), "expected None in row 5")
+        self.assertEqual('checkmark5', self.getvalue((6, 0)), "expected checkmark5 in row 6")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
 
     def test_insert_two_rows(self):
@@ -183,12 +190,11 @@ class TestRowManagement(unittest.TestCase):
         self.chk_insert_two_rows()
 
     def chk_insert_two_rows(self):
-        self.assertEqual(self.container.nrows(), 12)
-        self.assertEqual(getdata(self.container.get_cell((4, 0))), 'checkmark4')
-        self.assertIsNone(getdata(self.container.get_cell((5, 0))))
-        self.assertIsNone(getdata(self.container.get_cell((6, 0))))
-        self.assertEqual(getdata(self.container.get_cell((7, 0))), 'checkmark5')
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(12, self.container.nrows(), "expected 12 rows")
+        self.assertEqual('checkmark4', self.getvalue((4, 0)), "expected checkmark4 in row 4")
+        self.assertIsNone(self.getvalue((5, 0)), "expected None in row 5")
+        self.assertIsNone(self.getvalue((6, 0)), "expected None in row 6")
+        self.assertEqual('checkmark5', self.getvalue((7, 0)), "expected checkmark5 in row 7")
 
     def test_insert_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -211,10 +217,10 @@ class TestRowManagement(unittest.TestCase):
         self.chk_delete_one_row()
 
     def chk_delete_one_row(self):
-        self.assertEqual(self.container.nrows(), 9)
-        self.assertEqual(getdata(self.container.get_cell((4, 0))), 'checkmark4')
-        self.assertEqual(getdata(self.container.get_cell((5, 0))), 'checkmark6')
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(9, self.container.nrows(), "expected 9 rows")
+        self.assertEqual('checkmark4', self.getvalue((4, 0)), "expected checkmark4 in row 4")
+        self.assertEqual('checkmark6', self.getvalue((5, 0)), "expected checkmark6 in row 5")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_delete_two_rows(self):
         self.container.delete_rows(index=5, count=2)
@@ -225,15 +231,15 @@ class TestRowManagement(unittest.TestCase):
         self.chk_delete_two_rows()
 
     def chk_delete_two_rows(self):
-        self.assertEqual(self.container.nrows(), 8)
-        self.assertEqual(getdata(self.container.get_cell((4, 0))), 'checkmark4')
-        self.assertEqual(getdata(self.container.get_cell((5, 0))), 'checkmark7')
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(8, self.container.nrows(), "expected 8 rows")
+        self.assertEqual('checkmark4', self.getvalue((4, 0)), "expected checkmark4 in row 4")
+        self.assertEqual('checkmark7', self.getvalue((5, 0)), "expected checkmark7 in row 5")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_delete_last_row(self):
         self.container.delete_rows(index=9)
-        self.assertEqual(self.container.nrows(), 9)
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(9, self.container.nrows(), "expected 9 rows")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_delete_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -252,6 +258,9 @@ class TestRowManagement(unittest.TestCase):
             self.container.delete_rows(9, count=2)
 
 class TestColumnManagement(unittest.TestCase):
+    def getvalue(self, pos):
+        return getdata(self.container.get_cell(pos))
+
     def setUp(self):
         self.container = TableRowContainer(etree.XML(TABLE_10x10))
         for col in range(10):
@@ -260,13 +269,15 @@ class TestColumnManagement(unittest.TestCase):
 
     def test_append_one_column(self):
         self.container.append_columns(1)
-        self.assertEqual(self.container.ncols(), 11)
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual('checkmark9', self.getvalue((0, 9)), "expected checkmark9 in col 9")
+        self.assertEqual(11, self.container.ncols(), "expected 11 columns")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_append_two_columns(self):
         self.container.append_columns(2)
-        self.assertEqual(self.container.ncols(), 12)
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual('checkmark9', self.getvalue((0, 9)), "expected checkmark9 in col 9")
+        self.assertEqual(12, self.container.ncols(), "expected 12 columns")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_append_count_zero_error(self):
         with self.assertRaises(ValueError):
@@ -285,11 +296,11 @@ class TestColumnManagement(unittest.TestCase):
         self.chk_insert_one_column()
 
     def chk_insert_one_column(self):
-        self.assertEqual(self.container.ncols(), 11)
-        self.assertEqual(getdata(self.container.get_cell((0, 4))), 'checkmark4')
-        self.assertIsNone(getdata(self.container.get_cell((0, 5))))
-        self.assertEqual(getdata(self.container.get_cell((0, 6))), 'checkmark5')
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(11, self.container.ncols(), "expected 11 columns")
+        self.assertEqual('checkmark4', self.getvalue((0, 4)), "expected checkmark4 in col 4")
+        self.assertIsNone(self.getvalue((0, 5)), "expected None in col 5")
+        self.assertEqual('checkmark5', self.getvalue((0, 6)), "expected checkmark5 in col 6")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_insert_two_columns(self):
         self.container.insert_columns(5, count=2)
@@ -300,12 +311,12 @@ class TestColumnManagement(unittest.TestCase):
         self.chk_insert_two_columns()
 
     def chk_insert_two_columns(self):
-        self.assertEqual(self.container.ncols(), 12)
-        self.assertEqual(getdata(self.container.get_cell((0, 4))), 'checkmark4')
-        self.assertIsNone(getdata(self.container.get_cell((0, 5))))
-        self.assertIsNone(getdata(self.container.get_cell((0, 6))))
-        self.assertEqual(getdata(self.container.get_cell((0, 7))), 'checkmark5')
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(12, self.container.ncols(), "expected 12 columns")
+        self.assertEqual('checkmark4', self.getvalue((0, 4)), "expected checkmark4 in col 4")
+        self.assertIsNone(self.getvalue((0, 5)), "expected None in col 5")
+        self.assertIsNone(self.getvalue((0, 6)), "expected None in col 6")
+        self.assertEqual('checkmark5', self.getvalue((0, 7)), "expected checkmark5 in col 7")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_insert_zero_cols_value_error(self):
         with self.assertRaises(ValueError):
@@ -324,10 +335,10 @@ class TestColumnManagement(unittest.TestCase):
         self.chk_delete_one_column()
 
     def chk_delete_one_column(self):
-        self.assertEqual(self.container.ncols(), 9)
-        self.assertEqual(getdata(self.container.get_cell((0, 4))), 'checkmark4')
-        self.assertEqual(getdata(self.container.get_cell((0, 5))), 'checkmark6')
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(9, self.container.ncols(), "expected 9 columns")
+        self.assertEqual('checkmark4', self.getvalue((0, 4)), "expected checkmark4 in col 4")
+        self.assertEqual('checkmark6', self.getvalue((0, 5)), "expected checkmark6 in col 5")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_delete_two_columns(self):
         self.container.delete_columns(5, count=2)
@@ -338,15 +349,15 @@ class TestColumnManagement(unittest.TestCase):
         self.chk_delete_two_columns()
 
     def chk_delete_two_columns(self):
-        self.assertEqual(self.container.ncols(), 8)
-        self.assertEqual(getdata(self.container.get_cell((0, 4))), 'checkmark4')
-        self.assertEqual(getdata(self.container.get_cell((0, 5))), 'checkmark7')
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(8, self.container.ncols(), "expected 8 columns")
+        self.assertEqual('checkmark4', self.getvalue((0, 4)), "expected checkmark4 in col 4")
+        self.assertEqual('checkmark7', self.getvalue((0, 5)), "expected checkmark7 in col 5")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_delete_last_column(self):
         self.container.delete_columns(index=9)
-        self.assertEqual(self.container.ncols(), 9)
-        self.assertTrue(self.container.is_consistent())
+        self.assertEqual(9, self.container.ncols(), "expected 9 columns")
+        self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
     def test_delete_zero_cols_value_error(self):
         with self.assertRaises(ValueError):

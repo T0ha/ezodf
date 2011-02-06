@@ -33,16 +33,16 @@ class TestTableRowManagement(unittest.TestCase):
             invoke_cache = self.cellvalue(row, 0)
 
     def test_metrics(self):
-        self.assertEqual(self.table.nrows(), 10)
-        self.assertEqual(self.table.ncols(), 10)
+        self.assertEqual(10, self.table.nrows(), "expected 10 rows")
+        self.assertEqual(10, self.table.ncols(), "expected 10 columns")
 
     def test_append_one_row(self):
         self.table.append_rows(1)
-        self.assertEqual(self.table.nrows(), 11)
+        self.assertEqual(11, self.table.nrows(), "expected 11 rows")
 
     def test_append_two_rows(self):
         self.table.append_rows(2)
-        self.assertEqual(self.table.nrows(), 12)
+        self.assertEqual(12, self.table.nrows(), "expected 12 rows")
 
     def test_append_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -61,10 +61,10 @@ class TestTableRowManagement(unittest.TestCase):
         self.chk_insert_one_row()
 
     def chk_insert_one_row(self):
-        self.assertEqual(self.table.nrows(), 11)
-        self.assertEqual(self.cellvalue(4, 0), 'checkmark4')
-        self.assertIsNone(self.cellvalue(5, 0))
-        self.assertEqual(self.cellvalue(6, 0), 'checkmark5')
+        self.assertEqual(11, self.table.nrows(), "expected 11 rows")
+        self.assertEqual('checkmark4', self.cellvalue(4, 0), "expected checkmark4 in row 4")
+        self.assertIsNone(self.cellvalue(5, 0), "expected None in row 5")
+        self.assertEqual('checkmark5', self.cellvalue(6, 0), "expected checkmark5 in row 6")
 
     def test_insert_two_rows(self):
         self.table.insert_rows(index=5, count=2)
@@ -75,11 +75,11 @@ class TestTableRowManagement(unittest.TestCase):
         self.chk_insert_two_rows()
 
     def chk_insert_two_rows(self):
-        self.assertEqual(self.table.nrows(), 12)
-        self.assertEqual(self.cellvalue(4, 0), 'checkmark4')
+        self.assertEqual(12, self.table.nrows(), "expected 12 rows")
+        self.assertEqual('checkmark4', self.cellvalue(4, 0), "expected checkmark4 in row 4")
         self.assertIsNone(self.cellvalue(5, 0))
         self.assertIsNone(self.cellvalue(6, 0))
-        self.assertEqual(self.cellvalue(7, 0), 'checkmark5')
+        self.assertEqual('checkmark5', self.cellvalue(7, 0), "expected checkmark5 in row 7")
 
     def test_insert_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -102,9 +102,9 @@ class TestTableRowManagement(unittest.TestCase):
         self.chk_delete_one_row()
 
     def chk_delete_one_row(self):
-        self.assertEqual(self.table.nrows(), 9)
-        self.assertEqual(self.cellvalue(4, 0), 'checkmark4')
-        self.assertEqual(self.cellvalue(5, 0), 'checkmark6')
+        self.assertEqual(9, self.table.nrows(), "expected 9 rows")
+        self.assertEqual('checkmark4', self.cellvalue(4, 0), "expected checkmark4 in row 4")
+        self.assertEqual('checkmark6', self.cellvalue(5, 0), "expected checkmark6 in row 5")
 
     def test_delete_two_rows(self):
         self.table.delete_rows(index=5, count=2)
@@ -115,13 +115,13 @@ class TestTableRowManagement(unittest.TestCase):
         self.chk_delete_two_rows()
 
     def chk_delete_two_rows(self):
-        self.assertEqual(self.table.nrows(), 8)
-        self.assertEqual(self.cellvalue(4, 0), 'checkmark4')
-        self.assertEqual(self.cellvalue(5, 0), 'checkmark7')
+        self.assertEqual(8, self.table.nrows(), "expected 8 rows")
+        self.assertEqual('checkmark4', self.cellvalue(4, 0), "expected checkmark4 in row 4")
+        self.assertEqual('checkmark7', self.cellvalue(5, 0), "expected checkmark7 in row 5")
 
     def test_delete_last_row(self):
         self.table.delete_rows(index=9)
-        self.assertEqual(self.table.nrows(), 9)
+        self.assertEqual(9, self.table.nrows(), "expected 9 rows")
 
     def test_delete_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -161,13 +161,13 @@ class TestTableColumnManagement(unittest.TestCase):
 
     def test_append_one_column(self):
         self.table.append_columns(1)
-        self.assertEqual(self.table.ncols(), 11)
+        self.assertEqual(11, self.table.ncols(), "expected 11 columns")
         column_info = self.table.column_info(10)
         self.assertEqual(column_info.kind, "TableColumn")
 
     def test_append_two_columns(self):
         self.table.append_columns(2)
-        self.assertEqual(self.table.ncols(), 12)
+        self.assertEqual(12, self.table.ncols(), "expected 12 columns")
         column_info = self.table.column_info(11)
         self.assertEqual(column_info.kind, "TableColumn")
 
@@ -188,23 +188,23 @@ class TestTableColumnManagement(unittest.TestCase):
         self.chk_insert_one_column()
 
     def chk_insert_one_column(self):
-        self.assertEqual(self.table.ncols(), 11)
-        self.assertEqual(self.cellvalue(0, 4), 'checkmark4')
-        self.assertIsNone(self.cellvalue(0, 5)) # inserted
-        self.assertEqual(self.cellvalue(0, 6), 'checkmark5')
-        self.assertEqual(self.colinfo(4), 'c4')
-        self.assertEqual(self.colinfo(6), 'c5')
+        self.assertEqual(11, self.table.ncols(), "expected 11 columns")
+        self.assertEqual('checkmark4', self.cellvalue(0, 4), "expected checkmark4 in col 4")
+        self.assertIsNone(self.cellvalue(0, 5), "expected None in col 5")
+        self.assertEqual('checkmark5', self.cellvalue(0, 6), "expected checkmark5 in col 6")
+        self.assertEqual('c4', self.colinfo(4), "expected 'c4' as colinfo 4")
+        self.assertEqual('c5', self.colinfo(6), "expected 'c5' as colinfo 6")
 
     def test_insert_two_columns(self):
         self.table.insert_columns(5, count=2)
 
-        self.assertEqual(self.table.ncols(), 12)
-        self.assertEqual(self.cellvalue(0, 4), 'checkmark4')
-        self.assertIsNone(self.cellvalue(0, 5)) # inserted
-        self.assertIsNone(self.cellvalue(0, 6)) # inserted
-        self.assertEqual(self.cellvalue(0, 7), 'checkmark5')
-        self.assertEqual(self.colinfo(4), 'c4')
-        self.assertEqual(self.colinfo(7), 'c5')
+        self.assertEqual(12, self.table.ncols(), "expected 12 columns")
+        self.assertEqual('checkmark4', self.cellvalue(0, 4), "expected checkmark4 in col 4")
+        self.assertIsNone(self.cellvalue(0, 5), "expected None in col 5")
+        self.assertIsNone(self.cellvalue(0, 6), "expected None in col 6")
+        self.assertEqual('checkmark5', self.cellvalue(0, 7), "expected checkmark5 in col 7")
+        self.assertEqual(self.colinfo(4), 'c4', "expected 'c4' as colinfo 4")
+        self.assertEqual(self.colinfo(7), 'c5', "expected 'c5' as colinfo 7")
 
     def test_insert_zero_cols_value_error(self):
         with self.assertRaises(ValueError):
@@ -223,11 +223,11 @@ class TestTableColumnManagement(unittest.TestCase):
         self.chk_delete_one_column()
 
     def chk_delete_one_column(self):
-        self.assertEqual(self.table.ncols(), 9)
-        self.assertEqual(self.cellvalue(0, 4), 'checkmark4')
-        self.assertEqual(self.cellvalue(0, 5), 'checkmark6')
-        self.assertEqual(self.colinfo(4), 'c4')
-        self.assertEqual(self.colinfo(5), 'c6')
+        self.assertEqual(9, self.table.ncols(), "expected 9 columns")
+        self.assertEqual('checkmark4', self.cellvalue(0, 4), "expected checkmark4 in col 4")
+        self.assertEqual('checkmark6', self.cellvalue(0, 5), "expected checkmark6 in col 5")
+        self.assertEqual(self.colinfo(4), 'c4', "expected 'c4' as colinfo 4")
+        self.assertEqual(self.colinfo(5), 'c6', "expected 'c6' as colinfo 5")
 
     def test_delete_two_columns(self):
         self.table.delete_columns(5, count=2)
@@ -238,16 +238,15 @@ class TestTableColumnManagement(unittest.TestCase):
         self.chk_delete_two_columns()
 
     def chk_delete_two_columns(self):
-        self.assertEqual(self.table.ncols(), 8)
-        self.assertEqual(self.cellvalue(0, 4), 'checkmark4')
-        self.assertEqual(self.cellvalue(0, 5), 'checkmark7')
-        self.assertEqual(self.colinfo(4), 'c4')
-        self.assertEqual(self.colinfo(5), 'c7')
-
+        self.assertEqual(8, self.table.ncols(), "expected 8 columns")
+        self.assertEqual('checkmark4', self.cellvalue(0, 4), "expected checkmark4 in col 4")
+        self.assertEqual('checkmark7', self.cellvalue(0, 5), "expected checkmark7 in col 5")
+        self.assertEqual('c4', self.colinfo(4), "expected 'c4' as colinfo 4")
+        self.assertEqual('c7', self.colinfo(5), "expected 'c7' as colinfo 5")
 
     def test_delete_last_column(self):
         self.table.delete_columns(index=9)
-        self.assertEqual(self.table.ncols(), 9)
+        self.assertEqual(9, self.table.ncols(), "expected 9 columns")
 
     def test_delete_zero_cols_value_error(self):
         with self.assertRaises(ValueError):
