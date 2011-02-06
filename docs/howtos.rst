@@ -249,7 +249,7 @@ Inserting new empty rows/columns at position `index`::
    sheet.insert_rows(index=3, count=2)
    sheet.insert_columns(index=3, count=2)
 
-**How to delete new rows/columns?**
+**How to delete rows/columns?**
 
 .. warning::
 
@@ -273,7 +273,7 @@ Managing Sheet Content
 
 **How to reference cells?**
 
-Cells are reference by a (row, column) tuple or by classsic spreadsheet
+Cells are referenced by a (row, column) tuple or by classsic spreadsheet
 references like ``'A1'`` for cell (0, 0), letters stands for
 columns, numbers stands for rows, and as you see the row/column index is zero-based,
 where classic references start with row = ``'1'`` and column = ``'A'``.
@@ -308,7 +308,7 @@ The cell content is manged by the :class:`Cell` class::
    sheet['A1'].set_value('2011-02-05T09:24:00', 'date') # /w time
 
    # setting a time-period 1:10:05
-   sheet['A1'].set_value('PT01H10M05,0000S', 'date')
+   sheet['A1'].set_value('PT01H10M05,0000S', 'time')
 
 to convert date/timeperiod values see :class:`TimeParser` class. Here just a few
 examples::

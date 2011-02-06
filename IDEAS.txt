@@ -25,3 +25,24 @@ options:
 - ignore hidden data
 - ignore incomplete rows/columns
 - autodetect harvest ranges
+
+FormulaBuilder
+~~~~~~~~~~~~~~
+
+from formulatools import cref, cfunc
+
+cref('A1') => ".A1"
+cref('A1', 'Sheet2') => "Sheet2.A1"
+cref('A1', 'Sheet Two') => "'Sheet Two'.A1"
+
+A1 = cref('A1', 'Sheet2')
+A10 = cref('A10', 'Sheet2')
+
+crange = "[{0}:{1}]".format(A1, A10)
+
+fstr = "of:=%s" % cfunc('SUM', crange, '[.B1]', '[.B2]')
+
+=> "of:=SUM([Sheet2.A1:Sheet2.A10];[.B1];[.B2])"
+
+cref: ok, for sheetnames with and without spaces
+cfunc: NOT necessary, write a good tutorial for formula writing
