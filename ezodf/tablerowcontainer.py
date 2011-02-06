@@ -11,23 +11,6 @@ import copy
 from .xmlns import CN, etree
 from .nodestructuretags import TABLE_ROWS
 
-def get_columns_repeated(xmlnode):
-    count = xmlnode.get(CN('table:number-columns-repeated'))
-    return 1 if count is None else int(count)
-
-def del_columns_repeated(xmlnode):
-    del xmlnode.attrib[CN('table:number-columns-repeated')]
-
-def get_rows_repeated(xmlnode):
-    count = xmlnode.get(CN('table:number-rows-repeated'))
-    return 1 if count is None else int(count)
-
-def del_rows_repeated(xmlnode):
-    del xmlnode.attrib[CN('table:number-rows-repeated')]
-
-def new_empty_cell():
-    return etree.Element(CN('table:table-cell'))
-
 class TableRowContainer:
     def __init__(self, xmlnode):
         if xmlnode is None or xmlnode.tag != CN('table:table'):
@@ -37,10 +20,11 @@ class TableRowContainer:
 
     def buildup(self):
         self._expand_repeated_table_content()
+        self._align_table_rows()
         self.update()
 
     def update(self):
-        self._rows = self.xmlnode.findall('.//'+CN('table:table-row'))
+        self._rows = get_table_rows(self.xmlnode)
 
     def reset(self, size):
         def validate_parameter(nrows, ncols):
@@ -70,28 +54,12 @@ class TableRowContainer:
                 self.xmlnode.remove(child)
 
     def _expand_repeated_table_content(self):
-        def expand_element(count, xmlnode):
-            while count > 1:
-                clone = copy.deepcopy(xmlnode)
-                xmlnode.addnext(clone)
-                count -= 1
+        expand_repeated_table_content(self.xmlnode)
 
-        def expand_cells(xmlrow):
-            for cell in xmlrow.getchildren():
-                count = get_columns_repeated(cell)
-                if count > 1:
-                    del_columns_repeated(cell)
-                    expand_element(count, cell)
-
-        def expand_row(xmlrow):
-            count = get_rows_repeated(xmlrow)
-            del_rows_repeated(xmlrow)
-            expand_element(count, xmlrow)
-
-        for xmlrow in self.xmlnode.findall('.//'+CN('table:table-row')):
-            expand_cells(xmlrow)
-            if get_rows_repeated(xmlrow) > 1:
-                expand_row(xmlrow)
+    def _align_table_rows(self):
+        cmin, cmax = get_min_max_cell_count(self.xmlnode)
+        if cmin != cmax:
+            align_table_columns(self.xmlnode, cmax)
 
     def nrows(self):
         return len(self._rows)
@@ -129,7 +97,7 @@ class TableRowContainer:
 
     def is_consistent(self):
         # just for testing
-        xmlrows = self.xmlnode.findall('.//'+CN('table:table-row'))
+        xmlrows = get_table_rows(self.xmlnode)
         if len(xmlrows) != len(self._rows):
             return False
         for row1, row2 in zip(self._rows, xmlrows):
@@ -190,3 +158,69 @@ class TableRowContainer:
         for row in self._rows:
             for _ in range(count):
                 del row[index]
+
+def get_columns_repeated(xmlnode):
+    count = xmlnode.get(CN('table:number-columns-repeated'))
+    return 1 if count is None else int(count)
+
+def del_columns_repeated(xmlnode):
+    del xmlnode.attrib[CN('table:number-columns-repeated')]
+
+def get_rows_repeated(xmlnode):
+    count = xmlnode.get(CN('table:number-rows-repeated'))
+    return 1 if count is None else int(count)
+
+def del_rows_repeated(xmlnode):
+    del xmlnode.attrib[CN('table:number-rows-repeated')]
+
+def new_empty_cell():
+    return etree.Element(CN('table:table-cell'))
+
+def expand_repeated_table_content(xmltable):
+    def expand_element(xmlnode, count):
+        while count > 1:
+            clone = copy.deepcopy(xmlnode)
+            xmlnode.addnext(clone)
+            count -= 1
+
+    def expand_cell(xmlcell, count):
+        if count > 1:
+            del_columns_repeated(xmlcell)
+            expand_element(xmlcell, count)
+
+    def expand_cells(xmlrow):
+        for xmlcell in xmlrow:
+            expand_cell(xmlcell, get_columns_repeated(xmlcell))
+
+    def expand_row(xmlrow):
+        count = get_rows_repeated(xmlrow)
+        del_rows_repeated(xmlrow)
+        expand_element(xmlrow, count)
+
+    for xmlrow in get_table_rows(xmltable):
+        expand_cells(xmlrow)
+        if get_rows_repeated(xmlrow) > 1:
+            expand_row(xmlrow)
+
+def get_table_rows(xmltable):
+    return xmltable.findall('.//'+CN('table:table-row'))
+
+def count_cells_in_row(xmlrow):
+    return sum( (get_columns_repeated(xmlcell) for xmlcell in xmlrow) )
+
+def get_min_max_cell_count(xmltable):
+    count = [count_cells_in_row(xmlrow) for xmlrow in get_table_rows(xmltable)]
+    if len(count) > 0:
+        return min(count), max(count)
+    else:
+        return (0, 0)
+
+def align_table_rows(xmltable, required_cells_per_row):
+    def append_cells(xmlrow, count):
+        for _ in range(count):
+            xmlrow.append(new_empty_cell())
+
+    for xmlrow in get_table_rows(xmltable):
+        count = count_cells_in_row(xmlrow)
+        if count < required_cells_per_row:
+            append_cells(xmlrow, required_cells_per_row - count)
