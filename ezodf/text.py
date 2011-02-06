@@ -234,13 +234,13 @@ class List(GenericWrapper, _StyleNameMixin):
     @property
     def header(self):
         h = self.xmlnode.find(CN('text:list-header'))
-        return wrap(h) if h else None
+        return wrap(h) if h is not None else None
     @header.setter
     def header(self, header):
         if header.kind != 'ListHeader':
             raise TypeError("param 'header' is not a list header.")
         oldheader = self.xmlnode.find(CN('text:list-header'))
-        if oldheader:
+        if oldheader is not None:
             self.xmlnode.remove(oldheader)
         self.insert(0, header) # should be first child node
 
