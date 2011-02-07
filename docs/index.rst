@@ -38,6 +38,12 @@ or save it with a new name::
 
    doc.saveas('newname.ext')
 
+.. raw:: html
+
+   <a href="http://flattr.com/thing/129224/ezodf" target="_blank">
+   <img src="http://api.flattr.com/button/flattr-badge-large.png"
+   alt="Flattr this" title="Flattr this" border="0" /></a>
+
 Contents
 --------
 
@@ -56,7 +62,6 @@ Contents
    graphicsdocument.rst
    presentationdocument.rst
    howtos.rst
-
 
 Indices and tables
 ==================
