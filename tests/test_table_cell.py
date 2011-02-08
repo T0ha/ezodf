@@ -12,6 +12,7 @@ import unittest
 # trusted or separately tested modules
 from ezodf.xmlns import CN, etree, wrap
 from ezodf.text import Paragraph
+from ezodf.base import GenericWrapper
 
 # objects to test
 from ezodf.cells import Cell, CoveredCell
@@ -28,6 +29,10 @@ class TestCellAttributes(unittest.TestCase):
     def test_has_TAG(self):
         cell = Cell()
         self.assertEqual(cell.TAG, CN('table:table-cell'))
+
+    def test_constructor_with_style_name(self):
+        cell = Cell(style_name='astyle')
+        self.assertEqual('astyle', cell.style_name)
 
     def test_Cell_is_kind_of_Cell(self):
         cell = Cell()
@@ -49,6 +54,18 @@ class TestCellAttributes(unittest.TestCase):
         cell._set_covered(True)
         self.assertTrue(cell.covered)
         self.assertEqual(cell.TAG, CoveredCell.TAG)
+        self.assertEqual('Cell', cell.kind)
+
+    def test_covered_cell_is_kind_cell(self):
+        covered_cell = CoveredCell()
+        self.assertEqual('Cell', covered_cell.kind)
+
+    def test_cover_cell_and_remove_unwanted_tags(self):
+        cell = Cell()
+        cell._set_span((2, 2))
+        cell._set_covered(True)
+        self.assertIsNone(cell.get_attr(CN('table:number-rows-spanned')))
+        self.assertIsNone(cell.get_attr(CN('table:number-colums-spanned')))
 
     def test_has_xmlnode(self):
         cell = Cell()
@@ -99,6 +116,10 @@ class TestCellAttributes(unittest.TestCase):
         cell.set_value(100.)
         cell.display_form = "100,00"
         self.assertEqual(cell.plaintext(), "100,00")
+
+    def test_get_display_form(self):
+        cell = Cell('text')
+        self.assertEqual('text', cell.display_form)
 
     def test_replace_display_form(self):
         cell = Cell()
@@ -219,6 +240,12 @@ class TestCellContent(unittest.TestCase):
         self.assertEqual(cell.plaintext(), 'test1\ntest2')
         self.assertEqual(cell.value, 'test1\ntest2')
 
+    def test_replace_two_paragraphs_by_new_string(self):
+        cell = Cell('test1')
+        cell.append(Paragraph('test2'))
+        cell.set_value('new content')
+        self.assertEqual('new content', cell.value)
+
     def test_append_text_error(self):
         cell = Cell(1.)
         with self.assertRaises(TypeError):
@@ -282,6 +309,11 @@ class TestCellContent(unittest.TestCase):
         cell = Cell()
         with self.assertRaises(ValueError):
             cell.set_value(None)
+
+    def test_error_set_invalid_odf_object(self):
+        cell = Cell()
+        with self.assertRaises(ValueError):
+            cell.set_value(GenericWrapper())
 
     def test_set_time_value(self):
         cell = Cell()

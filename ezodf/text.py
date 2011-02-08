@@ -207,6 +207,9 @@ class ListHeader(GenericWrapper):
             if text:
                 self.append(Paragraph(text))
 
+    def plaintext(self):
+        return '\n'.join([e.plaintext() for e in iter(self)])
+
 
 @register_class
 class ListItem(ListHeader, _NumberingMixin):

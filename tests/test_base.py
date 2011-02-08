@@ -39,26 +39,26 @@ SPAN3
 class TestBaseClass(unittest.TestCase):
     def test_bare_init(self):
         b = GenericWrapper()
-        self.assertEqual(b.xmlnode.tag, 'GenericWrapper')
+        self.assertEqual('GenericWrapper', b.xmlnode.tag, "expected tag is 'GenericWrapper'")
 
     def test_init_xmlroot(self):
         node = etree.Element('GenericWrapper', test="GenericWrapper")
         b = GenericWrapper(xmlnode=node)
-        self.assertEqual(b.xmlnode.tag, 'GenericWrapper')
-        self.assertEqual(b.xmlnode.get('test'), "GenericWrapper")
+        self.assertEqual('GenericWrapper', b.xmlnode.tag, "expected tag is 'GenericWrapper'")
+        self.assertEqual('GenericWrapper', b.xmlnode.get('test'), "expected attribute test is 'GenericWrapper'")
 
     def test_len(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
-        self.assertEqual(len(b), 4)
+        self.assertEqual(4, len(b), "expected len is 4")
 
     def test_getattr(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
-        self.assertEqual(b.get_attr('name'), 'root')
+        self.assertEqual('root', b.get_attr('name'), "expected attribute name is 'root'")
 
     def test_setattr(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         b.set_attr('name', 'xxx')
-        self.assertEqual(b.xmlnode.get('name'), 'xxx')
+        self.assertEqual('xxx', b.xmlnode.get('name'), "expected attribute name is 'xxx'")
 
     def test_setattr_None_error(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
@@ -74,19 +74,19 @@ class TestBaseClass(unittest.TestCase):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         for pos, e in enumerate(b):
             self.assertTrue(isinstance(e, GenericWrapper))
-            self.assertEqual(int(e.get_attr('pos')), pos)
+            self.assertEqual(pos, int(e.get_attr('pos')))
 
     def test_get(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         for x in range(4):
             e = b.get_child(x)
-            self.assertEqual(int(e.get_attr('pos')), x)
+            self.assertEqual(x, int(e.get_attr('pos')))
 
     def test_getitem(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         for x in range(4):
             e = b[x]
-            self.assertEqual(int(e.get_attr('pos')), x)
+            self.assertEqual(x, int(e.get_attr('pos')))
 
     def test_getitem_index_error(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
@@ -194,7 +194,7 @@ class TestBaseClass(unittest.TestCase):
     def test_get_root_None(self):
         b = GenericWrapper()
         b.xmlnode = None
-        self.assertIsNone(b.get_xmlroot())
+        self.assertIsNone(b.get_xmlroot(), "expected xmlroot is None")
 
     def test_get_root_no_children(self):
         b = GenericWrapper()
@@ -205,6 +205,24 @@ class TestBaseClass(unittest.TestCase):
         first_child = b[0]
         xmlroot = first_child.get_xmlroot()
         self.assertEqual(xmlroot.get('name'), 'root')
+
+    def test_textlen_for_no_text(self):
+        b = GenericWrapper()
+        self.assertEqual(0, b.textlen, "expected textlen == 0")
+
+    def test_textlen(self):
+        b = GenericWrapper()
+        b .text = "text"
+        self.assertEqual(4, b.textlen, "expected textlen == 4")
+
+    def test_plaintext(self):
+        b = GenericWrapper()
+        b .text = "text"
+        self.assertEqual('text', b.plaintext())
+
+    def test_plaintext_for_no_text(self):
+        b = GenericWrapper()
+        self.assertEqual('', b.plaintext())
 
 if __name__=='__main__':
     unittest.main()

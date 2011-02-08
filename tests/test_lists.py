@@ -11,72 +11,81 @@ import sys
 import unittest
 
 # trusted or separately tested modules
-from ezodf.xmlns import etree, CN
+from ezodf.text import Paragraph
 
 from ezodf.text import List, ListItem, ListHeader
 from ezodf import ezlist
 
 class TestList(unittest.TestCase):
+    def setUp(self):
+        self.alist = List()
+
     def test_init(self):
-        l = List()
-        self.assertIsNotNone(l)
+        self.assertIsNotNone(self.alist, 'got no list')
 
     def test_init_style_name(self):
-        l = List(style_name='test')
-        self.assertEqual(l.style_name, 'test')
+        alist = List(style_name='test')
+        self.assertEqual('test', alist.style_name, "style_name not set on __init__()")
 
     def test_unset_continue_numbering(self):
-        l = List()
-        self.assertFalse(l.continue_numbering)
+        self.assertFalse(self.alist.continue_numbering, "wrong init value for: continue_numbering")
 
     def test_continue_numbering_true(self):
-        l = List()
-        l.continue_numbering = True
-        self.assertTrue(l.continue_numbering)
+        self.alist.continue_numbering = True
+        self.assertTrue(self.alist.continue_numbering, "wrong value for: continue_numbering")
 
     def test_continue_numbering_false(self):
-        l = List()
-        l.continue_numbering = False
-        self.assertFalse(l.continue_numbering)
+        self.alist.continue_numbering = False
+        self.assertFalse(self.alist.continue_numbering, "wrong value for: continue_numbering")
 
     def test_unset_header(self):
-        l = List()
-        self.assertFalse(l.header)
+        self.assertIsNone(self.alist.header, "init value of header in not None")
 
     def test_new_header(self):
-        l = List()
-        l.header = ListHeader('head')
-        self.assertEqual(l.header[0].plaintext(), 'head')
+        self.alist.header = ListHeader('head')
+        self.assertEqual('head', self.alist.header.plaintext(), "wrong content for: header")
 
     def test_replace_header(self):
-        l = List()
-        l.header = ListHeader('tail')
-        self.assertEqual(l.header[0].plaintext(), 'tail')
-        l.header = ListHeader('head')
-        self.assertEqual(l.header[0].plaintext(), 'head')
+        self.alist.header = ListHeader('tail')
+        self.assertEqual('tail', self.alist.header.plaintext(), "expected: 'tail'")
+        self.alist.header = ListHeader('head')
+        self.assertEqual('head', self.alist.header.plaintext(), "expected: 'head'")
 
     def test_iter_items(self):
         items = ['Item1', 'Item2', 'Item3']
-        l = ezlist(items)
-        for item, result in zip(l.iteritems(), items):
-            p = item[0]
-            self.assertEqual(p.plaintext(), result)
+        alist = ezlist(items)
+        for expected, item in zip(items, alist.iteritems()):
+            self.assertEqual(expected, item.plaintext(), "expected item: %s" % expected)
 
 
 class TestListItem(unittest.TestCase):
-    def test_init(self):
-        h = ListHeader('text')
-        # append 'text' as first subelement
-        p = h[0]
-        self.assertEqual(p.kind, 'Paragraph')
+    def test_constructor(self):
+        item = ListItem('text')
+        self.assertEqual('text', item.plaintext(), "wrong item content")
+
+    def test_plainttext_with_two_paragraphs_as_header(self):
+        item = ListItem('paragraph1')
+        item += Paragraph('paragraph2')
+        self.assertEqual('paragraph1\nparagraph2', item.plaintext(), "wrong item content")
+
 
 class TestListHeader(unittest.TestCase):
-    def test_init(self):
-        h = ListHeader('text')
-        # append 'text' as first subelement
-        p = h[0]
-        self.assertEqual(p.kind, 'Paragraph')
+    def test_constructor_and_plaintext(self):
+        header = ListHeader('text')
+        self.assertEqual('text', header.plaintext(), "wrong header content")
 
+    def test_plainttext_with_two_paragraphs_as_header(self):
+        header = ListHeader('paragraph1')
+        header += Paragraph('paragraph2')
+        self.assertEqual('paragraph1\nparagraph2', header.plaintext(), "wrong header content")
+
+
+class TestEzList(unittest.TestCase):
+    def test_with_header(self):
+        alist = ezlist(['1', '2', '3'], header='head')
+        self.assertEqual(4, len(alist), "wrong list child count")
+        header = alist.header
+        self.assertEqual('head', header.plaintext(), "wrong header content")
 
 if __name__=='__main__':
     unittest.main()

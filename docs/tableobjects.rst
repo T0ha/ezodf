@@ -331,6 +331,9 @@ Attributes
 TableColumn Class
 -----------------
 
+Attributes
+~~~~~~~~~~
+
 .. class:: TableColumn
 
 .. attribute:: TableColumn.style_name (read/write)

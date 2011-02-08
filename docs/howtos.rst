@@ -111,8 +111,8 @@ Add :class:`~whitespaces.SoftPageBreak` object to heading or paragraph::
 
 **How to create a simple list?**
 
-Use the :func:`ezodf.ezlist` function, creates unnumbered lists as default, use
-the `style_name` parameter to assign an new list-style::
+Use the :func:`ezodf.ezlist` function, creates an unnumbered list as default, use
+the `style_name` parameter to use a different list-style::
 
    ulist = ezodf.ezlist(['Point 1', 'Point 2', 'Point 3'])
    doc.body.append(ulist)
@@ -141,7 +141,7 @@ Managing Sheets
 **How to add a new sheet?**
 
 Sheets are :class:`Sheet` objects and resides in the :attr:`sheets` attribute
-of the document::
+of the spreadsheet-document::
 
    # append new sheets at the end of the document
    doc.sheets += Sheet('ANewSheet')
