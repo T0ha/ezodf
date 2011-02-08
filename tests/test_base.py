@@ -36,6 +36,7 @@ SPAN3
 </text:span>
 </text:p>
 """
+
 class TestBaseClass(unittest.TestCase):
     def test_bare_init(self):
         b = GenericWrapper()
@@ -53,12 +54,12 @@ class TestBaseClass(unittest.TestCase):
 
     def test_getattr(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
-        self.assertEqual('root', b.get_attr('name'), "expected attribute name is 'root'")
+        self.assertEqual('root', b.get_attr('name'))
 
     def test_setattr(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         b.set_attr('name', 'xxx')
-        self.assertEqual('xxx', b.xmlnode.get('name'), "expected attribute name is 'xxx'")
+        self.assertEqual('xxx', b.xmlnode.get('name'))
 
     def test_setattr_None_error(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
@@ -103,8 +104,8 @@ class TestBaseClass(unittest.TestCase):
         newitem = GenericWrapper()
         newitem.set_attr('name', 'newitem')
         b[1] = newitem
-        self.assertEqual(b[1].get_attr('name'), 'newitem')
-        self.assertEqual(len(b), 4)
+        self.assertEqual('newitem', b[1].get_attr('name'))
+        self.assertEqual(4, len(b))
 
     def test_setitem_index_error(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
@@ -116,7 +117,7 @@ class TestBaseClass(unittest.TestCase):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         del b[0]
         self.assertEqual(len(b), 3)
-        self.assertEqual(int(b[0].get_attr('pos')), 1)
+        self.assertEqual(1, int(b[0].get_attr('pos')))
 
     def test_delitem_index_error(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
@@ -129,7 +130,7 @@ class TestBaseClass(unittest.TestCase):
         newitem = GenericWrapper()
         newitem.set_attr('name', 'newitem')
         b.append(newitem)
-        self.assertEqual(b[pos].get_attr('name'), 'newitem')
+        self.assertEqual('newitem', b[pos].get_attr('name'))
 
     def test_iadd(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
@@ -137,40 +138,40 @@ class TestBaseClass(unittest.TestCase):
         newitem = GenericWrapper()
         newitem.set_attr('name', 'newitem')
         b += newitem
-        self.assertEqual(b[pos].get_attr('name'), 'newitem')
+        self.assertEqual('newitem', b[pos].get_attr('name'))
 
     def test_insert_before(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         newitem = GenericWrapper()
         newitem.set_attr('name', 'newitem')
         b.insert_before(b[2], newitem)
-        self.assertEqual(b[2].get_attr('name'), 'newitem')
+        self.assertEqual('newitem', b[2].get_attr('name'))
 
     def test_remove(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         b.remove(b[2])
-        self.assertEqual(len(b), 3)
-        self.assertEqual(b[2].get_attr('pos'), '3')
+        self.assertEqual(3, len(b))
+        self.assertEqual('3', b[2].get_attr('pos'))
 
     def test_findall_All(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         result = list(b.findall(GenericWrapper.TAG))
-        self.assertEqual(len(result), 4)
+        self.assertEqual(4, len(result))
 
     def test_findall_None(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         result = list(b.findall(CN('text:p')))
-        self.assertEqual(len(result), 0)
+        self.assertEqual(0, len(result))
 
     def test_findall_subelements(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA2))
         subelements = list(b.findall(CN('text:span')))
-        self.assertEqual(len(subelements), 2)
+        self.assertEqual(2, len(subelements))
 
     def test_find(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
         first_element = b.find(GenericWrapper.TAG)
-        self.assertEqual(first_element.get_attr('pos'), '0')
+        self.assertEqual('0', first_element.get_attr('pos'))
 
     def test_find_None(self):
         b = GenericWrapper(xmlnode=etree.fromstring(DATA1))
@@ -208,12 +209,12 @@ class TestBaseClass(unittest.TestCase):
 
     def test_textlen_for_no_text(self):
         b = GenericWrapper()
-        self.assertEqual(0, b.textlen, "expected textlen == 0")
+        self.assertEqual(0, b.textlen)
 
     def test_textlen(self):
         b = GenericWrapper()
         b .text = "text"
-        self.assertEqual(4, b.textlen, "expected textlen == 4")
+        self.assertEqual(4, b.textlen)
 
     def test_plaintext(self):
         b = GenericWrapper()

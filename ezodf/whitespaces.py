@@ -58,6 +58,7 @@ class Spaces(Tabulator):
 @register_class
 class SoftPageBreak(Tabulator):
     TAG = CN('text:soft-page-break')
+    @property
     def textlen(self):
         return 0
 

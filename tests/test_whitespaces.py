@@ -14,7 +14,7 @@ import unittest
 from ezodf.xmlns import CN, etree
 
 # objects to test
-from ezodf.whitespaces import Spaces, Tabulator, LineBreak
+from ezodf.whitespaces import Spaces, Tabulator, LineBreak, SoftPageBreak
 from ezodf.whitespaces import encode_whitespaces, decode_whitespaces
 
 class TestSpaces(unittest.TestCase):
@@ -202,6 +202,15 @@ class TestEncodeDecode(unittest.TestCase):
         self.assertEqual(result[3].count, 4)
         self.assertEqual(result[4].TAG, CN('text:line-break'))
         self.assertEqual(decode_whitespaces(result), txt)
+
+class TestSoftPageBreak(unittest.TestCase):
+    def test_textlen(self):
+        br = SoftPageBreak()
+        self.assertEqual(0, br.textlen)
+
+    def test_plaintext(self):
+        br = SoftPageBreak()
+        self.assertEqual('', br.plaintext())
 
 if __name__=='__main__':
     unittest.main()

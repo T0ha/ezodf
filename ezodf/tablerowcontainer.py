@@ -13,7 +13,7 @@ from .nodestructuretags import TABLE_ROWS
 
 class TableRowContainer:
     def __init__(self, xmlnode):
-        if xmlnode is None or xmlnode.tag != CN('table:table'):
+        if (xmlnode is None) or (xmlnode.tag != CN('table:table')):
             raise ValueError('invalid xmlnode')
         self.xmlnode = xmlnode
         self.buildup()

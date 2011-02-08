@@ -52,25 +52,33 @@ class TestTableRowContainer(unittest.TestCase):
         table = etree.Element(CN('table:table'))
         self.container = TableRowContainer(table)
 
+    def test_init_None_error(self):
+        with self.assertRaises(ValueError):
+            TableRowContainer(xmlnode=None)
+
+    def test_init_node_error(self):
+        with self.assertRaises(ValueError):
+            TableRowContainer(xmlnode=etree.Element(CN('error')))
+
     def test_init_size(self):
         self.container.reset(size=(10, 20))
-        self.assertEqual(self.container.nrows(), 10)
-        self.assertEqual(self.container.ncols(), 20)
+        self.assertEqual(10, self.container.nrows())
+        self.assertEqual(20, self.container.ncols())
 
     def test_uncompressed_content(self):
         container = TableRowContainer(etree.XML(TABLE_5x3))
-        self.assertEqual(container.nrows(), 5)
-        self.assertEqual(container.ncols(), 3)
+        self.assertEqual(5, container.nrows())
+        self.assertEqual(3, container.ncols())
 
     def test_expand_content(self):
         container = TableRowContainer(etree.XML(TABLE_REP_7x7))
-        self.assertEqual(container.nrows(), 7)
-        self.assertEqual(container.ncols(), 7)
+        self.assertEqual(7, container.nrows())
+        self.assertEqual(7, container.ncols())
 
     def test_get_cell(self):
         self.container.reset(size=(10, 10))
         element = self.container.get_cell((3, 3))
-        self.assertEqual(element.tag, CN('table:table-cell'))
+        self.assertEqual(CN('table:table-cell'), element.tag)
 
     def test_get_set_value(self):
         self.container.reset(size=(10, 10))
@@ -101,7 +109,13 @@ class TestTableRowContainer(unittest.TestCase):
     def test_get_table_row(self):
         self.container.reset(size=(10, 10))
         table_row = self.container.get_table_row(0)
-        self.assertEqual(table_row.tag, CN('table:table-row'))
+        self.assertEqual(CN('table:table-row'), table_row.tag)
+
+    def test_is_not_consistent(self):
+        self.container.reset(size=(10, 10))
+        self.container._rows[0] = None # white box test
+        self.assertFalse(self.container.is_consistent())
+
 
 class TestTableRowContainer_GetRowColumns(unittest.TestCase):
     def test_get_row(self):

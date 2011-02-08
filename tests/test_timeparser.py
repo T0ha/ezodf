@@ -64,6 +64,10 @@ class TestDurationParser(unittest.TestCase):
         expected = timedelta(hours=2, minutes=5)
         self.assertEqual(result, expected)
 
+    def test_parse_error(self):
+        with self.assertRaises(ValueError):
+            TimeParser.duration_parser("T02H05M")
+
 class TestDurationToString(unittest.TestCase):
     def test_just_days(self):
         result = TimeParser.duration_to_string(timedelta(days=7))
