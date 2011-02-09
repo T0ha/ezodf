@@ -47,35 +47,36 @@ class TestManifest(unittest.TestCase):
 
     def test_add_file(self):
         manifest = Manifest()
-        manifest.add('test.xml', 'text/xml')
+        manifest.add('test.xml', 'text/xml', '1.1')
         result = manifest.tobytes()
         self.assertEqual(result,
             b'<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">'\
                 b'<manifest:file-entry '\
                 b'manifest:full-path="test.xml" '\
-                b'manifest:media-type="text/xml"/>'\
+                b'manifest:media-type="text/xml" '\
+                b'manifest:version="1.1"/>'\
             b'</manifest:manifest>')
 
     def test_query_file(self):
         XML = '{urn:oasis:names:tc:opendocument:xmlns:manifest:1.0}'
         manifest = Manifest(testdata)
         rootfile = manifest.find('/')
-        self.assertEqual(rootfile.get(XML+'media-type'), 'application/vnd.oasis.opendocument.text')
+        self.assertEqual('application/vnd.oasis.opendocument.text', rootfile.get(XML+'media-type'))
         rdf = manifest.find('manifest.rdf')
-        self.assertEqual(rdf.get(XML+'media-type'), 'application/rdf+xml')
+        self.assertEqual('application/rdf+xml', rdf.get(XML+'media-type'))
 
     def test_query_file_not_found(self):
         manifest = Manifest(testdata)
         result = manifest.find('unknown.exe')
-        self.assertTrue(result is None)
+        self.assertIsNone(result)
 
     def test_remove_file(self):
         manifest = Manifest(testdata)
         result = manifest.find('/')
-        self.assertTrue(result is not None)
+        self.assertIsNotNone(result)
         manifest.remove('/')
         result = manifest.find('/')
-        self.assertTrue(result is None)
+        self.assertIsNone(result)
 
 if __name__=='__main__':
     unittest.main()

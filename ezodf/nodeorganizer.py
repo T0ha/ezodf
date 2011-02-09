@@ -19,18 +19,19 @@ class PreludeEpilogueOrganizer:
         self.epilogue_tags = epilogue_tags
 
     def reorder(self, xmlnode):
+        def insert_prelude_nodes(nodes):
+            for node in reversed(nodes):
+                xmlnode.insert(0, node)
+
+        def append_epilogue_nodes(nodes):
+            xmlnode.extend(epilogue_nodes)
+
         if len(xmlnode) < 2:
             return
-
-        nodes = xmlnode.getchildren()
-
         prelude_nodes = self._extract_nodes(xmlnode, self.prelude_tags)
         epilogue_nodes = self._extract_nodes(xmlnode, self.epilogue_tags)
-
-        for node in reversed(prelude_nodes):
-            xmlnode.insert(0, node)
-
-        xmlnode.extend(epilogue_nodes)
+        insert_prelude_nodes(prelude_nodes)
+        append_epilogue_nodes(epilogue_nodes)
 
     @staticmethod
     def _extract_nodes(xmlnode, tags):
@@ -124,7 +125,7 @@ class PreludeTagBlock:
         return self.tags[tagpos + 1]
 
     def insert_position_after(self, tag=None):
-        # tag=None -> insert after all prelude-tags
+        # if tag is None -> insert after all prelude-tags
         if tag is None:
             tag = self.tags[-1]
         self._check_for_valid_tag(tag)
@@ -151,7 +152,7 @@ class EpilogueTagBlock(PreludeTagBlock):
         return (pos, count)
 
     def insert_position_before(self, tag=None):
-        # tag=None -> insert before all epiloge-tags
+        # if tag is None -> insert before all epiloge-tags
         if tag is None:
             tag = self.tags[-1]
         self._check_for_valid_tag(tag)

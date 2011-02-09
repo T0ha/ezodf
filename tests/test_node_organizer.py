@@ -56,13 +56,24 @@ class TestTestFunction(unittest.TestCase):
         self.assertFalse(has_valid_structure(nodes))
 
 class TestPreludeEpilogueOrganizer(unittest.TestCase):
+    def setUp(self):
+        self.nodeorganizer = PreludeEpilogueOrganizer(PRELUDE_TAGS, EPILOGUE_TAGS)
+
     def test_reorg(self):
         tags = get_n_random_tags(100, ALLTAGS)
         tree = create_node(tags)
-
-        no = PreludeEpilogueOrganizer(PRELUDE_TAGS, EPILOGUE_TAGS)
-        no.reorder(tree)
+        self.nodeorganizer.reorder(tree)
         self.assertTrue(has_valid_structure(tree))
+
+    def test_reorg_with_zero_nodes(self):
+        node = create_node('')
+        self.nodeorganizer.reorder(node)
+        self.assertEqual(0, len(node))
+
+    def test_reorg_with_one_node(self):
+        node = create_node('g')
+        self.nodeorganizer.reorder(node)
+        self.assertEqual('g', node[0].tag)
 
 if __name__=='__main__':
     unittest.main()

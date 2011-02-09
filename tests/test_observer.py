@@ -31,6 +31,9 @@ class TestObserver(unittest.TestCase):
     def setUp(self):
         self.observer = Observer()
 
+    def test_count_listener(self):
+        self.assertEqual(0, self.observer._count_listeners('test'))
+
     def test_can_subscribe_with_no_get_root(self):
         listerner = ListenerWithoutGetXMLRootMethod()
         self.observer.subscribe('save', listerner)
