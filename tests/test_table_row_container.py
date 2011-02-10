@@ -196,7 +196,6 @@ class TestRowManagement(unittest.TestCase):
         self.assertEqual('checkmark5', self.getvalue((6, 0)), "expected checkmark5 in row 6")
         self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
 
-
     def test_insert_two_rows(self):
         self.container.insert_rows(index=5, count=2)
         self.chk_insert_two_rows()
@@ -256,6 +255,10 @@ class TestRowManagement(unittest.TestCase):
         self.container.delete_rows(index=9)
         self.assertEqual(9, self.container.nrows(), "expected 9 rows")
         self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
+
+    def test_do_not_delete_all_rows(self):
+        with self.assertRaises(ValueError):
+            self.container.delete_rows(0, self.container.nrows())
 
     def test_delete_zero_rows_value_error(self):
         with self.assertRaises(ValueError):
@@ -374,6 +377,10 @@ class TestColumnManagement(unittest.TestCase):
         self.container.delete_columns(index=9)
         self.assertEqual(9, self.container.ncols(), "expected 9 columns")
         self.assertTrue(self.container.is_consistent(), "container structure is not consistent")
+
+    def test_do_not_delete_all_columns(self):
+        with self.assertRaises(ValueError):
+            self.container.delete_columns(0, self.container.ncols())
 
     def test_delete_zero_cols_value_error(self):
         with self.assertRaises(ValueError):

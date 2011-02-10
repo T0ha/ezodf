@@ -124,8 +124,8 @@ class TableRowContainer:
             self._rows.insert(index, newrow)
 
     def delete_rows(self, index, count=1):
-        if count < 1:
-            raise ValueError('count < 1')
+        if count < 1 or count >= self.nrows():
+            raise ValueError('invalid count')
         if index < 0:
             index += self.nrows()
 
@@ -151,10 +151,11 @@ class TableRowContainer:
                 row.insert(index, new_empty_cell())
 
     def delete_columns(self, index, count=1):
-        if count < 1:
-            raise ValueError('count < 1')
+        if count < 1 or count >= self.ncols():
+            raise ValueError('invalid count')
         if index < 0:
             index += self.ncols()
+
         for row in self._rows:
             for _ in range(count):
                 del row[index]
