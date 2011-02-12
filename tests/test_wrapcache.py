@@ -29,5 +29,12 @@ class TestWrapCache(unittest.TestCase):
         copy2 = wrapcache.wrap(original.xmlnode)
         self.assertFalse(original is copy2)
 
+    def test_remove(self):
+        original = GenericWrapper()
+        wrapcache.add(original)
+        wrapcache.remove(original)
+        copy = wrapcache.wrap(original.xmlnode)
+        self.assertTrue(original is not copy)
+
 if __name__=='__main__':
     unittest.main()
