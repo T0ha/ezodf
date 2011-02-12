@@ -12,7 +12,7 @@ import unittest
 # trusted or separately tested modules
 from ezodf.xmlns import CN
 from lxml.etree import Element
-from ezodf.drawingpage import Page
+from ezodf.drawingpage import DrawingPage as Page
 
 # objects to test
 from ezodf.pages import Pages

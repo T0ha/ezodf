@@ -9,6 +9,7 @@
 from .xmlns import register_class, CN
 from .base import GenericWrapper
 from .sheets import Sheets
+from .pages import Pages
 from .nodeorganizer import EpilogueTagBlock
 from .nodestructuretags import TEXT_EPILOGUE
 
@@ -34,12 +35,15 @@ class SpreadsheetBody(GenericBody):
         self.sheets = Sheets(self.xmlnode)
 
 @register_class
-class PresentationBody(GenericBody):
-    TAG = CN('office:presentation')
-
-@register_class
 class DrawingBody(GenericBody):
     TAG = CN('office:drawing')
+    def __init__(self, xmlnode=None):
+        super(DrawingBody, self).__init__(xmlnode=xmlnode)
+        self.pages = Pages(self.xmlnode)
+
+@register_class
+class PresentationBody(DrawingBody):
+    TAG = CN('office:presentation')
 
 @register_class
 class ChartBody(GenericBody):
