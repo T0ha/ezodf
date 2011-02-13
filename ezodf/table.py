@@ -15,8 +15,8 @@ from .base import GenericWrapper
 from .protection import random_protection_key
 from .propertymixins import TableVisibilityMixin
 from .propertymixins import TableStylenNameMixin, TableDefaultCellStyleNameMixin
-from .tablerowcontainer import TableRowContainer
-from .tablecolumncontainer import TableColumnContainer
+from .tablerowcontainer import TableRowController
+from .tablecolumncontainer import TableColumnController
 
 CELL_ADDRESS = re.compile('^([A-Z]+)(\d+)$')
 
@@ -43,8 +43,8 @@ class Table(GenericWrapper, TableStylenNameMixin):
 
     def __init__(self, name='NEWTABLE', size=(10, 10), xmlnode=None):
         super(Table, self).__init__(xmlnode=xmlnode)
-        self._rows = TableRowContainer(self.xmlnode)
-        self._columns = TableColumnContainer(self.xmlnode)
+        self._rows = TableRowController(self.xmlnode)
+        self._columns = TableColumnController(self.xmlnode)
         if xmlnode is None:
             self.name = name
             self._rows.reset(size)

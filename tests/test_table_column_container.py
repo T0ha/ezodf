@@ -13,7 +13,7 @@ from ezodf.xmlns import CN, etree
 from ezodf.nodestructuretags import TABLE_PRELUDE
 
 # objects to test
-from ezodf.tablecolumncontainer import TableColumnContainer
+from ezodf.tablecolumncontainer import TableColumnController
 
 def add_table_prelude_content(container):
     for tag in reversed(TABLE_PRELUDE):
@@ -51,7 +51,7 @@ class TestTableColumnContainer(unittest.TestCase):
 
     def setUp(self):
         table = etree.Element(CN('table:table'))
-        self.container = TableColumnContainer(table)
+        self.container = TableColumnController(table)
 
     def test_init_size(self):
         self.container.reset(ncols=10)
@@ -66,12 +66,12 @@ class TestTableColumnContainer(unittest.TestCase):
         self.assertEqual(10, len(self.container), "expected 10 colums")
 
     def test_uncompressed_content(self):
-        container = TableColumnContainer(etree.XML(TABLECOLUMNS_U5))
+        container = TableColumnController(etree.XML(TABLECOLUMNS_U5))
         self.assertEqual(5, len(container), "expected 5 columns")
         self.assertEqual(2, len(container.xmlnode), "expected 2 children at top level of xmlnode")
 
     def test_expand_content(self):
-        container = TableColumnContainer(etree.XML(TABLECOLUMNS_C10))
+        container = TableColumnController(etree.XML(TABLECOLUMNS_C10))
         self.assertEqual(10, len(container), "expected 10 columns")
         self.assertEqual(2, len(container.xmlnode), "expected 2 children at top level of xmlnode")
 
@@ -91,7 +91,7 @@ class TestTableColumnContainer(unittest.TestCase):
         self.chk_set_column()
 
     def test_set_column_buildup(self):
-        self.container = TableColumnContainer(etree.XML(TABLECOLUMNS_C10))
+        self.container = TableColumnController(etree.XML(TABLECOLUMNS_C10))
         self.container[3] = setdata('test')
         self.chk_set_column()
 
@@ -121,7 +121,7 @@ class TestTableColumnContainer(unittest.TestCase):
 
 class TestColumnManagement(unittest.TestCase):
     def setUp(self):
-        self.container = TableColumnContainer(etree.XML(TABLECOLUMNS_C10))
+        self.container = TableColumnController(etree.XML(TABLECOLUMNS_C10))
         for col in range(len(self.container)):
             self.container[col] = setdata('checkmark%d' % col)
 

@@ -11,7 +11,7 @@ import copy
 from .xmlns import CN, etree
 from .nodestructuretags import TABLE_ROWS
 
-class TableRowContainer:
+class TableRowController:
     def __init__(self, xmlnode):
         if (xmlnode is None) or (xmlnode.tag != CN('table:table')):
             raise ValueError('invalid xmlnode')

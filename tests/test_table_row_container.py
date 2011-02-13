@@ -12,7 +12,7 @@ import unittest
 from ezodf.xmlns import CN, etree
 
 # objects to test
-from ezodf.tablerowcontainer import TableRowContainer
+from ezodf.tablerowcontainer import TableRowController
 from ezodf.tablerowcontainer import get_min_max_cell_count
 from ezodf.tablerowcontainer import align_table_rows
 
@@ -50,15 +50,15 @@ class TestTableRowContainer(unittest.TestCase):
 
     def setUp(self):
         table = etree.Element(CN('table:table'))
-        self.container = TableRowContainer(table)
+        self.container = TableRowController(table)
 
     def test_init_None_error(self):
         with self.assertRaises(ValueError):
-            TableRowContainer(xmlnode=None)
+            TableRowController(xmlnode=None)
 
     def test_init_node_error(self):
         with self.assertRaises(ValueError):
-            TableRowContainer(xmlnode=etree.Element(CN('error')))
+            TableRowController(xmlnode=etree.Element(CN('error')))
 
     def test_init_size(self):
         self.container.reset(size=(10, 20))
@@ -66,12 +66,12 @@ class TestTableRowContainer(unittest.TestCase):
         self.assertEqual(20, self.container.ncols())
 
     def test_uncompressed_content(self):
-        container = TableRowContainer(etree.XML(TABLE_5x3))
+        container = TableRowController(etree.XML(TABLE_5x3))
         self.assertEqual(5, container.nrows())
         self.assertEqual(3, container.ncols())
 
     def test_expand_content(self):
-        container = TableRowContainer(etree.XML(TABLE_REP_7x7))
+        container = TableRowController(etree.XML(TABLE_REP_7x7))
         self.assertEqual(7, container.nrows())
         self.assertEqual(7, container.ncols())
 
@@ -119,7 +119,7 @@ class TestTableRowContainer(unittest.TestCase):
 
 class TestTableRowContainer_GetRowColumns(unittest.TestCase):
     def test_get_row(self):
-        container = TableRowContainer(etree.XML(TABLE_REP_7x7))
+        container = TableRowController(etree.XML(TABLE_REP_7x7))
         for col in range(container.ncols()):
             container.set_cell((3, col), setdata('x'))
 
@@ -127,7 +127,7 @@ class TestTableRowContainer_GetRowColumns(unittest.TestCase):
         self.assertEqual('xxxxxxx', result)
 
     def test_get_col(self):
-        container = TableRowContainer(etree.XML(TABLE_REP_7x7))
+        container = TableRowController(etree.XML(TABLE_REP_7x7))
         for row in range(container.nrows()):
             container.set_cell((row, 3), setdata('y'))
 
@@ -149,7 +149,7 @@ class TestRowManagement(unittest.TestCase):
         return getdata(self.container.get_cell(pos))
 
     def setUp(self):
-        self.container = TableRowContainer(etree.XML(TABLE_10x10))
+        self.container = TableRowController(etree.XML(TABLE_10x10))
         for row in range(10):
             self.container.set_cell((row, 0), setdata('checkmark%d' % row))
             invoke_cache = self.container.get_cell((row, 0))
@@ -281,7 +281,7 @@ class TestColumnManagement(unittest.TestCase):
         return getdata(self.container.get_cell(pos))
 
     def setUp(self):
-        self.container = TableRowContainer(etree.XML(TABLE_10x10))
+        self.container = TableRowController(etree.XML(TABLE_10x10))
         for col in range(10):
             self.container.set_cell((0, col), setdata('checkmark%d' % col))
             invoke_cache = self.container.get_cell((0, col))
