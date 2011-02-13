@@ -12,9 +12,9 @@ import unittest
 from ezodf.xmlns import CN, etree
 
 # objects to test
-from ezodf.tablerowcontainer import TableRowController
-from ezodf.tablerowcontainer import get_min_max_cell_count
-from ezodf.tablerowcontainer import align_table_rows
+from ezodf.tablerowcontroller import TableRowController
+from ezodf.tablerowcontroller import get_min_max_cell_count
+from ezodf.tablerowcontroller import align_table_rows
 
 TABLE_5x3 = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">

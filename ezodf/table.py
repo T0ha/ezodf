@@ -15,8 +15,8 @@ from .base import GenericWrapper
 from .protection import random_protection_key
 from .propertymixins import TableVisibilityMixin
 from .propertymixins import TableStylenNameMixin, TableDefaultCellStyleNameMixin
-from .tablerowcontainer import TableRowController
-from .tablecolumncontainer import TableColumnController
+from .tablerowcontroller import TableRowController
+from .tablecolumncontroller import TableColumnController
 
 CELL_ADDRESS = re.compile('^([A-Z]+)(\d+)$')
 

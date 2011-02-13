@@ -13,7 +13,7 @@ from ezodf.xmlns import CN, etree
 from ezodf.nodestructuretags import TABLE_PRELUDE
 
 # objects to test
-from ezodf.tablecolumncontainer import TableColumnController
+from ezodf.tablecolumncontroller import TableColumnController
 
 def add_table_prelude_content(container):
     for tag in reversed(TABLE_PRELUDE):
