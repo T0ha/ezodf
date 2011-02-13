@@ -9,6 +9,7 @@
 from .xmlns import wrap, CN
 from .tableutils import iter_cell_range
 
+
 class CellSpanController:
     # is not a public class
     # public access only by Table or similar classes

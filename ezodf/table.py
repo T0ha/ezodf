@@ -43,13 +43,13 @@ class Table(GenericWrapper, TableStylenNameMixin):
         if isinstance(key, int):
             return self.get_child(key)
         else:
-            return self._get_cell(get_cell_index(key))
+            return self.get_cell(get_cell_index(key))
 
     def __setitem__(self, key, cell):
         if isinstance(key, int):
-            return self.set_child(key, cell)
+            self.set_child(key, cell)
         else:
-            self._set_cell(get_cell_index(key), cell)
+            self.set_cell(get_cell_index(key), cell)
 
     @property
     def name(self):
@@ -103,11 +103,11 @@ class Table(GenericWrapper, TableStylenNameMixin):
         newtable.name = newname
         return newtable
 
-    def _get_cell(self, pos):
+    def get_cell(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
         return wrap(self._rows.get_cell(pos))
 
-    def _set_cell(self, pos, cell):
+    def set_cell(self, pos, cell):
         """ Set cell at position 'pos', where 'pos' is a tuple (row, column). """
         if not hasattr(cell, 'kind') or cell.kind != 'Cell':
             raise TypeError("invalid type of 'cell'.")

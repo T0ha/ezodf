@@ -11,22 +11,30 @@ import unittest
 
 # trusted objects
 from ezodf.xmlns import etree, CN, wrap
-from ezodf.tablerowcontroller import TableRowController
+from ezodf.tablerowcontroller import TableCellAccessor
 from ezodf.tableutils import iter_cell_range
 
 # object to test
 from ezodf.cellspancontroller import CellSpanController
 
+TABLE_10x10 = """
+<table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
+<table:table-rows>
+  <table:table-row table:number-rows-repeated="10">
+    <table:table-cell table:number-columns-repeated="10"/>
+  </table:table-row>
+</table:table-rows>
+</table:table>
+"""
 
 class TestCellSpanController(unittest.TestCase):
     def setUp(self):
-        self.table = etree.Element(CN('table:table'))
-        self.table_row_controller = TableRowController(self.table)
-        self.table_row_controller.reset(size=(10, 10))
-        self.span_controller = CellSpanController(self.table_row_controller)
+        self.table = etree.XML(TABLE_10x10)
+        self.tablecells = TableCellAccessor(self.table)
+        self.span_controller = CellSpanController(self.tablecells)
 
     def get_cell(self, pos):
-        return wrap(self.table_row_controller.get_cell(pos))
+        return wrap(self.tablecells.get_cell(pos))
 
     def set_span(self, pos, size):
         cell = self.get_cell(pos)

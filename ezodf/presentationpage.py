@@ -9,5 +9,5 @@
 from .drawingpage import DrawingPage
 
 class PresentationPage(DrawingPage):
-    def _setup(self):
+    def _setup_new_page(self):
         pass

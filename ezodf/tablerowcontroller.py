@@ -11,20 +11,54 @@ import copy
 from .xmlns import CN, etree
 from .nodestructuretags import TABLE_ROWS
 
-class TableRowController:
+class TableCellAccessor:
     def __init__(self, xmlnode):
         if (xmlnode is None) or (xmlnode.tag != CN('table:table')):
             raise ValueError('invalid xmlnode')
         self.xmlnode = xmlnode
-        self.buildup()
+        self._buildup()
 
-    def buildup(self):
-        self._expand_repeated_table_content()
+    def _buildup(self):
+        expand_repeated_table_content(self.xmlnode)
         self._align_table_rows()
         self.update()
 
+    def _align_table_rows(self):
+        cmin, cmax = get_min_max_cell_count(self.xmlnode)
+        if cmin != cmax:
+            align_table_columns(self.xmlnode, cmax)
+
     def update(self):
         self._rows = get_table_rows(self.xmlnode)
+
+    def nrows(self):
+        return len(self._rows)
+
+    def ncols(self):
+        try:
+            return len(self._rows[0])
+        except IndexError:
+            return 0
+
+    def get_cell(self, pos):
+        row, col = self._adjust_negative_indices(pos)
+        return self._rows[row][col]
+
+    def set_cell(self, pos, element):
+        row, col = self._adjust_negative_indices(pos)
+        self._rows[row][col] = element
+
+    def _adjust_negative_indices(self, pos):
+        row, col = pos
+        if row < 0:
+            row += self.nrows()
+        if col < 0:
+            col += self.ncols()
+        return (row, col)
+
+class TableRowController(TableCellAccessor):
+    def __init__(self, xmlnode):
+        super(TableRowController, self).__init__(xmlnode)
 
     def reset(self, size):
         def validate_parameter(nrows, ncols):
@@ -52,36 +86,6 @@ class TableRowController:
         for child in self.xmlnode.getchildren():
             if child.tag in TABLE_ROWS:
                 self.xmlnode.remove(child)
-
-    def _expand_repeated_table_content(self):
-        expand_repeated_table_content(self.xmlnode)
-
-    def _align_table_rows(self):
-        cmin, cmax = get_min_max_cell_count(self.xmlnode)
-        if cmin != cmax:
-            align_table_columns(self.xmlnode, cmax)
-
-    def nrows(self):
-        return len(self._rows)
-
-    def ncols(self):
-        return len(self._rows[0]) if self.nrows() > 0 else 0
-
-    def get_cell(self, pos):
-        row, col = self._get_row_col(pos)
-        return self._rows[row][col]
-
-    def set_cell(self, pos, element):
-        row, col = self._get_row_col(pos)
-        self._rows[row][col] = element
-
-    def _get_row_col(self, pos):
-        row, col = pos
-        if row < 0:
-            row += self.nrows()
-        if col < 0:
-            col += self.ncols()
-        return (row, col)
 
     def get_table_row(self, index):
         return self._rows[index]

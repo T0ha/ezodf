@@ -17,9 +17,9 @@ class DrawingPage(GenericWrapper):
         super(DrawingPage, self).__init__(xmlnode)
         if xmlnode is None:
             self.name = name
-            self._setup()
+            self._setup_new_page()
 
-    def _setup(self):
+    def _setup_new_page(self):
         pass
 
     @property

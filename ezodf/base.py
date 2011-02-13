@@ -106,9 +106,7 @@ class GenericWrapper:
         if `key` does not exist.
         """
         value = self.xmlnode.get(key)
-        if value is None:
-            value = default
-        return value
+        return default if value is None else value
 
     def get_bool_attr(self, key):
         value = self.xmlnode.get(key)

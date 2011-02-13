@@ -29,7 +29,7 @@ options:
 FormulaBuilder
 ~~~~~~~~~~~~~~
 
-from formulatools import cref, cfunc
+from tableutils import cref, cfunc
 
 cref('A1') => ".A1"
 cref('A1', 'Sheet2') => "Sheet2.A1"
