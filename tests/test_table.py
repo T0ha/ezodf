@@ -16,7 +16,7 @@ from ezodf.xmlns import CN, etree, wrap
 
 # objects to test
 from ezodf.cells import Cell
-from ezodf.table import Table, address_to_index
+from ezodf.table import Table
 
 TESTTABLE = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" />
@@ -173,32 +173,6 @@ class TestTableMethods(unittest.TestCase):
         table1 = Table(name='Test')
         table2 = table1.copy()
         self.assertEqual('CopyOfTest', table2.name, "table2 has wrong name.")
-
-class TestAddress2Index(unittest.TestCase):
-    def test_A1(self):
-        self.assertEqual(address_to_index('A1'), (0, 0))
-
-    def test_A2(self):
-        self.assertEqual(address_to_index('A2'), (1, 0))
-
-    def test_C2(self):
-        self.assertEqual(address_to_index('C2'), (1, 2))
-
-    def test_AA100(self):
-        self.assertEqual(address_to_index('AA100'), (99, 26))
-
-    def test_CCC100(self):
-        self.assertEqual(address_to_index('CCC100'), (99, 2108))
-
-    def test_errors(self):
-        with self.assertRaises(ValueError):
-            address_to_index('100')
-        with self.assertRaises(ValueError):
-            address_to_index('A')
-        with self.assertRaises(ValueError):
-            address_to_index('a1')
-        with self.assertRaises(ValueError):
-            address_to_index('A1A')
 
 TABLE_COMP = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
@@ -413,6 +387,24 @@ class TestRowColumnInfoAccess(unittest.TestCase):
     def test_get_column_info_index_error(self):
         with self.assertRaises(IndexError):
             self.table.column_info(4)
+
+class TestCellSpan(unittest.TestCase):
+    # this test-case tests only, if cell spanning is available
+    # for extensive cell span testing see: test_cell_span_controller.py
+    def setUp(self):
+        self.table = Table(name="TEST", size=(10, 10))
+
+    def test_set_cell_span(self):
+        self.table.set_cell_span('A1', (3, 3))
+        self.assertEqual((3, 3), self.table['A1'].span, "Span values for cell 'A1' not set.")
+        self.assertTrue(self.table['B2'].covered, "cell 'B1' is not covered")
+
+    def test_remove_cell_span(self):
+        self.table.set_cell_span('A1', (3, 3))
+        self.table.remove_cell_span('A1')
+        self.assertEqual((1, 1), self.table['A1'].span, "Span values for cell 'A1' should be (1, 1).")
+        self.assertFalse(self.table['B2'].covered, "cell 'B1' is covered")
+
 
 if __name__=='__main__':
     unittest.main()

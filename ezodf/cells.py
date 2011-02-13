@@ -196,7 +196,7 @@ class Cell(GenericWrapper, TableStylenNameMixin):
 
     @property
     def currency(self):
-        return self.get_attr(CN('office:currency'))
+        return self.xmlnode.get(CN('office:currency'))
 
     @property
     def protected(self):
@@ -207,8 +207,8 @@ class Cell(GenericWrapper, TableStylenNameMixin):
 
     @property
     def span(self):
-        rows = self.get_attr(CN('table:number-rows-spanned'))
-        cols = self.get_attr(CN('table:number-columns-spanned'))
+        rows = self.xmlnode.get(CN('table:number-rows-spanned'))
+        cols = self.xmlnode.get(CN('table:number-columns-spanned'))
         rows = 1 if rows is None else max(1, int(rows))
         cols = 1 if cols is None else max(1, int(cols))
         return (rows, cols)
@@ -217,8 +217,18 @@ class Cell(GenericWrapper, TableStylenNameMixin):
         rows, cols = value
         rows = max(1, int(rows))
         cols = max(1, int(cols))
-        self.set_attr(CN('table:number-rows-spanned'), str(rows))
-        self.set_attr(CN('table:number-columns-spanned'), str(cols))
+        if rows == 1 and cols == 1:
+            self._del_span_attributes()
+        else:
+            self._set_span_attributes(rows, cols)
+
+    def _del_span_attributes(self):
+        del self.xmlnode.attrib[CN('table:number-rows-spanned')]
+        del self.xmlnode.attrib[CN('table:number-columns-spanned')]
+
+    def _set_span_attributes(self, rows, cols):
+        self.xmlnode.set(CN('table:number-rows-spanned'), str(rows))
+        self.xmlnode.set(CN('table:number-columns-spanned'), str(cols))
 
     @property
     def covered(self):

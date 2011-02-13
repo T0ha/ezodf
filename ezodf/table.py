@@ -6,7 +6,7 @@
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-import re
+
 import copy
 
 from .xmlns import register_class, CN, wrap, etree
@@ -15,27 +15,10 @@ from .base import GenericWrapper
 from .protection import random_protection_key
 from .propertymixins import TableVisibilityMixin
 from .propertymixins import TableStylenNameMixin, TableDefaultCellStyleNameMixin
+from .tableutils import address_to_index, get_cell_index
 from .tablerowcontroller import TableRowController
 from .tablecolumncontroller import TableColumnController
-
-CELL_ADDRESS = re.compile('^([A-Z]+)(\d+)$')
-
-def address_to_index(address):
-    def column_name_to_index(colname):
-        index = 0
-        power = 1
-        base = ord('A') - 1
-        for char in reversed(colname):
-            index += (ord(char) - base) * power
-            power *= 26
-        return index - 1
-
-    res = CELL_ADDRESS.match(address)
-    if res:
-        column_name, row_name = res.groups()
-        return (int(row_name)-1, column_name_to_index(column_name))
-    else:
-        raise ValueError('Invalid cell address: %s' % address)
+from .cellspancontroller import CellSpanController
 
 @register_class
 class Table(GenericWrapper, TableStylenNameMixin):
@@ -45,6 +28,8 @@ class Table(GenericWrapper, TableStylenNameMixin):
         super(Table, self).__init__(xmlnode=xmlnode)
         self._rows = TableRowController(self.xmlnode)
         self._columns = TableColumnController(self.xmlnode)
+        self._cell_span_controller = CellSpanController(self._rows)
+
         if xmlnode is None:
             self.name = name
             self._rows.reset(size)
@@ -57,22 +42,14 @@ class Table(GenericWrapper, TableStylenNameMixin):
     def __getitem__(self, key):
         if isinstance(key, int):
             return self.get_child(key)
-        elif isinstance(key, tuple): # key => (row, column)
-            return self.get_cell_by_index(key)
-        elif isinstance(key, str): # key => 'A1'
-            return self.get_cell_by_address(key)
         else:
-            raise TypeError(str(type(key)))
+            return self._get_cell(get_cell_index(key))
 
     def __setitem__(self, key, cell):
         if isinstance(key, int):
             return self.set_child(key, cell)
-        elif isinstance(key, tuple): # key => (row, column)
-            return self.set_cell_by_index(key, cell)
-        elif isinstance(key, str): # key => 'A1'
-            return self.set_cell_by_address(key, cell)
         else:
-            raise TypeError(str(type(key)))
+            self._set_cell(get_cell_index(key), cell)
 
     @property
     def name(self):
@@ -126,25 +103,15 @@ class Table(GenericWrapper, TableStylenNameMixin):
         newtable.name = newname
         return newtable
 
-    def get_cell_by_index(self, pos):
+    def _get_cell(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
         return wrap(self._rows.get_cell(pos))
 
-    def get_cell_by_address(self, address):
-        """ Get cell at position 'address' ('address' like 'A1'). """
-        pos = address_to_index(address)
-        return self.get_cell_by_index(pos)
-
-    def set_cell_by_index(self, pos, cell):
+    def _set_cell(self, pos, cell):
         """ Set cell at position 'pos', where 'pos' is a tuple (row, column). """
         if not hasattr(cell, 'kind') or cell.kind != 'Cell':
             raise TypeError("invalid type of 'cell'.")
         self._rows.set_cell(pos, cell.xmlnode)
-
-    def set_cell_by_address(self, address, cell):
-        """ Set cell at position 'address' ('address' like 'A1'). """
-        pos = address_to_index(address)
-        return self.set_cell_by_index(pos, cell)
 
     def row(self, index):
         if isinstance(index, str):
@@ -198,6 +165,12 @@ class Table(GenericWrapper, TableStylenNameMixin):
         # CAUTION: this will break refernces in formulas!
         self._rows.delete_columns(index, count)
         self._columns.delete(index, count)
+
+    def set_cell_span(self, pos, size):
+        self._cell_span_controller.set_span(get_cell_index(pos), size)
+
+    def remove_cell_span(self, pos):
+        self._cell_span_controller.remove_span(get_cell_index(pos))
 
 @register_class
 class TableColumn(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
