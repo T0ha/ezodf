@@ -13,8 +13,6 @@ from ezodf.xmlns import CN, etree
 
 # objects to test
 from ezodf.tablerowcontroller import TableRowController
-from ezodf.tablerowcontroller import get_min_max_cell_count
-from ezodf.tablerowcontroller import align_table_rows
 
 TABLE_5x3 = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
@@ -397,32 +395,6 @@ class TestColumnManagement(unittest.TestCase):
     def test_delete_cols_index_and_count_out_of_range_error(self):
         with self.assertRaises(IndexError):
             self.container.delete_columns(9, count=2)
-
-UNALIGNED_TABLE_3_2_1 = """
-<table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
-<table:table-header-rows>
-  <table:table-row><table:table-cell table:number-columns-repeated="3"/></table:table-row>
-</table:table-header-rows>
-<table:table-rows>
-  <table:table-row><table:table-cell table:number-columns-repeated="2"/></table:table-row>
-  <table:table-row><table:table-cell /></table:table-row>
-</table:table-rows>
-</table:table>
-"""
-
-class TestAlignTableRows(unittest.TestCase):
-    def setUp(self):
-        self.table = etree.XML(UNALIGNED_TABLE_3_2_1)
-
-    def test_min_max_cell_count(self):
-        cmin, cmax = get_min_max_cell_count(self.table)
-        self.assertEqual(1, cmin, 'expected min cols == 1')
-        self.assertEqual(3, cmax, 'expected max cols == 3')
-
-    def test_align_table_rows(self):
-        align_table_rows(self.table, 3)
-        cmin, cmax = get_min_max_cell_count(self.table)
-        self.assertEqual(3, cmin, "table contains rows with cell-count < 3.")
 
 if __name__=='__main__':
     unittest.main()

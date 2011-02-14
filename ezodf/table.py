@@ -34,9 +34,6 @@ class Table(GenericWrapper, TableStylenNameMixin):
             self.name = name
             self._rows.reset(size)
             self._columns.reset(size[1])
-        else:
-            self._rows.buildup()
-            self._columns.buildup()
         wrapcache.add(self)
 
     def __getitem__(self, key):

@@ -172,6 +172,24 @@ Methods
    Delete `count` columns at `index`. **CAUTION:** This operation breaks cell
    references in formulas
 
+.. method:: Table.set_cell_span(pos, size)
+
+   Set cell span for cell at position `pos` to `size`, `pos` can be a
+   (row, column) tuple or a reference string, `size` has to be a (nrows, ncols)
+   tuple, where nrows and ncols are >= 1. Spanning is not possible if the
+   spanning area contains other spanning cells.
+
+   The cell span value is an attribute of the :class:`Cell` class. To request
+   the span value use::
+
+       if table['A1'].span == (3, 2):
+           print("cell 'A1' spans over three rows and two columns")
+
+.. method:: Table.remove_cell_span(pos)
+
+   Removes spanning for cell at position `pos`, `pos` can be a
+   (row, column) tuple or a reference string.
+
 Sheet Class
 -----------
 

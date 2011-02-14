@@ -7,7 +7,7 @@
 # License: GPLv3
 
 from .xmlns import wrap, CN
-from .tableutils import iter_cell_range
+from .tableutils import iter_cell_range, iter_cell_range_without_start_pos
 
 
 class CellSpanController:
@@ -27,7 +27,7 @@ class CellSpanController:
         self._check_pos_and_size(pos, size)
         if self._has_cell_range_spanned_cells(pos, size):
             raise ValueError("cell range contains already spanned cells")
-        for cell_index in iter_cell_range_without_pos(pos, size):
+        for cell_index in iter_cell_range_without_start_pos(pos, size):
             self._cover_cell(cell_index)
         self._set_span_attributes(pos, size)
 
@@ -75,7 +75,4 @@ class CellSpanController:
         cell = self._get_cell(pos)
         cell._del_span_attributes()
         self._uncover_cell(pos)
-
-def iter_cell_range_without_pos(pos, size):
-    return (index for index in iter_cell_range(pos, size) if index != pos)
 

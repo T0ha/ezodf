@@ -11,25 +11,16 @@ import copy
 from .xmlns import CN, etree
 from .nodestructuretags import TABLE_COLUMNS, TABLE_PRELUDE
 from .nodeorganizer import PreludeTagBlock
-
-def get_columns_repeated(xmlnode):
-    count = xmlnode.get(CN('table:number-columns-repeated'))
-    return 1 if count is None else int(count)
-
-def del_columns_repeated(xmlnode):
-    del xmlnode.attrib[CN('table:number-columns-repeated')]
+from .tableutils import is_table, RepetitionAttribute
 
 def new_empty_column():
     return etree.Element(CN('table:table-column'))
 
 class TableColumnController:
     def __init__(self, xmlnode):
-        if xmlnode is None or xmlnode.tag != CN('table:table'):
+        if not is_table(xmlnode):
             raise ValueError('invalid xmlnode')
         self.xmlnode = xmlnode
-        self.buildup()
-
-    def buildup(self):
         self._expand_repeated_content()
         self.update()
 
@@ -58,9 +49,9 @@ class TableColumnController:
                 count -= 1
 
         def expand_columns(xmlcolumn):
-            count = get_columns_repeated(xmlcolumn)
+            count = RepetitionAttribute(xmlcolumn).cols
             if count > 1:
-                del_columns_repeated(xmlcolumn)
+                del RepetitionAttribute(xmlcolumn).cols
                 expand_element(count, xmlcolumn)
 
         for xmlrow in self.xmlnode.findall('.//'+CN('table:table-column')):
