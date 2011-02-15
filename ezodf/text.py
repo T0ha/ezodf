@@ -10,39 +10,15 @@ from .xmlns import CN, register_class, subelement, wrap
 from .base import GenericWrapper, safelen
 from .whitespaces import encode_whitespaces
 from .protection import random_protection_key
-
-class _StyleNameMixin:
-    @property
-    def style_name(self):
-        return self.get_attr(CN('text:style-name'))
-    @style_name.setter
-    def style_name(self, name):
-        self.set_attr(CN('text:style-name'), name)
-
-
-class _NumberingMixin:
-    @property
-    def start_value(self):
-        value = self.get_attr(CN('text:start-value'))
-        return int(value) if value is not None else None
-    @start_value.setter
-    def start_value(self, value):
-        value = str(max(int(value), 1))
-        self.set_attr(CN('text:start-value'), value)
-
-    @property
-    def formatted_number(self):
-        formatted_number = self.xmlnode.find(CN('text:number'))
-        return formatted_number.text if formatted_number is not None else None
-    @formatted_number.setter
-    def formatted_number(self, value):
-        formatted_number = subelement(self.xmlnode, CN('text:number'))
-        formatted_number.text = str(value)
+from .propertymixins import StringProperty, TextNumberingMixin, BooleanProperty
+from .propertymixins import IntegerWithLowerLimitProperty
 
 
 @register_class
-class Span(GenericWrapper, _StyleNameMixin):
+class Span(GenericWrapper):
     TAG = CN('text:span')
+    style_name = StringProperty(CN('text:style-name'))
+
     def __init__(self, text="", style_name="", xmlnode=None):
         super(Span, self).__init__(xmlnode)
         if xmlnode is None:
@@ -87,24 +63,13 @@ class Span(GenericWrapper, _StyleNameMixin):
 @register_class
 class Paragraph(Span):
     TAG = CN('text:p')
-
-    @property
-    def cond_style_name(self):
-        return self.get_attr(CN('text:cond-style-name'))
-    @cond_style_name.setter
-    def cond_style_name(self, value):
-        self.set_attr(CN('text:cond-style-name'), value)
-
-    @property
-    def ID(self):
-        return self.get_attr(CN('text:id'))
-    @ID.setter
-    def ID(self, value):
-        self.set_attr(CN('text:id'), value)
+    cond_style_name = StringProperty(CN('text:cond-style-name'))
+    ID = StringProperty(CN('text:id'))
 
 @register_class
-class NumberedParagraph(GenericWrapper, _NumberingMixin):
+class NumberedParagraph(GenericWrapper, TextNumberingMixin):
     TAG = CN('text:numbered-paragraph')
+    level = IntegerWithLowerLimitProperty(CN('text:level'), 1)
 
     def __init__(self, paragraph=None, xmlnode=None):
         super(NumberedParagraph, self).__init__(xmlnode)
@@ -115,15 +80,6 @@ class NumberedParagraph(GenericWrapper, _NumberingMixin):
                 else:
                     raise TypeError("Parameter 'paragraph' has to be a subclass of class 'GenericWrapper'")
 
-
-    @property
-    def level(self):
-        return int(self.get_attr(CN('text:level')))
-    @level.setter
-    def level(self, value):
-        number = max(int(value), 1)
-        self.set_attr(CN('text:level'), str(number))
-
     @property
     def content(self):
         p = self.xmlnode.find(CN('text:h'))
@@ -132,60 +88,28 @@ class NumberedParagraph(GenericWrapper, _NumberingMixin):
         return wrap(p)
 
 @register_class
-class Heading(Span, _NumberingMixin):
+class Heading(Span, TextNumberingMixin):
     TAG = CN('text:h')
+    outline_level = IntegerWithLowerLimitProperty(CN('text:outline-level'), 1)
+    restart_numbering = BooleanProperty(CN('text:restart-numbering'))
+    suppress_numbering = BooleanProperty(CN('text:is-list-header'))
 
     def __init__(self, text="", outline_level=1, style_name="", xmlnode=None):
         super(Heading, self).__init__(text, style_name, xmlnode)
         if xmlnode is None:
             self.outline_level = outline_level
 
-    @property
-    def outline_level(self):
-        return int(self.get_attr(CN('text:outline-level')))
-    @outline_level.setter
-    def outline_level(self, level):
-        number = max(int(level), 1)
-        self.set_attr(CN('text:outline-level'), str(number))
-
-    @property
-    def restart_numbering(self):
-        return self.get_bool_attr(CN('text:restart-numbering'))
-    @restart_numbering.setter
-    def restart_numbering(self, value):
-        self.set_bool_attr(CN('text:restart-numbering'), value)
-
-    @property
-    def suppress_numbering(self):
-        return self.get_bool_attr(CN('text:is-list-header'))
-    @suppress_numbering.setter
-    def suppress_numbering(self, value):
-        self.set_bool_attr(CN('text:is-list-header'), value)
-
-
 @register_class
 class Hyperlink(Span):
     TAG = CN('text:a')
+    name = StringProperty(CN('office:name'))
+    href = StringProperty(CN('xlink:href'))
 
     def __init__(self, href="", text="", style_name="", xmlnode=None):
         super(Hyperlink, self).__init__(text, style_name, xmlnode)
         if xmlnode is None:
             if href: self.href = href
             self.target_frame = '_blank'
-
-    @property
-    def name(self):
-        return self.get_attr(CN('office:name'))
-    @name.setter
-    def name(self, name):
-        self.set_attr(CN('office:name'), name)
-
-    @property
-    def href(self):
-        return self.get_attr(CN('xlink:href'))
-    @href.setter
-    def href(self, href):
-        self.set_attr(CN('xlink:href'), href)
 
     @property
     def target_frame(self):
@@ -212,27 +136,21 @@ class ListHeader(GenericWrapper):
 
 
 @register_class
-class ListItem(ListHeader, _NumberingMixin):
+class ListItem(ListHeader, TextNumberingMixin):
     TAG = CN('text:list-item')
 
 
 @register_class
-class List(GenericWrapper, _StyleNameMixin):
+class List(GenericWrapper):
     TAG = CN('text:list')
+    style_name = StringProperty(CN('text:style-name'))
+    continue_numbering = BooleanProperty(CN('text:continue-numbering'))
 
     def __init__(self, style_name="", xmlnode=None):
         super(List, self).__init__(xmlnode)
         if xmlnode is None:
             if style_name:
                 self.style_name = style_name
-
-    @property
-    def continue_numbering(self):
-        return True if self.get_attr(CN('text:continue-numbering')) == 'true' else False
-    @continue_numbering.setter
-    def continue_numbering(self, value):
-        value = 'true' if value else 'false'
-        self.set_attr(CN('text:continue-numbering'), value)
 
     @property
     def header(self):
@@ -252,8 +170,10 @@ class List(GenericWrapper, _StyleNameMixin):
 
 
 @register_class
-class Section(GenericWrapper, _StyleNameMixin):
+class Section(GenericWrapper):
     TAG = CN('text:section')
+    style_name = StringProperty(CN('text:style-name'))
+    name = StringProperty(CN('text:name'))
 
     def __init__(self, name="", style_name="", xmlnode=None):
         super(Section, self).__init__(xmlnode)
@@ -262,12 +182,6 @@ class Section(GenericWrapper, _StyleNameMixin):
                 self.style_name = style_name
             if name:
                 self.name = name
-    @property
-    def name(self):
-        return self.get_attr(CN('text:name'))
-    @name.setter
-    def name(self, value):
-        return self.set_attr(CN('text:name'), value)
 
     @property
     def protected(self):

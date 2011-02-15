@@ -9,7 +9,7 @@
 from .xmlns import register_class, CN
 from .base import GenericWrapper
 from .text import Paragraph, Span
-from .propertymixins import TableStylenNameMixin
+from .propertymixins import StringProperty, BooleanProperty
 
 VALID_VALUE_TYPES = frozenset( ('float', 'percentage', 'currency', 'date', 'time',
                                 'boolean', 'string') )
@@ -30,13 +30,17 @@ TYPE_VALUE_MAP = {
 SUPPORTED_CELL_CONTENT = ("Paragraph", "Heading")
 
 @register_class
-class Cell(GenericWrapper, TableStylenNameMixin):
+class Cell(GenericWrapper):
     CELL_ONLY_ATTRIBS = (CN('table:number-rows-spanned'),
                          CN('table:number-columns-spanned'),
                          CN('table:number-matrix-columns-spanned'),
                          CN('table:number-matrix-rows-spanned'))
 
     TAG = CN('table:table-cell')
+    style_name = StringProperty(CN('table:style-name'))
+    formula = StringProperty(CN('table:formula'))
+    protected = BooleanProperty(CN('table:protect'))
+    content_validation_name = StringProperty(CN('table:content-validation-name'))
 
     def __init__(self, value=None, value_type=None, currency=None, style_name=None, xmlnode=None):
         super(Cell, self).__init__(xmlnode=xmlnode)
@@ -47,20 +51,6 @@ class Cell(GenericWrapper, TableStylenNameMixin):
                 self.set_value(value, value_type, currency)
             elif value_type is not None:
                 self._set_value_type(value_type)
-
-    @property
-    def content_validation_name(self):
-        return self.get_attr(CN('table:content-validation-name'))
-    @content_validation_name.setter
-    def content_validation_name(self, value):
-        self.set_attr(CN('table:content-validation-name'), value)
-
-    @property
-    def formula(self):
-        return self.get_attr(CN('table:formula'))
-    @formula.setter
-    def formula(self, value):
-        self.set_attr(CN('table:formula'), value)
 
     @property
     def value_type(self):
@@ -197,13 +187,6 @@ class Cell(GenericWrapper, TableStylenNameMixin):
     @property
     def currency(self):
         return self.xmlnode.get(CN('office:currency'))
-
-    @property
-    def protected(self):
-        return self.get_bool_attr(CN('table:protect'))
-    @protected.setter
-    def protected(self, value):
-        self.set_bool_attr(CN('table:protect'), value)
 
     @property
     def span(self):

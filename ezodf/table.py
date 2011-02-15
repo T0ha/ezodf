@@ -14,15 +14,17 @@ from . import wrapcache
 from .base import GenericWrapper
 from .protection import random_protection_key
 from .propertymixins import TableVisibilityMixin
-from .propertymixins import TableStylenNameMixin, TableDefaultCellStyleNameMixin
+from .propertymixins import StringProperty, BooleanProperty
 from .tableutils import address_to_index, get_cell_index
 from .tablerowcontroller import TableRowController
 from .tablecolumncontroller import TableColumnController
 from .cellspancontroller import CellSpanController
 
 @register_class
-class Table(GenericWrapper, TableStylenNameMixin):
+class Table(GenericWrapper):
     TAG = CN('table:table')
+    style_name = StringProperty(CN('table:style-name'))
+    print = BooleanProperty(CN('table:print'))
 
     def __init__(self, name='NEWTABLE', size=(10, 10), xmlnode=None):
         super(Table, self).__init__(xmlnode=xmlnode)
@@ -69,13 +71,6 @@ class Table(GenericWrapper, TableStylenNameMixin):
         self.set_bool_attr(CN('table:protected'), value)
         if self.protected:
             self.set_attr(CN('table:protection-key'), random_protection_key())
-
-    @property
-    def print(self):
-        return self.get_bool_attr(CN('table:print'))
-    @print.setter
-    def print(self, value):
-        self.set_bool_attr(CN('table:print'), value)
 
     def nrows(self):
         """ Count of table rows. """
@@ -170,9 +165,10 @@ class Table(GenericWrapper, TableStylenNameMixin):
         self._cell_span_controller.remove_span(get_cell_index(pos))
 
 @register_class
-class TableColumn(GenericWrapper, TableStylenNameMixin, TableVisibilityMixin,
-                  TableDefaultCellStyleNameMixin):
+class TableColumn(GenericWrapper, TableVisibilityMixin):
     TAG = CN('table:table-column')
+    style_name = StringProperty(CN('table:style-name'))
+    default_cell_style_name = StringProperty(CN('table:default-cell-style-name'))
 
 @register_class
 class TableRow(TableColumn):
