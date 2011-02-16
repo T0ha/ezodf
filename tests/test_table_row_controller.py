@@ -106,7 +106,7 @@ class TestTableRowContainer(unittest.TestCase):
 
     def test_get_table_row(self):
         self.container.reset(size=(10, 10))
-        table_row = self.container.get_table_row(0)
+        table_row = self.container.row(0)
         self.assertEqual(CN('table:table-row'), table_row.tag)
 
     def test_is_not_consistent(self):

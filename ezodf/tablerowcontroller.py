@@ -48,6 +48,15 @@ class TableCellAccessor:
             col += self.ncols()
         return (row, col)
 
+    def row(self, index):
+        return self._rows[index]
+
+    def column(self, index):
+        return [row[index] for row in self._rows]
+
+    def rows(self):
+        return self._rows
+
 class TableRowController(TableCellAccessor):
     def __init__(self, xmlnode):
         super(TableRowController, self).__init__(xmlnode)
@@ -62,34 +71,19 @@ class TableRowController(TableCellAccessor):
         self._remove_existing_rows()
         nrows, ncols = size
         validate_parameter(nrows, ncols)
-        row = self._buildrow(ncols)
-        for _ in range(nrows):
-            self.xmlnode.append(copy.deepcopy(row))
+        self.xmlnode.extend( (self._build_new_row(ncols) for _ in range(nrows)) )
         self.update()
 
     @staticmethod
-    def _buildrow(ncols):
+    def _build_new_row(ncols):
         row = etree.Element(CN('table:table-row'))
-        for _ in range(ncols):
-            row.append(new_empty_cell())
+        row.extend( (new_empty_cell() for _ in range(ncols)) )
         return row
 
     def _remove_existing_rows(self):
         for child in self.xmlnode.getchildren():
             if child.tag in TABLE_ROWS:
                 self.xmlnode.remove(child)
-
-    def get_table_row(self, index):
-        return self._rows[index]
-
-    def row(self, index):
-        return self._rows[index]
-
-    def column(self, index):
-        return [row[index] for row in self._rows]
-
-    def rows(self):
-        return self._rows
 
     def is_consistent(self):
         # just for testing
@@ -105,7 +99,7 @@ class TableRowController(TableCellAccessor):
         if count < 1:
             raise ValueError('count < 1')
         for _ in range(count):
-            newrow = self._buildrow(self.ncols())
+            newrow = self._build_new_row(self.ncols())
             last_row = self._rows[-1]
             last_row.addnext(newrow)
             self._rows.append(newrow)
@@ -114,7 +108,7 @@ class TableRowController(TableCellAccessor):
         if count < 1:
             raise ValueError('count < 1')
         for _ in range(count):
-            newrow = self._buildrow(self.ncols())
+            newrow = self._build_new_row(self.ncols())
             insert_row = self._rows[index]
             insert_row.addprevious(newrow)
             self._rows.insert(index, newrow)

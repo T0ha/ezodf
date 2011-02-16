@@ -8,47 +8,6 @@
 
 from .xmlns import CN, subelement
 
-class TextNumberingMixin:
-    @property
-    def start_value(self):
-        value = self.get_attr(CN('text:start-value'))
-        return int(value) if value is not None else None
-    @start_value.setter
-    def start_value(self, value):
-        value = str(max(int(value), 1))
-        self.set_attr(CN('text:start-value'), value)
-
-    @property
-    def formatted_number(self):
-        formatted_number = self.xmlnode.find(CN('text:number'))
-        return formatted_number.text if formatted_number is not None else None
-    @formatted_number.setter
-    def formatted_number(self, value):
-        formatted_number = subelement(self.xmlnode, CN('text:number'))
-        formatted_number.text = str(value)
-
-class TableVisibilityMixin:
-    VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )
-    @property
-    def visibility(self):
-        value = self.get_attr(CN('table:visibility'))
-        if value is None:
-            value = 'visible'
-        return value
-    @visibility.setter
-    def visibility(self, value):
-        if value not in self.VALID_VISIBILITY_STATES:
-            raise ValueError("allowed values are: 'visible', 'collapse', 'filter'")
-        self.set_attr(CN('table:visibility'), value)
-
-class TableNumberColumnsRepeatedMixin:
-    @property
-    def columns_repeated(self):
-        value = self.get_attr(CN('table:number-columns-repeated'))
-        value = int(value) if value is not None else 1
-        return max(1, value)
-    def clear_columns_repeated_attribute(self):
-        del self.xmlnode.attrib[CN('table:number-columns-repeated')]
 
 def StringProperty(name, doc=None):
     def getter(self):
@@ -108,3 +67,36 @@ def IntegerWithLowerLimitProperty(name, lower_limit=0, doc=None):
     def deleter(self):
         del self.xmlnode.attrib[name]
     return property(getter, setter, deleter, doc)
+
+class TextNumberingMixin:
+    @property
+    def start_value(self):
+        value = self.get_attr(CN('text:start-value'))
+        return int(value) if value is not None else None
+    @start_value.setter
+    def start_value(self, value):
+        value = str(max(int(value), 1))
+        self.set_attr(CN('text:start-value'), value)
+
+    @property
+    def formatted_number(self):
+        formatted_number = self.xmlnode.find(CN('text:number'))
+        return formatted_number.text if formatted_number is not None else None
+    @formatted_number.setter
+    def formatted_number(self, value):
+        formatted_number = subelement(self.xmlnode, CN('text:number'))
+        formatted_number.text = str(value)
+
+class TableVisibilityMixin:
+    VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )
+    @property
+    def visibility(self):
+        value = self.get_attr(CN('table:visibility'))
+        if value is None:
+            value = 'visible'
+        return value
+    @visibility.setter
+    def visibility(self, value):
+        if value not in self.VALID_VISIBILITY_STATES:
+            raise ValueError("allowed values are: 'visible', 'collapse', 'filter'")
+        self.set_attr(CN('table:visibility'), value)

@@ -126,7 +126,7 @@ class Table(GenericWrapper):
     def row_info(self, index):
         if isinstance(index, str):
             index, column = address_to_index(index)
-        return wrap(self._rows.get_table_row(index))
+        return wrap(self._rows.row(index))
 
     def column_info(self, index):
         if isinstance(index, str):

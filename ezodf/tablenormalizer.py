@@ -9,13 +9,13 @@
 import copy
 
 from .xmlns import CN
-from .tableutils import new_empty_cell, get_table_rows
+from .tableutils import new_empty_cell, get_table_rows, is_table
 from .tableutils import get_min_max_cell_count, count_cells_in_row
 from .tableutils import RepetitionAttribute
 
 class TableNormalizer:
     def __init__(self, xmlnode):
-        if (xmlnode is None) or (xmlnode.tag != CN('table:table')):
+        if not is_table(xmlnode):
             raise ValueError('invalid xmlnode')
         self.xmlnode = xmlnode
 
@@ -51,7 +51,6 @@ class TableNormalizer:
                 xmlrow.append(new_empty_cell())
 
         def _align_table_columns(required_cells_per_row):
-
             for xmlrow in get_table_rows(self.xmlnode):
                 count = count_cells_in_row(xmlrow)
                 if count < required_cells_per_row:
