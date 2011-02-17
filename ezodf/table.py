@@ -27,15 +27,20 @@ class Table(GenericWrapper):
     print = BooleanProperty(CN('table:print'))
 
     def __init__(self, name='NEWTABLE', size=(10, 10), xmlnode=None):
-        super(Table, self).__init__(xmlnode=xmlnode)
-        self._rows = TableRowController(self.xmlnode)
-        self._columns = TableColumnController(self.xmlnode)
-        self._cell_span_controller = CellSpanController(self._rows)
+        def init_attributes_by_xmlnode():
+            self._cellmatrix = TableRowController(self.xmlnode)
+            self._columns_info = TableColumnController(self.xmlnode)
+            self._cell_span_controller = CellSpanController(self._cellmatrix)
 
-        if xmlnode is None:
+        def set_new_table_metrics():
             self.name = name
-            self._rows.reset(size)
-            self._columns.reset(size[1])
+            self._cellmatrix.reset(size)
+            self._columns_info.reset(size[1])
+
+        super(Table, self).__init__(xmlnode=xmlnode)
+        init_attributes_by_xmlnode()
+        if xmlnode is None:
+            set_new_table_metrics()
         wrapcache.add(self)
 
     def __getitem__(self, key):
@@ -74,19 +79,23 @@ class Table(GenericWrapper):
 
     def nrows(self):
         """ Count of table rows. """
-        return self._rows.nrows()
+        return self._cellmatrix.nrows()
 
     def ncols(self):
         """ Count of table columns. """
-        return self._rows.ncols()
+        return self._cellmatrix.ncols()
 
     def reset(self, size=(10, 10)):
+        preserve_name = self.name
         super(Table, self).clear()
-        self._rows.reset(size)
-        self._columns.reset(size[1])
+
+        self.name = preserve_name
+        self._cellmatrix.reset(size)
+        self._columns_info.reset(size[1])
 
     def clear(self):
-        raise NotImplementedError("for tables use the reset() method.")
+        size = (self.nrows(), self.ncols())
+        self.reset(size)
 
     def copy(self, newname=None):
         newtable = Table(xmlnode=copy.deepcopy(self.xmlnode))
@@ -97,18 +106,18 @@ class Table(GenericWrapper):
 
     def get_cell(self, pos):
         """ Get cell at position 'pos', where 'pos' is a tuple (row, column). """
-        return wrap(self._rows.get_cell(pos))
+        return wrap(self._cellmatrix.get_cell(pos))
 
     def set_cell(self, pos, cell):
         """ Set cell at position 'pos', where 'pos' is a tuple (row, column). """
         if not hasattr(cell, 'kind') or cell.kind != 'Cell':
             raise TypeError("invalid type of 'cell'.")
-        self._rows.set_cell(pos, cell.xmlnode)
+        self._cellmatrix.set_cell(pos, cell.xmlnode)
 
     def row(self, index):
         if isinstance(index, str):
             index, column = address_to_index(index)
-        return [wrap(e) for e in self._rows.row(index)]
+        return [wrap(e) for e in self._cellmatrix.row(index)]
 
     def rows(self):
         for index in range(self.ncols()):
@@ -117,7 +126,7 @@ class Table(GenericWrapper):
     def column(self, index):
         if isinstance(index, str):
             row, index = address_to_index(index)
-        return [wrap(e) for e in self._rows.column(index)]
+        return [wrap(e) for e in self._cellmatrix.column(index)]
 
     def columns(self):
         for index in range(self.ncols()):
@@ -126,37 +135,37 @@ class Table(GenericWrapper):
     def row_info(self, index):
         if isinstance(index, str):
             index, column = address_to_index(index)
-        return wrap(self._rows.row(index))
+        return wrap(self._cellmatrix.row(index))
 
     def column_info(self, index):
         if isinstance(index, str):
             row, index = address_to_index(index)
-        return wrap(self._columns.get_table_column(index))
+        return wrap(self._columns_info.get_table_column(index))
 
     def append_rows(self, count=1):
-        self._rows.append_rows(count)
+        self._cellmatrix.append_rows(count)
 
     def insert_rows(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        self._rows.insert_rows(index, count)
+        self._cellmatrix.insert_rows(index, count)
 
     def delete_rows(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        self._rows.delete_rows(index, count)
+        self._cellmatrix.delete_rows(index, count)
 
     def append_columns(self, count=1):
-        self._rows.append_columns(count)
-        self._columns.append(count)
+        self._cellmatrix.append_columns(count)
+        self._columns_info.append(count)
 
     def insert_columns(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        self._rows.insert_columns(index, count)
-        self._columns.insert(index, count)
+        self._cellmatrix.insert_columns(index, count)
+        self._columns_info.insert(index, count)
 
     def delete_columns(self, index, count=1):
         # CAUTION: this will break refernces in formulas!
-        self._rows.delete_columns(index, count)
-        self._columns.delete(index, count)
+        self._cellmatrix.delete_columns(index, count)
+        self._columns_info.delete(index, count)
 
     def set_cell_span(self, pos, size):
         self._cell_span_controller.set_span(get_cell_index(pos), size)

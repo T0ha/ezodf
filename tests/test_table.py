@@ -96,7 +96,7 @@ class TestTableAttributes(unittest.TestCase):
         table = Table()
         table.print = True
         self.assertTrue(table.print)
-        self.assertEqual(table.get_attr(CN('table:print')), 'true', 'wrong tag name')
+        self.assertEqual(table.get_attr(CN('table:print')), 'true', 'table:print should be true')
 
     def test_if_Table_class_is_registered(self):
         table = wrap(etree.XML(TESTTABLE))
@@ -144,15 +144,15 @@ class TestTableMethods(unittest.TestCase):
     def test_reset(self):
         table = Table(name="TEST", size=(7, 5))
         table.reset(size=(8, 10))
-        self.assertIsNone(table.name)
+        self.assertEqual("TEST", table.name, "name attribute is deleted")
         self.assertEqual(table.ncols(), 10)
         self.assertEqual(table.nrows(), 8)
 
-    def test_clear_error(self):
+    def test_clear_table(self):
         table = Table(name="TEST")
-        with self.assertRaises(NotImplementedError):
-            table.clear()
-
+        table[0,0].set_value("marker")
+        table.clear()
+        self.assertIsNone(table[0,0].value, "cell value should be None")
 
     def test_setup_error(self):
         with self.assertRaises(ValueError):
