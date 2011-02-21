@@ -6,6 +6,7 @@ Version 0.2.2 - xx March 2011
 
   * Alpha version
   * Spreadsheet: added cell-span management
+  * tested with Python 3.2 - OK
 
 Version 0.2.1 - 06 February 2011
 
