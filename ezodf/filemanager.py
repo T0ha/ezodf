@@ -57,6 +57,9 @@ class FileManager:
             return zipfile.is_zipfile(self.zipname)
         return False
 
+    def _open_bytestream(self):
+        return open(self.zipname, 'rb')
+
     def tmpfilename(self, basefile=None):
         def randomname(count):
             return ''.join(random.sample(FNCHARS, count))
@@ -100,38 +103,38 @@ class FileManager:
 
     def get_bytes(self, filename):
         """ Returns a byte stream or None. """
-        stream = None
+        filecontent = None
         if self.has_zip():
-            zippo = zipfile.ZipFile(self.zipname, 'r')
+            bytestream = self._open_bytestream()
+            zipfile_ = zipfile.ZipFile(bytestream, 'r')
             try:
-                stream = zippo.read(filename)
+                filecontent = zipfile_.read(filename)
             except KeyError:
                 pass
-            zippo.close()
-        return stream
+            zipfile_.close()
+            bytestream.close()
+        return filecontent
 
     def get_text(self, filename, default=None):
         """ Retuns a str or 'default'. """
-        stream = self.get_bytes(filename)
-        if stream is not None:
-            return str(stream, 'utf-8')
+        filecontent = self.get_bytes(filename)
+        if filecontent is not None:
+            return str(filecontent, 'utf-8')
         else:
             return default
 
     def get_xml_element(self, filename):
-        content = self.get_bytes(filename)
-        if content:
-            return etree.XML(content)
+        filecontent = self.get_bytes(filename)
+        if filecontent:
+            return etree.XML(filecontent)
         else:
             return None
 
     def _tozip(self, zippo):
-        # write mimetype as first file
+        # mimetype file should be the first & uncompressed file in zipfile
         mimetype = self.directory.pop('mimetype')
-        # mimetype file should be uncompressed
         mimetype.zipinfo.compress_type = zipfile.ZIP_STORED
         zippo.writestr(mimetype.zipinfo, mimetype.tobytes())
-        # mimetype done.
         processed = [mimetype.filename]
 
         for file in self.directory.values():
@@ -145,21 +148,25 @@ class FileManager:
     def _copy_zip_to(self, newzip, ignore=[]):
         """ Copy all files like pictures and settings except the files in 'ignore'.
         """
-        def copyzip(fromzip, tozip):
-            for zipinfo in fromzip.filelist:
-                if zipinfo.filename not in ignore:
-                    tozip.writestr(zipinfo, fromzip.read(zipinfo.filename))
-
-        if self.zipname is None:
+        if not self.has_zip():
             return # nothing to copy
-        if not os.path.exists(self.zipname):
-            return # nothing to copy
-
-        origzip = zipfile.ZipFile(self.zipname)
         try:
-            copyzip(origzip, newzip)
+            bytestream = self._open_bytestream()
+        except IOError:
+            return # nothing to copy
+
+        origzip = zipfile.ZipFile(bytestream)
+        try:
+            self._copy_from_zip_to_zip(origzip, newzip, ignore)
         finally:
             origzip.close()
+            bytestream.close()
+
+    @staticmethod
+    def _copy_from_zip_to_zip(fromzip, tozip, ignore):
+        for zipinfo in fromzip.filelist:
+            if zipinfo.filename not in ignore:
+                tozip.writestr(zipinfo, fromzip.read(zipinfo.filename))
 
     def tobytes(self):
         iobuffer = io.BytesIO()
@@ -167,6 +174,7 @@ class FileManager:
         self._tozip(zippo)
         zippo.close()
         buffer = iobuffer.getvalue()
+        del iobuffer
         return buffer
 
 def check_zipfile_for_oasis_validity(filename, mimetype):

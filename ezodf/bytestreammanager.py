@@ -7,7 +7,6 @@
 # License: GPLv3
 
 import io
-import zipfile
 
 from .filemanager import FileManager
 
@@ -20,33 +19,8 @@ class ByteStreamManager(FileManager):
         with open(filename, 'wb') as fp:
             fp.write(self.tobytes())
 
-    def get_bytes(self, filename):
-        """ Returns a byte stream or None. """
-        stream = None
-        if self.buffer is not None:
-            iobuffer = io.BytesIO(self.buffer)
-            zippo = zipfile.ZipFile(iobuffer, 'r')
-            try:
-                stream = zippo.read(filename)
-            except KeyError:
-                pass
-            zippo.close()
-            del iobuffer
-        return stream
+    def has_zip(self):
+        return self.buffer is not None
 
-    def _copy_zip_to(self, newzip, ignore=[]):
-        """ Copy all files like pictures and settings except the files in 'ignore'.
-        """
-        def copyzip(fromzip, tozip):
-            for zipinfo in fromzip.filelist:
-                if zipinfo.filename not in ignore:
-                    tozip.writestr(zipinfo, fromzip.read(zipinfo.filename))
-
-        if self.buffer is None:
-            return # nothing to copy
-        buffer = io.BytesIO(self.buffer)
-        origzip = zipfile.ZipFile(buffer)
-        try:
-            copyzip(origzip, newzip)
-        finally:
-            origzip.close()
+    def _open_bytestream(self):
+        return io.BytesIO(self.buffer)
