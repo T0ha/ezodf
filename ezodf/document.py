@@ -208,4 +208,4 @@ class PackagedDocument(_BaseDocument):
         self.filemanager.save(self.docname, backup=self.backup)
 
     def tobytes(self):
-        return None
+        return self.filemanager.tobytes()
