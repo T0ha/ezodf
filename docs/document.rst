@@ -56,6 +56,9 @@ Methods
 
    Save document to file system with a new `filename`.
 
+.. method:: PackagedDocument.tobytes()
+
+   Get the document zip-file as `bytes`.
 
 Flat XML Document
 -----------------

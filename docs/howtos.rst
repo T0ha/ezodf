@@ -14,6 +14,13 @@ General Document Management
 
 see :ref:`opendoc`
 
+**How to open an ODF document from a file-like object?**
+
+`stream` is a file-like object, opened in binary mode::
+
+    buffer = stream.read()
+    doc = ezodf.open(buffer)
+
 **How to create a new ODF document?**
 
 ::
@@ -21,6 +28,28 @@ see :ref:`opendoc`
    doc = ezodf.newdoc(doctype, filename)
 
 see :ref:`newdoc`
+
+**How to save the document?**
+
+::
+
+   # save with filename given at opendoc() or newdoc()
+   doc.save()
+   # save with a new name
+   doc.saveas(filename, backup=True)
+
+**How to manage the document without filesystem access?**
+
+You can also get the document zip-file as `bytes`.
+
+::
+
+   # get content as bytes
+   buffer = doc.tobytes()
+   # and reopen the document
+   doc = ezodf.opendoc(buffer)
+   # or use it as template for a new document
+   doc = ezodf.newdoc(template=buffer)
 
 **Where is the document content?**
 

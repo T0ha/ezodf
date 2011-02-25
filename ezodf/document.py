@@ -8,10 +8,12 @@
 
 import zipfile
 import os
+import io
 
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
 from .xmlns import subelement, CN, etree, wrap, ALL_NSMAP, fake_element
 from .filemanager import FileManager
+from .bytestreammanager import ByteStreamManager
 from .meta import OfficeDocumentMeta
 from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
@@ -22,17 +24,27 @@ from . import body # no used, but important to register body classes
 class InvalidFiletypeError(TypeError):
     pass
 
+def is_valid_stream(buffer):
+    if isinstance(buffer, bytes):
+        return zipfile.is_zipfile(io.BytesIO(buffer))
+    else:
+        return False
+
 def opendoc(filename):
     if zipfile.is_zipfile(filename):
         fm = FileManager(filename)
-        mimetype = fm.get_text('mimetype')
-        return PackagedDocument(filemanager=fm, mimetype=mimetype)
+    elif is_valid_stream(filename):
+        fm = ByteStreamManager(filename)
     else:
         try:
             xmlnode = etree.parse(filename)
             return FlatXMLDocument(filename=filename, xmlnode=xmlnode)
         except etree.ParseError:
-            raise IOError("File '%s' is neither a zip-package nor a flat XML OpenDocumentFormat file." % filename)
+            raise IOError("File '%s' is neither a zip-package nor a flat " \
+                          "XML OpenDocumentFormat file." % filename)
+
+    mimetype = fm.get_text('mimetype')
+    return PackagedDocument(filemanager=fm, mimetype=mimetype)
 
 
 def newdoc(doctype="odt", filename="", template=None):
@@ -46,25 +58,31 @@ def newdoc(doctype="odt", filename="", template=None):
 
 def _new_doc_from_template(filename, templatename):
     #TODO: only works with zip packaged documents
-    if zipfile.is_zipfile(templatename):
-        fm = FileManager(templatename)
-        mimetype = fm.get_text('mimetype')
-        if mimetype.endswith('-template'):
-            mimetype = mimetype[:-9]
-        try:
-            document = PackagedDocument(filemanager=fm, mimetype=mimetype)
-            document.docname = filename
-            return document
-        except KeyError:
-            raise InvalidFiletypeError("Unsupported mimetype: %s".format(mimetype))
-    else:
-        raise IOError('File does not exist or it is not a zipfile: %s' % templatename)
+    def get_filemanager(buffer):
+        if is_valid_stream(buffer):
+            return ByteStreamManager(buffer)
+        elif zipfile.is_zipfile(buffer):
+            return FileManager(buffer)
+        else:
+            raise IOError('File does not exist or it is not a zipfile: %s' % str(buffer))
+
+    fm = get_filemanager(templatename)
+    mimetype = fm.get_text('mimetype')
+    if mimetype.endswith('-template'):
+        mimetype = mimetype[:-9]
+    try:
+        document = PackagedDocument(filemanager=fm, mimetype=mimetype)
+        document.docname = filename
+        return document
+    except KeyError:
+        raise InvalidFiletypeError("Unsupported mimetype: %s".format(mimetype))
 
 
 class _BaseDocument:
     """
     Broadcasting Events:
-        broadcast(event='save', msg=self): send before saving the document
+        broadcast(event='prepare_saving'): send before saving the document
+        broadcast(event='post_saving'): send after saving the document
     """
     def __init__(self):
         self.backup = True
@@ -152,9 +170,12 @@ class FlatXMLDocument(_BaseDocument):
 
     def _writefile(self, filename):
         with open(filename, 'wb') as fp:
-            fp.write(etree.tostring(self.xmlnode,
-                                    xml_declaration=True,
-                                    encoding='UTF-8'))
+            fp.write(self.tobytes())
+
+    def tobytes(self):
+        return etree.tostring(self.xmlnode,
+                              xml_declaration=True,
+                              encoding='UTF-8')
 
 class PackagedDocument(_BaseDocument):
     """ OpenDocument as package in a zipfile.
@@ -185,3 +206,6 @@ class PackagedDocument(_BaseDocument):
 
     def _saving_routine(self):
         self.filemanager.save(self.docname, backup=self.backup)
+
+    def tobytes(self):
+        return None

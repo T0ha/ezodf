@@ -7,6 +7,11 @@ Version 0.2.2 - xx March 2011
   * Alpha version
   * Spreadsheet: added cell-span management
   * tested with Python 3.2 - OK
+  * added tobytes() method to all document classes
+  * opendoc() accept the zip-file content as 'bytes' instead of the filename
+    as parameter 'filename'
+  * newdoc() accept the zip-file content as 'bytes' instead of the filename
+    as parameter 'template'
 
 Version 0.2.1 - 06 February 2011
 

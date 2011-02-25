@@ -8,13 +8,17 @@ Open an existing Document
 
 .. function:: ezodf.opendoc(filename)
 
-   :param str filename: filename of the document
+   :param str filename: a filename  or the file-content as `bytes`
    :returns: :class:`~document.PackagedDocument` or :class:`~document.FlatXMLDocument`
 
    Open the document `filename`. Returns an instance of the :class:`~document.PackagedDocument`
    class, if the file is a zip-packed document, or an instance of the
    :class:`~document.FlatXMLDocument` class, if the document is a single-XML-file document.
    The document type is determined by the file content.
+
+   If you have no access to the filesystem, pass the content of the zip-file
+   (type `bytes`) as filename parameter. The :meth:`~document.PackagedDocument.save`
+   method still works, but no backups will be created.
 
    You can check the document type by the :attr:`~document.PackagedDocument.doctype` or the
    :attr:`~document.PackagedDocument.mimetype` attribute.
@@ -30,13 +34,16 @@ Create a new Document
     extensions (``'odt'`` for text, ``'ods'`` for spreadsheets and so on)
   :param str filename: filename of the document, can also be set by the
     :func:`~document.PackagedDocument.saveas()` method
-  :param str template: filename of a template file, it has to be a zip-packed
-    document and the parameter `doctype` is ignored, because the template content
-    determines the document type.
+  :param str template: filename of a template file or the file-content as
+    `bytes`, it has to be a zip-packed document and the parameter `doctype`
+    is ignored, because the template content determines the document type.
   :returns: :class:`~document.PackagedDocument`
 
   Create a new ODF Document. Returns always an instance of the
   :class:`~document.PackagedDocument` class.
+
+  If you have no access to the filesystem, pass the content of the zip-file
+  (type `bytes`) as filename parameter.
 
 .. _doctype_table:
 

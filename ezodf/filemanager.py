@@ -8,6 +8,7 @@
 
 import os
 import zipfile
+import io
 import random
 from datetime import datetime
 
@@ -45,8 +46,6 @@ class FileObject:
         return self.zipinfo.filename
 
 class FileManager:
-    __slots__ = ['directory', 'manifest', 'zipname']
-
     def __init__(self, zipname=None):
         self.directory = dict()
         self.zipname = zipname
@@ -161,6 +160,14 @@ class FileManager:
             copyzip(origzip, newzip)
         finally:
             origzip.close()
+
+    def tobytes(self):
+        iobuffer = io.BytesIO()
+        zippo = zipfile.ZipFile(iobuffer, 'w', zipfile.ZIP_DEFLATED)
+        self._tozip(zippo)
+        zippo.close()
+        buffer = iobuffer.getvalue()
+        return buffer
 
 def check_zipfile_for_oasis_validity(filename, mimetype):
     """ Checks the zipfile structure and least necessary content, but not the

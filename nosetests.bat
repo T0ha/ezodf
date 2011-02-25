@@ -1,3 +1,3 @@
 @set PYTHONPATH=%CD%
-@C:\Python31\python.exe C:\Python31\Scripts\nosetests-script.py %*
+@C:\Python32\python.exe C:\Python32\Scripts\nosetests-script.py %*
 
