@@ -28,7 +28,7 @@ class TestByteStreamManager(unittest.TestCase):
     def test_constructor(self):
         data = self.get_empty_odt()
         fm = ByteStreamManager(data)
-        self.assertEqual(data, fm.buffer)
+        self.assertTrue(fm.has_zip())
 
     def test_to_zip_manifest(self):
         fm = ByteStreamManager()

@@ -22,7 +22,8 @@
 import os
 from distutils.core import setup
 
-VERSION = '0.2.2'
+from ezodf import VERSION
+
 AUTHOR_NAME = 'Manfred Moitzi'
 AUTHOR_EMAIL = 'mozman@gmx.at'
 

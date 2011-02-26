@@ -12,7 +12,7 @@ from .filemanager import FileManager
 
 class ByteStreamManager(FileManager):
     def __init__(self, buffer=None):
-        self.buffer = buffer
+        self._zipfile_as_bytes = buffer
         super(ByteStreamManager, self).__init__()
 
     def save(self, filename, backup=False):
@@ -20,7 +20,7 @@ class ByteStreamManager(FileManager):
             fp.write(self.tobytes())
 
     def has_zip(self):
-        return self.buffer is not None
+        return self._zipfile_as_bytes is not None
 
     def _open_bytestream(self):
-        return io.BytesIO(self.buffer)
+        return io.BytesIO(self._zipfile_as_bytes)
