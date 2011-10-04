@@ -114,13 +114,19 @@ class Table(GenericWrapper):
             raise TypeError("invalid type of 'cell'.")
         self._cellmatrix.set_cell(pos, cell.xmlnode)
 
+    def itercells(self):
+        """ Iterate over all cells, returns tuples (pos, cell). """
+        for irow, row in enumerate(self.rows()):
+            for icol, cell in enumerate(row):
+                yield ((irow, icol), cell)
+
     def row(self, index):
         if isinstance(index, str):
             index, column = address_to_index(index)
         return [wrap(e) for e in self._cellmatrix.row(index)]
 
     def rows(self):
-        for index in range(self.ncols()):
+        for index in range(self.nrows()):
             yield self.row(index)
 
     def column(self, index):
