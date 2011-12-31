@@ -10,7 +10,7 @@ from .xmlns import wrap, CN
 from .tableutils import iter_cell_range, iter_cell_range_without_start_pos
 
 
-class CellSpanController:
+class CellSpanController(object):
     # is not a public class
     # public access only by Table or similar classes
     # all cell references has to be 2-tuples!

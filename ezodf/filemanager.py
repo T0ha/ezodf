@@ -17,7 +17,7 @@ from .manifest import Manifest
 
 FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
-class FileObject:
+class FileObject(object):
     __slots__ = ['element', 'media_type', 'zipinfo']
 
     def __init__(self, name, element, media_type=""):
@@ -45,7 +45,7 @@ class FileObject:
     def filename(self):
         return self.zipinfo.filename
 
-class FileManager:
+class FileManager(object):
     def __init__(self, zipname=None):
         self.directory = dict()
         self.zipname = zipname

@@ -9,7 +9,7 @@
 from .xmlns import CN
 from . import wrapcache
 
-class AbstractPageContainer:
+class AbstractPageContainer(object):
     def __init__(self, xmlbody, childtag, nametag):
         self._childtag = childtag
         self._nametag = nametag

@@ -13,7 +13,7 @@ from datetime import date, timedelta, datetime
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%Y-%m-%d"
 
-class TimeParser:
+class TimeParser(object):
     duration_matcher = re.compile("^P(\d+Y)?(\d+M)?(\d+D)?(?:T(\d+H)?(\d+M)?(\d+(?:,\d+)?S)?)?$")
 
     def __init__(self, time):

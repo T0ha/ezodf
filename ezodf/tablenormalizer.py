@@ -13,7 +13,7 @@ from .tableutils import new_empty_cell, get_table_rows, is_table
 from .tableutils import get_min_max_cell_count, count_cells_in_row
 from .tableutils import RepetitionAttribute
 
-class TableNormalizer:
+class TableNormalizer(object):
     def __init__(self, xmlnode):
         if not is_table(xmlnode):
             raise ValueError('invalid xmlnode')

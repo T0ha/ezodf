@@ -24,7 +24,7 @@ from .cellspancontroller import CellSpanController
 class Table(GenericWrapper):
     TAG = CN('table:table')
     style_name = StringProperty(CN('table:style-name'))
-    print = BooleanProperty(CN('table:print'))
+    print_ = BooleanProperty(CN('table:print'))
 
     def __init__(self, name='NEWTABLE', size=(10, 10), xmlnode=None):
         def init_attributes_by_xmlnode():

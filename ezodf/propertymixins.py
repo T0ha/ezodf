@@ -68,7 +68,7 @@ def IntegerWithLowerLimitProperty(name, lower_limit=0, doc=None):
         del self.xmlnode.attrib[name]
     return property(getter, setter, deleter, doc)
 
-class TextNumberingMixin:
+class TextNumberingMixin(object):
     @property
     def start_value(self):
         value = self.get_attr(CN('text:start-value'))
@@ -87,7 +87,7 @@ class TextNumberingMixin:
         formatted_number = subelement(self.xmlnode, CN('text:number'))
         formatted_number.text = str(value)
 
-class TableVisibilityMixin:
+class TableVisibilityMixin(object):
     VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )
     @property
     def visibility(self):

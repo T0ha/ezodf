@@ -33,7 +33,7 @@ class OfficeDocumentStyles(XMLMixin):
 
 ## style container
 
-class Container:
+class Container(object):
     def __init__(self, xmlnode):
         assert xmlnode.tag == self.TAG
         self.xmlnode = xmlnode

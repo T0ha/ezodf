@@ -8,7 +8,7 @@
 
 from weakref import WeakSet
 
-class Observer:
+class Observer(object):
     """ Simple implementation of the observer pattern for broadcasting messages
     to objects.
 

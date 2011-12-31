@@ -12,7 +12,7 @@ from .nodestructuretags import TABLE_ROWS
 from .tablenormalizer import normalize_table
 from .tableutils import get_table_rows, new_empty_cell, is_table
 
-class TableCellAccessor:
+class TableCellAccessor(object):
     def __init__(self, xmlnode):
         if not is_table(xmlnode):
             raise ValueError('invalid xmlnode')

@@ -8,7 +8,7 @@
 
 from .xmlns import wrap as uncached_wrap
 
-class _WrapCache:
+class _WrapCache(object):
     # Should only used for big expensive objects like tables.
     _cache = {}
 

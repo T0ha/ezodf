@@ -90,12 +90,12 @@ class TestTableAttributes(unittest.TestCase):
 
     def test_get_print(self):
         table = Table()
-        self.assertFalse(table.print)
+        self.assertFalse(table.print_)
 
     def test_set_print(self):
         table = Table()
-        table.print = True
-        self.assertTrue(table.print)
+        table.print_ = True
+        self.assertTrue(table.print_)
         self.assertEqual(table.get_attr(CN('table:print')), 'true', 'table:print should be true')
 
     def test_if_Table_class_is_registered(self):

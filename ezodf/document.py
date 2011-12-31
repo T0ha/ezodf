@@ -78,7 +78,7 @@ def _new_doc_from_template(filename, templatename):
         raise InvalidFiletypeError("Unsupported mimetype: %s".format(mimetype))
 
 
-class _BaseDocument:
+class _BaseDocument(object):
     """
     Broadcasting Events:
         broadcast(event='prepare_saving'): send before saving the document

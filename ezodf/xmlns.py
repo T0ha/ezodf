@@ -19,7 +19,7 @@ def subelement(parent, tag, new=True):
         element = etree.SubElement(parent, tag)
     return element
 
-class _XMLNamespaces:
+class _XMLNamespaces(object):
     def __init__(self, namespaces):
         self.prefix2uri = {}
         self.uri2prefix = {}
@@ -64,7 +64,7 @@ class _XMLNamespaces:
 XML = _XMLNamespaces(ALL_NSMAP)
 CN = XML._prefix2clark_cached
 
-class XMLMixin:
+class XMLMixin(object):
     def tobytes(self, xml_declaration=None, pretty_print=False):
         """ Returns the XML representation as bytes in 'UTF-8' encoding.
 
@@ -75,7 +75,7 @@ class XMLMixin:
                               xml_declaration=xml_declaration,
                               pretty_print=pretty_print)
 
-class _ClassRegistry:
+class _ClassRegistry(object):
     """ Class Registry """
     _classmap = {}
 

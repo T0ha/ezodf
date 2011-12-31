@@ -16,7 +16,7 @@ from .tableutils import is_table, RepetitionAttribute
 def new_empty_column():
     return etree.Element(CN('table:table-column'))
 
-class TableColumnController:
+class TableColumnController(object):
     def __init__(self, xmlnode):
         if not is_table(xmlnode):
             raise ValueError('invalid xmlnode')

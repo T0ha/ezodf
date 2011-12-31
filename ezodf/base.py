@@ -12,7 +12,7 @@ def safelen(text):
     return len(text) if text else 0
 
 @register_class
-class GenericWrapper:
+class GenericWrapper(object):
     TAG = 'GenericWrapper'
 
     def __init__(self, xmlnode=None):

@@ -10,7 +10,7 @@ from .nodestructuretags import TEXT_PRELUDE, TEXT_CONTENT_STREAM, TEXT_CONTENT_P
 
 from .nodeorganizer import PreludeTagBlock, EpilogueTagBlock
 
-class NodeStructureChecker:
+class NodeStructureChecker(object):
     """ Provides a method to check if an XMLNode has only children with tags
     defined in prelude_tags, midrange_tags, epilogue_tags.
 

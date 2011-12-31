@@ -76,7 +76,7 @@ def is_table(xmlnode):
     else:
         return True
 
-class RepetitionAttribute:
+class RepetitionAttribute(object):
     def __init__(self, xmlnode):
         self.xmlnode = xmlnode
 

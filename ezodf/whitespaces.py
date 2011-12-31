@@ -65,7 +65,7 @@ class SoftPageBreak(Tabulator):
     def plaintext(self):
         return ''
 
-class _WhitespaceEncoder:
+class _WhitespaceEncoder(object):
     result = []
     stack = []
     space_counter = 0

@@ -6,7 +6,7 @@
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
 
-class PreludeEpilogueOrganizer:
+class PreludeEpilogueOrganizer(object):
     """ Reorganizes children order of an XMLNode.
 
     Moves prelude-tags in front of the node and epilogue-tags to the end of the
@@ -47,7 +47,7 @@ class PreludeEpilogueOrganizer:
             xmlnode.remove(child)
 
 
-class PreludeTagBlock:
+class PreludeTagBlock(object):
     def __init__(self, xmlnode, tags):
         if xmlnode is None:
             raise ValueError('xmlnode is None')

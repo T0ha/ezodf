@@ -86,7 +86,7 @@ class OfficeDocumentMeta(XMLMixin):
             count = 1
         self['editing-cycles'] = str(count)
 
-class Keywords:
+class Keywords(object):
     def __init__(self, meta):
         self.meta = meta
 
@@ -124,7 +124,7 @@ class Keywords:
                 return tag
         return None
 
-class Usertags:
+class Usertags(object):
     def __init__(self, meta):
         self.meta = meta
 
@@ -197,7 +197,7 @@ class Usertags:
                 return tag
         return None
 
-class Statistic:
+class Statistic(object):
     TYPES = frozenset(['page', 'table', 'draw', 'image', 'object',
                        'ole-object', 'paragraph', 'word', 'character',
                        'row', 'frame', 'sentence', 'syllable',
