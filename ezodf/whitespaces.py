@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: whitespace processing
 # Created: 06.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
+from .compatibility import tostr
 from .xmlns import register_class, CN
 from .base import GenericWrapper
-
 
 @register_class
 class Tabulator(GenericWrapper):
@@ -46,7 +47,7 @@ class Spaces(Tabulator):
     @count.setter
     def count(self, value):
         if int(value) > 1:
-            self.set_attr(CN('text:c'), str(value))
+            self.set_attr(CN('text:c'), tostr(value))
 
     @property
     def textlen(self):
@@ -91,7 +92,7 @@ class _WhitespaceEncoder(object):
 
     @staticmethod
     def decode(taglist):
-        return "".join( (str(tag) for tag in taglist) )
+        return "".join( (tostr(tag) for tag in taglist) )
 
     def append_stack(self):
         if not self.stack:

@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: ODF meta.xml document management
 # Created: 28.12.2010
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 from datetime import datetime
 
+from .compatibility import tostr
 from .xmlns import CN, subelement, etree, register_class, XMLMixin
 from .const import META_NSMAP, GENERATOR, META_NS
 
@@ -84,7 +86,7 @@ class OfficeDocumentMeta(XMLMixin):
                 count = 1
         except KeyError:
             count = 1
-        self['editing-cycles'] = str(count)
+        self['editing-cycles'] = tostr(count)
 
 class Keywords(object):
     def __init__(self, meta):
@@ -146,7 +148,7 @@ class Usertags(object):
         if tag is None:
             tag = etree.SubElement(self.meta, CN('meta:user-defined'))
             tag.set(CN('meta:name'), name)
-        tag.text = str(value)
+        tag.text = tostr(value)
         if value_type is not None:
             tag.set(CN('meta:value-type'), value_type)
 
@@ -223,7 +225,7 @@ class Statistic(object):
 
     def __setitem__(self, key, value):
         if key in Statistic.TYPES:
-            self.stats.set(Statistic.NS % key, str(value))
+            self.stats.set(Statistic.NS % key, tostr(value))
         else:
             raise KeyError(key)
 

@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: test table
 # Created: 20.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 # Standard Library
-import sys
 import unittest
 from itertools import chain
 
 # trusted or separately tested modules
 from ezodf.xmlns import CN, etree, wrap
+from ezodf.compatibility import is_string
 
 # objects to test
 from ezodf.cells import Cell
@@ -36,7 +37,7 @@ class TestTableAttributes(unittest.TestCase):
     def test_get_name(self):
         table = Table()
         name = table.name
-        self.assertTrue(isinstance(name, str))
+        self.assertTrue(is_string(name))
 
     def test_set_name(self):
         table = Table()

@@ -33,14 +33,10 @@ Dependencies
   declaration (xlmns:prefix="global:namespace:specifier") in the root element.
   Declarations for unused prefixes are also possible.
 
-The target platform is Python 3.1+, no Python 2 support planned at this time.
+The target platform is CPython 2.7 and CPython 3.2+.
 
 Installation
 ============
-
-with easy_install::
-
-    easy_install ezodf
 
 with pip::
 

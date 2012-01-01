@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: create simple text document
 # Created: 06.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 import ezodf
 from ezodf.text import Paragraph, Heading, Section

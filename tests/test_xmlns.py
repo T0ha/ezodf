@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: test xmlns module
 # Created: 27.12.2010
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 # Standard Library
 import unittest
@@ -14,6 +15,7 @@ from mytesttools import in_XML
 
 # objects to test
 from ezodf.xmlns import XML, CN, etree, fake_element
+from ezodf.compatibility import tostr
 
 class TestXMLNamespaces(unittest.TestCase):
     def test_split_prefix(self):
@@ -79,7 +81,7 @@ class TestNSParsing(unittest.TestCase):
 
     def test_tostring_subelements(self):
         xmltree = etree.fromstring(testdata)
-        result = etree.tostring(xmltree[0], encoding=str).strip()
+        result = etree.tostring(xmltree[0], encoding=tostr).strip()
         self.assertTrue(in_XML('<manifest:file-entry '\
                                'manifest:media-type="application/vnd.oasis.opendocument.text" '\
                                'manifest:version="1.2" '\

@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: text objects
 # Created: 03.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
+from.compatibility import is_string
 from .xmlns import CN, register_class, subelement, wrap
 from .base import GenericWrapper, safelen
 from .whitespaces import encode_whitespaces
@@ -50,7 +52,7 @@ class Span(GenericWrapper):
             return text + new if text else new
 
         for tag in encode_whitespaces(text):
-            if isinstance(tag, str):
+            if is_string(tag):
                 if len(self.xmlnode) > 0:
                     lastchild = self[-1]
                     lastchild.tail = append(lastchild.tail, tag)

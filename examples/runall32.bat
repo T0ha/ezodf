@@ -1,5 +1,5 @@
 @echo off
-set PYTHON=c:\python27\python.exe
+set PYTHON=c:\python32\python.exe
 cd ..
 set PYTHONPATH=%CD%
 cd examples

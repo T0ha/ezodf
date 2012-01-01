@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: ODF Document class
 # Created: 27.12.2010
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 import zipfile
 import os
 import io
 
+from .compatibility import tostr, is_bytes
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
 from .xmlns import subelement, CN, etree, wrap, ALL_NSMAP, fake_element
 from .filemanager import FileManager
@@ -25,7 +27,7 @@ class InvalidFiletypeError(TypeError):
     pass
 
 def is_valid_stream(buffer):
-    if isinstance(buffer, bytes):
+    if is_bytes(buffer):
         return zipfile.is_zipfile(io.BytesIO(buffer))
     else:
         return False
@@ -64,7 +66,7 @@ def _new_doc_from_template(filename, templatename):
         elif zipfile.is_zipfile(buffer):
             return FileManager(buffer)
         else:
-            raise IOError('File does not exist or it is not a zipfile: %s' % str(buffer))
+            raise IOError('File does not exist or it is not a zipfile: %s' % tostr(buffer))
 
     fm = get_filemanager(templatename)
     mimetype = fm.get_text('mimetype')

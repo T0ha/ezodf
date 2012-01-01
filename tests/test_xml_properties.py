@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: test xml properties
 # Created: 15.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
-import sys
 import unittest
 
 from ezodf.xmlns import etree
 from ezodf.propertymixins import StringProperty, BooleanProperty, FloatProperty
 from ezodf.propertymixins import IntegerProperty, IntegerWithLowerLimitProperty
 
-class StringTest:
+class StringTest(object):
     def __init__(self, xmlnode):
         self.xmlnode = xmlnode
     name = StringProperty('name', "its a name")
@@ -35,7 +35,7 @@ class TestStringProperty(unittest.TestCase):
         del self.table.name
         self.assertFalse('name' in self.table.xmlnode.attrib)
 
-class BoolTest:
+class BoolTest(object):
     def __init__(self, xmlnode):
         self.xmlnode = xmlnode
     flag = BooleanProperty('flag', "its a flag")
@@ -65,7 +65,7 @@ class TestBoolProperty(unittest.TestCase):
         del self.table.flag
         self.assertFalse('flag' in self.table.xmlnode.attrib)
 
-class FloatTest:
+class FloatTest(object):
     def __init__(self, xmlnode):
         self.xmlnode = xmlnode
     number = FloatProperty('number', "its a number")
@@ -91,7 +91,7 @@ class TestFloatProperty(unittest.TestCase):
         del self.table.number
         self.assertFalse('number' in self.table.xmlnode.attrib)
 
-class IntegerTest:
+class IntegerTest(object):
     def __init__(self, xmlnode):
         self.xmlnode = xmlnode
     number = IntegerProperty('number', "its a integer")
@@ -117,7 +117,7 @@ class TestIntegerProperty(unittest.TestCase):
         del self.table.number
         self.assertFalse('number' in self.table.xmlnode.attrib)
 
-class IntegerWithLowerLimitTest:
+class IntegerWithLowerLimitTest(object):
     def __init__(self, xmlnode):
         self.xmlnode = xmlnode
     number = IntegerWithLowerLimitProperty('number', 1, "always greater equal 1")

@@ -2,6 +2,11 @@
 NEWS
 ====
 
+Version 0.2.3 - xx January 2012
+
+  * Alpha version
+  * tested: on Windows7 32 Bit with CPython 2.7 and CPython 3.2
+
 Version 0.2.2 - xx March 2011
 
   * Alpha version

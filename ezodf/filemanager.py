@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: filemanager module
 # Created: 31.12.2010
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 import os
 import zipfile
@@ -14,6 +15,7 @@ from datetime import datetime
 
 from .xmlns import etree, CN
 from .manifest import Manifest
+from .compatibility import tobytes, bytes2unicode, is_bytes
 
 FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -34,12 +36,7 @@ class FileObject(object):
             else:
                 return self.element.tobytes()
         else:
-            if isinstance(self.element, str):
-                return self.element.encode('utf-8')
-            elif isinstance(self.element, bytes):
-                return self.element
-            else:
-                raise TypeError('Unsupported type: %s' % type(self.element))
+            return tobytes(self.element)
 
     @property
     def filename(self):
@@ -119,7 +116,7 @@ class FileManager(object):
         """ Retuns a str or 'default'. """
         filecontent = self.get_bytes(filename)
         if filecontent is not None:
-            return str(filecontent, 'utf-8')
+            return bytes2unicode(filecontent)
         else:
             return default
 
@@ -187,11 +184,11 @@ def check_zipfile_for_oasis_validity(filename, mimetype):
         for name in ('content.xml', 'meta.xml', 'styles.xml', '/'):
             if name not in directory:
                 return False
-        if str(mimetype, encoding='utf-8') != directory['/'].get(CN('manifest:media-type')):
+        if bytes2unicode(mimetype) != directory['/'].get(CN('manifest:media-type')):
             return False
         return True
 
-    assert isinstance(mimetype, bytes)
+    assert is_bytes(mimetype)
     if not zipfile.is_zipfile(filename):
         return False
     # The first file in an OpenDocumentFormat zipfile should be the uncompressed

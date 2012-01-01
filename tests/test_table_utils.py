@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: test table utils
 # Created: 13.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
-import sys
 import unittest
 
 from ezodf.tableutils import address_to_index, iter_cell_range
@@ -42,7 +42,7 @@ class TestIterCellRange(unittest.TestCase):
     def test_range(self):
         result = list(iter_cell_range((0,0), (2, 2)))
         self.assertEqual(4, len(result))
-        self.assertSameElements([(0,0), (0,1), (1, 0), (1, 1)], result)
+        self.assertListEqual([(0,0), (0,1), (1, 0), (1, 1)], result)
 
     def test_size_error_negative_rows(self):
         with self.assertRaises(ValueError):

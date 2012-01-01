@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: table cell objects
 # Created: 03.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 from .xmlns import register_class, CN
 from .base import GenericWrapper
 from .text import Paragraph, Span
 from .propertymixins import StringProperty, BooleanProperty
+from .compatibility import tostr, is_string
 
 VALID_VALUE_TYPES = frozenset( ('float', 'percentage', 'currency', 'date', 'time',
                                 'boolean', 'string') )
@@ -103,16 +105,16 @@ class Cell(GenericWrapper):
             if isinstance(value, GenericWrapper):
                 pass
             elif value_type == 'string':
-                value = Paragraph(str(value))
+                value = Paragraph(tostr(value))
             elif value_type == 'boolean':
                 value = 'true' if value else 'false'
             else:
-                value = str(value)
+                value = tostr(value)
             return value
 
         if not is_valid_value(value):
-            raise ValueError("invalid value: %s" % str(value))
-        if isinstance(currency, str):
+            raise ValueError("invalid value: %s" % tostr(value))
+        if is_string(currency):
             value_type = 'currency'
         if value_type is None:
             value_type = determine_value_type(value)
@@ -210,8 +212,8 @@ class Cell(GenericWrapper):
         del self.xmlnode.attrib[CN('table:number-columns-spanned')]
 
     def _set_span_attributes(self, rows, cols):
-        self.xmlnode.set(CN('table:number-rows-spanned'), str(rows))
-        self.xmlnode.set(CN('table:number-columns-spanned'), str(cols))
+        self.xmlnode.set(CN('table:number-rows-spanned'), tostr(rows))
+        self.xmlnode.set(CN('table:number-columns-spanned'), tostr(cols))
 
     @property
     def covered(self):

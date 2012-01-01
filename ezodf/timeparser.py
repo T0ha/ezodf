@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: timeparser
 # Created: 29.01.2011
 # Copyright (C) , Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 import re
-import math
 from datetime import date, timedelta, datetime
+from .compatibility import tostr, is_string
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%Y-%m-%d"
@@ -17,12 +18,12 @@ class TimeParser(object):
     duration_matcher = re.compile("^P(\d+Y)?(\d+M)?(\d+D)?(?:T(\d+H)?(\d+M)?(\d+(?:,\d+)?S)?)?$")
 
     def __init__(self, time):
-        if isinstance(time, str):
+        if is_string(time):
             self.timestr = time
             self.value = TimeParser.parse(time)
         else:
             self.value = time
-            self.timestr = str(self)
+            self.timestr = tostr(self)
 
     def __str__(self):
         if self.is_date:

@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: table objects
 # Created: 03.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
-
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 import copy
 
+from .compatibility import is_string
 from .xmlns import register_class, CN, wrap, etree
 from . import wrapcache
 from .base import GenericWrapper
@@ -121,7 +122,7 @@ class Table(GenericWrapper):
                 yield ((irow, icol), cell)
 
     def row(self, index):
-        if isinstance(index, str):
+        if is_string(index):
             index, column = address_to_index(index)
         return [wrap(e) for e in self._cellmatrix.row(index)]
 
@@ -130,7 +131,7 @@ class Table(GenericWrapper):
             yield self.row(index)
 
     def column(self, index):
-        if isinstance(index, str):
+        if is_string(index):
             row, index = address_to_index(index)
         return [wrap(e) for e in self._cellmatrix.column(index)]
 
@@ -139,12 +140,12 @@ class Table(GenericWrapper):
             yield self.column(index)
 
     def row_info(self, index):
-        if isinstance(index, str):
+        if is_string(index):
             index, column = address_to_index(index)
         return wrap(self._cellmatrix.row(index))
 
     def column_info(self, index):
-        if isinstance(index, str):
+        if is_string(index):
             row, index = address_to_index(index)
         return wrap(self._columns_info.get_table_column(index))
 

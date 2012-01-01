@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: property mixins
 # Created: 30.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
+from .compatibility import tostr
 from .xmlns import CN, subelement
 
 
@@ -36,7 +38,7 @@ def FloatProperty(name, doc=None):
         else:
             return float(value)
     def setter(self, value):
-        self.xmlnode.set(name, str(value))
+        self.xmlnode.set(name, tostr(value))
     def deleter(self):
         del self.xmlnode.attrib[name]
     return property(getter, setter, deleter, doc)
@@ -49,7 +51,7 @@ def IntegerProperty(name, doc=None):
         else:
             return int(value)
     def setter(self, value):
-        self.xmlnode.set(name, str(value))
+        self.xmlnode.set(name, tostr(value))
     def deleter(self):
         del self.xmlnode.attrib[name]
     return property(getter, setter, deleter, doc)
@@ -63,7 +65,7 @@ def IntegerWithLowerLimitProperty(name, lower_limit=0, doc=None):
             return max(lower_limit, int(value))
     def setter(self, value):
         value = int(value)
-        self.xmlnode.set(name, str(max(lower_limit, value)))
+        self.xmlnode.set(name, tostr(max(lower_limit, value)))
     def deleter(self):
         del self.xmlnode.attrib[name]
     return property(getter, setter, deleter, doc)
@@ -75,7 +77,7 @@ class TextNumberingMixin(object):
         return int(value) if value is not None else None
     @start_value.setter
     def start_value(self, value):
-        value = str(max(int(value), 1))
+        value = tostr(max(int(value), 1))
         self.set_attr(CN('text:start-value'), value)
 
     @property
@@ -85,7 +87,7 @@ class TextNumberingMixin(object):
     @formatted_number.setter
     def formatted_number(self, value):
         formatted_number = subelement(self.xmlnode, CN('text:number'))
-        formatted_number.text = str(value)
+        formatted_number.text = tostr(value)
 
 class TableVisibilityMixin(object):
     VALID_VISIBILITY_STATES = frozenset( ('visible', 'collapse', 'filter') )

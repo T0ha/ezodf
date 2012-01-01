@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: cell spanning controller
 # Created: 13.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
-from .xmlns import wrap, CN
+from .xmlns import wrap
 from .tableutils import iter_cell_range, iter_cell_range_without_start_pos
 
 
@@ -34,10 +35,10 @@ class CellSpanController(object):
     def _check_pos_and_size(self, pos, size):
         start_row, start_column = pos
         if start_row < 0 or start_column < 0:
-            raise IndexError("invalid start pos: %s" % str(pos))
+            raise IndexError("invalid start pos: %s" % tostr(pos))
         nrows, ncols = size
         if nrows < 1 or ncols < 1:
-            raise ValueError("invalid size parameter: %s" % str(size))
+            raise ValueError("invalid size parameter: %s" % tostr(size))
         if start_row + nrows > self._row_controller.nrows() or \
            start_column + ncols > self._row_controller.ncols():
             raise ValueError("cell range exceeds table limits")

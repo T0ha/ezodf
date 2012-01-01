@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: test section
 # Created: 17.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 # Standard Library
-import sys
 import unittest
 
 # trusted or separately tested modules
-from ezodf.xmlns import etree, CN
+from ezodf.xmlns import CN
 
 # objects to test
 from ezodf.text import Section

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: abstract page container
 # Created: 12.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
-from .xmlns import CN
+from .compatibility import tostr, is_string
 from . import wrapcache
 
 class AbstractPageContainer(object):
@@ -27,7 +28,7 @@ class AbstractPageContainer(object):
     def __getitem__(self, key):
         if isinstance(key, int):
             return self._child_by_index(key)
-        elif isinstance(key, str):
+        elif is_string(key):
             return self._child_by_name(key)
         else:
             raise TypeError('key has invalid type.')
@@ -37,7 +38,7 @@ class AbstractPageContainer(object):
             raise TypeError('child has to be a Table or Page object.')
         if isinstance(key, int):
             oldchild = self._child_by_index(key)
-        elif isinstance(key, str):
+        elif is_string(key):
             oldchild = self._child_by_name(key)
         else:
             raise TypeError('key has invalid type.')
@@ -46,7 +47,7 @@ class AbstractPageContainer(object):
     def __delitem__(self, key):
         if isinstance(key, int):
             oldchild = self._child_by_index(key)
-        elif isinstance(key, str):
+        elif is_string(key):
             oldchild = self._child_by_name(key)
         else:
             raise TypeError('key has invalid type.')
@@ -77,7 +78,7 @@ class AbstractPageContainer(object):
             self.xmlnode.append(child.xmlnode)
             return child
         else:
-            raise TypeError('Unable to append: %s' % str(child))
+            raise TypeError('Unable to append: %s' % tostr(child))
 
     def names(self):
         return (child.get(self._nametag) for child in self._xmlchildren())

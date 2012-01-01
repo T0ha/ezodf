@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: ODF styles.xml document management
 # Created: 28.12.2010
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 from .const import STYLES_NSMAP
 from .xmlns import XMLMixin, subelement, etree, CN, register_class, wrap

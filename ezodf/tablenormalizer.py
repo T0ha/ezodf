@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: table nomalizer
 # Created: 14.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 import copy
 
-from .xmlns import CN
 from .tableutils import new_empty_cell, get_table_rows, is_table
 from .tableutils import get_min_max_cell_count, count_cells_in_row
 from .tableutils import RepetitionAttribute

@@ -7,7 +7,9 @@ Welcome to ezodf's documentation!
 =================================
 
 **ezodf** is a Python package to create new or open existing OpenDocumentFormat
-files to extract, add, modify or delete document data.
+files to extract, add, modify or delete document data. Supported python versions
+are CPython 2.7 and CPython 3.2+, because the `lxml` package is needed, PyPy
+support isn't possible at this time (01.01.2012).
 
 To open an existing document, just use the :func:`ezodf.opendoc` function::
 
@@ -37,12 +39,6 @@ the original file will be created (if not disabled)::
 or save it with a new name::
 
    doc.saveas('newname.ext')
-
-.. raw:: html
-
-   <a href="http://flattr.com/thing/129224/ezodf" target="_blank">
-   <img src="http://api.flattr.com/button/flattr-badge-large.png"
-   alt="Flattr this" title="Flattr this" border="0" /></a>
 
 Contents
 --------

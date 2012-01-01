@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: Python Package for easy reading, writing and modifying of
 #          OpenDocumentFormat files.
 # Created: 27.12.2010
@@ -19,6 +18,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 version = (0, 2, 2)
 VERSION = '%d.%d.%d' % version

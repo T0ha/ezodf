@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: test observer object
 # Created: 23.01.2011
 # Copyright (C) , Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 # Standard Library
-import sys
 import unittest
 
 # objects to test

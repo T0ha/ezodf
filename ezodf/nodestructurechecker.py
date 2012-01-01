@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: node structure checker
 # Created: 02.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 from .nodestructuretags import TEXT_PRELUDE, TEXT_CONTENT_STREAM, TEXT_CONTENT_PAGED, TEXT_EPILOGUE
 

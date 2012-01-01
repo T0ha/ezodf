@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: GenericWrapper for ODF content objects
 # Created: 03.01.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 from .xmlns import etree, register_class, wrap
+from .compatibility import itermap, tostr
 
 def safelen(text):
     return len(text) if text else 0
@@ -22,7 +24,7 @@ class GenericWrapper(object):
             self.xmlnode = etree.Element(self.TAG)
 
     def __iter__(self):
-        return map(wrap, self.xmlnode.iterchildren())
+        return itermap(wrap, self.xmlnode.iterchildren())
 
     def __len__(self):
         return len(self.xmlnode)
@@ -118,7 +120,7 @@ class GenericWrapper(object):
     def set_attr(self, key, value):
         """ Set the `key` attribute of the xmlnode element to `value`. """
         if value:
-            self.xmlnode.set(key, str(value))
+            self.xmlnode.set(key, tostr(value))
         else:
             raise ValueError(value)
 

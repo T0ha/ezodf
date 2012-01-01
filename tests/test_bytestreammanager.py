@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman -- <mozman@gmx.at>
 # Purpose: test bayte stream manager
 # Created: 25.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
-import sys
 import unittest
 import zipfile, io
 # trusted or separately tested modules
@@ -64,7 +64,7 @@ class TestByteStreamManager(unittest.TestCase):
 
         expected_files = get_filelist(data)
         result_files = get_filelist(result)
-        self.assertSameElements(expected_files, result_files)
+        self.assertSetEqual(set(expected_files), set(result_files))
 
 if __name__=='__main__':
     unittest.main()

@@ -1,20 +1,19 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Author:  mozman --<mozman@gmx.at>
 # Purpose: test meta.py
 # Created: 28.12.2010
 # Copyright (C) 2010, Manfred Moitzi
 # License: GPLv3
+from __future__ import unicode_literals, print_function, division
+__author__ = "mozman <mozman@gmx.at>"
 
 # Standard Library
-import os
 import unittest
-from zipfile import ZipFile
 
 # trusted or separately tested modules
 from mytesttools import in_XML
 from ezodf.const import GENERATOR
-from ezodf.xmlns import XML, etree
+from ezodf.xmlns import etree
 
 # objects to test
 from ezodf.meta import OfficeDocumentMeta
