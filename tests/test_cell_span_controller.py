@@ -20,8 +20,11 @@ from ezodf.cellspancontroller import CellSpanController
 TABLE_10x10 = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
 <table:table-rows>
-  <table:table-row table:number-rows-repeated="10">
-    <table:table-cell table:number-columns-repeated="10"/>
+  <table:table-row table:number-rows-repeated="9">
+    <table:table-cell table:number-columns-repeated="9" /><table:table-cell />
+  </table:table-row>
+  <table:table-row>
+    <table:table-cell table:number-columns-repeated="9"/><table:table-cell />
   </table:table-row>
 </table:table-rows>
 </table:table>

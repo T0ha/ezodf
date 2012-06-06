@@ -32,10 +32,11 @@ TABLE_5x3 = """
 TABLE_REP_7x7 = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
 <table:table-header-rows>
-  <table:table-row><table:table-cell table:number-columns-repeated="7"/></table:table-row>
+  <table:table-row><table:table-cell table:number-columns-repeated="6"/><table:table-cell /></table:table-row>
 </table:table-header-rows>
 <table:table-rows>
-  <table:table-row table:number-rows-repeated="6"><table:table-cell table:number-columns-repeated="7" /></table:table-row>
+  <table:table-row table:number-rows-repeated="5"><table:table-cell table:number-columns-repeated="6" /><table:table-cell /></table:table-row>
+  <table:table-row><table:table-cell table:number-columns-repeated="6"/><table:table-cell /></table:table-row>
 </table:table-rows>
 </table:table>
 """
@@ -43,8 +44,11 @@ TABLE_REP_7x7 = """
 TABLE_10x10 = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
 <table:table-rows>
-  <table:table-row table:number-rows-repeated="10">
-    <table:table-cell table:number-columns-repeated="10"/>
+  <table:table-row table:number-rows-repeated="9">
+    <table:table-cell table:number-columns-repeated="9" /><table:table-cell />
+  </table:table-row>
+  <table:table-row>
+    <table:table-cell table:number-columns-repeated="9"/><table:table-cell />
   </table:table-row>
 </table:table-rows>
 </table:table>
@@ -81,10 +85,10 @@ class TestTableNormalizer(unittest.TestCase):
 UNALIGNED_TABLE_3_2_1 = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
 <table:table-header-rows>
-  <table:table-row><table:table-cell table:number-columns-repeated="3"/></table:table-row>
+  <table:table-row><table:table-cell /><table:table-cell /><table:table-cell /></table:table-row>
 </table:table-header-rows>
 <table:table-rows>
-  <table:table-row><table:table-cell table:number-columns-repeated="2"/></table:table-row>
+  <table:table-row><table:table-cell /><table:table-cell /></table:table-row>
   <table:table-row><table:table-cell /></table:table-row>
 </table:table-rows>
 </table:table>
