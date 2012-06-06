@@ -26,24 +26,40 @@ class TableNormalizer(object):
                 xmlnode.addnext(clone)
                 count -= 1
 
-        def expand_cell(xmlcell, count):
+        def expand_cell(xmlcell):
+            repeat = RepetitionAttribute(xmlcell)
+            count = repeat.cols
             if count > 1:
-                del RepetitionAttribute(xmlcell).cols
+                del repeat.cols
                 expand_element(xmlcell, count)
+                
+        def do_not_expand_cell(xmlcell):
+            repeat = RepetitionAttribute(xmlcell)
+            if repeat.cols > 1:
+                del repeat.cols
 
         def expand_cells(xmlrow):
-            for xmlcell in xmlrow:
-                expand_cell(xmlcell, RepetitionAttribute(xmlcell).cols)
+            # do not expand last column
+            for xmlcell in xmlrow[:-1]:
+                expand_cell(xmlcell)
+            do_not_expand_cell(xmlrow[-1])
 
         def expand_row(xmlrow):
             count = RepetitionAttribute(xmlrow).rows
             del RepetitionAttribute(xmlrow).rows
             expand_element(xmlrow, count)
-
-        for xmlrow in get_table_rows(self.xmlnode):
+            
+        def do_not_expand_row(xmlrow):
+            repeat = RepetitionAttribute(xmlrow)
+            if repeat.rows > 1:
+                del repeat.rows
+            
+        rows = get_table_rows(self.xmlnode)
+        for xmlrow in rows[:-1]: # do not expand last row
             expand_cells(xmlrow)
             if RepetitionAttribute(xmlrow).rows > 1:
-                expand_row(xmlrow)
+                expand_row(xmlrow)  
+        do_not_expand_row(rows[-1])
 
     def align_table_columns(self):
         def append_cells(xmlrow, count):
