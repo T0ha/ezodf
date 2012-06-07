@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Purpose: test tabl-row container
+# Purpose: test table-column-controller
 # Created: 02.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
@@ -11,7 +11,7 @@ import unittest
 
 from ezodf.xmlns import CN, etree
 from ezodf.nodestructuretags import TABLE_PRELUDE
-from ezodf import global_normalizer_params
+from ezodf import config
 
 # objects to test
 from ezodf.tablecolumncontroller import TableColumnController
@@ -252,22 +252,22 @@ TABLECOLUMNS_C99 = """
 
 class TestColumnExpandingStrategies(unittest.TestCase):
     def test_expand_all(self):
-        global_normalizer_params.set_strategy('all')
+        config.table_expand_strategy.set_strategy('all')
         container = TableColumnController(etree.XML(TABLECOLUMNS_C99))
-        global_normalizer_params.reset()
+        config.table_expand_strategy.reset()
         self.assertEqual(99, len(container))
 
 
     def test_expand_all_but_last(self):
-        global_normalizer_params.set_strategy('all_but_last')
+        config.table_expand_strategy.set_strategy('all_but_last')
         container = TableColumnController(etree.XML(TABLECOLUMNS_C99))
-        global_normalizer_params.reset()
+        config.table_expand_strategy.reset()
         self.assertEqual(34, len(container))
 
     def test_expand_all_less_maxcount(self):
-        global_normalizer_params.set_strategy('all_less_maxcount')
+        config.table_expand_strategy.set_strategy('all_less_maxcount', (32, 32))
         container = TableColumnController(etree.XML(TABLECOLUMNS_C99))
-        global_normalizer_params.reset()
+        config.table_expand_strategy.reset()
         self.assertEqual(2, len(container))
 
 if __name__=='__main__':

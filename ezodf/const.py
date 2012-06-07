@@ -211,3 +211,6 @@ MIMETYPE_BODYTAG_MAP = {
     "application/vnd.oasis.opendocument.chart" : "office:chart",
     "application/vnd.oasis.opendocument.image" : "office:image",
 }
+
+DEFAULT_TABLE_EXPAND_STRATEGY = "all_less_maxcount"
+DEFAULT_MAXCOUNT = (32, 32)

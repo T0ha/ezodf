@@ -13,7 +13,7 @@ from .xmlns import CN, etree
 from .nodestructuretags import TABLE_COLUMNS, TABLE_PRELUDE
 from .nodeorganizer import PreludeTagBlock
 from .tableutils import is_table, RepetitionAttribute
-from .tablenormalizer import global_normalizer_params
+from .conf import config
 
 def new_empty_column():
     return etree.Element(CN('table:table-column'))
@@ -90,8 +90,8 @@ class TableColumnController(object):
                 self.xmlnode.remove(child)
 
     def _expand_repeated_content(self):
-        maxcols = global_normalizer_params.get_maxcols()
-        expand = global_normalizer_params.get_strategy()
+        maxcols = config.table_expand_strategy.get_maxcols()
+        expand = config.table_expand_strategy.get_strategy()
         try:
             strategy = expand_strategies[expand]
         except KeyError:

@@ -12,39 +12,12 @@ import copy
 from .tableutils import new_empty_cell, get_table_rows, is_table
 from .tableutils import get_min_max_cell_count, count_cells_in_row
 from .tableutils import RepetitionAttribute
-
-_DEFAULT_TABLE_EXPAND_STRATEGY = "all_less_maxcount"
-_DEFAULT_MAXCOUNT = (32, 32)
-
-class NormalizerParams(object):
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.set_strategy(_DEFAULT_TABLE_EXPAND_STRATEGY, _DEFAULT_MAXCOUNT)
-
-    def set_strategy(self, strategy, maxcount=_DEFAULT_MAXCOUNT):
-        self._strategy = strategy
-        self._maxcount = maxcount
-
-    def get_strategy(self):
-        return self._strategy
-
-    def get_maxcount(self):
-        return self._maxcount
-
-    def get_maxrows(self):
-        return self._maxcount[0]
-
-    def get_maxcols(self):
-        return self._maxcount[1]
-
-global_normalizer_params = NormalizerParams()
+from . import const
 
 class _ExpandAll:
     """ Expand all rows and columns, many repeated rows/cols blow up your ram """
     def __init__(self):
-        self.set_maxcount(_DEFAULT_MAXCOUNT)
+        self.set_maxcount(const.DEFAULT_MAXCOUNT)
 
     def set_maxcount(self, maxcount):
         self.maxrows = maxcount[0]
@@ -176,7 +149,9 @@ class TableNormalizer(object):
         if cmin != cmax:
             _align_table_columns(cmax)
 
-def normalize_table(xmlnode, expand=_DEFAULT_TABLE_EXPAND_STRATEGY, maxcount=_DEFAULT_MAXCOUNT):
+def normalize_table(xmlnode, 
+                    expand=const.DEFAULT_TABLE_EXPAND_STRATEGY, 
+                    maxcount=const.DEFAULT_MAXCOUNT):
     normalizer = TableNormalizer(xmlnode)
     normalizer.expand_repeated_table_content(expand, maxcount)
     normalizer.align_table_columns()

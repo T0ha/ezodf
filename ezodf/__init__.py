@@ -21,7 +21,7 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-version = (0, 2, 2)
+version = (0, 2, 4)
 VERSION = '%d.%d.%d' % version
 
 from .document import opendoc, newdoc
@@ -32,7 +32,7 @@ from .text import Span, Paragraph, Heading, Section, Hyperlink
 from .text import List, ListHeader, ListItem, NumberedParagraph
 from .table import Table
 from .cells import Cell
-from .tablenormalizer import global_normalizer_params
+from .conf import config
 
 Sheet = Table
 
