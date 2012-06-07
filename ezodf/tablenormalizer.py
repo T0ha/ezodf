@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #coding:utf-8
-# Purpose: table nomalizer
+# Purpose: table normalizer
 # Created: 14.02.2011
 # Copyright (C) 2011, Manfred Moitzi
 # License: GPLv3
@@ -33,33 +33,41 @@ class TableNormalizer(object):
                 del repeat.cols
                 expand_element(xmlcell, count)
                 
-        def do_not_expand_cell(xmlcell):
+        def expand_last_cell(xmlcell):
+            # actual strategy: do not expand last cell
             repeat = RepetitionAttribute(xmlcell)
             if repeat.cols > 1:
                 del repeat.cols
 
         def expand_cells(xmlrow):
-            # do not expand last column
-            for xmlcell in xmlrow[:-1]:
+            for xmlcell in xmlrow[:-1]: # do all cells except last one
                 expand_cell(xmlcell)
-            do_not_expand_cell(xmlrow[-1])
+            if len(xmlrow): # do last cell
+                expand_last_cell(xmlrow[-1])
 
         def expand_row(xmlrow):
-            count = RepetitionAttribute(xmlrow).rows
-            del RepetitionAttribute(xmlrow).rows
-            expand_element(xmlrow, count)
+            repeat = RepetitionAttribute(xmlrow)
+            count = repeat.rows
+            if count > 1:
+                del repeat.rows
+                expand_element(xmlrow, count)
             
-        def do_not_expand_row(xmlrow):
+        def expand_last_row(xmlrow):
+            # actual strategy: do not expand last row
             repeat = RepetitionAttribute(xmlrow)
             if repeat.rows > 1:
                 del repeat.rows
             
-        rows = get_table_rows(self.xmlnode)
-        for xmlrow in rows[:-1]: # do not expand last row
+        xmlrows = get_table_rows(self.xmlnode)
+        # expand columns of all rows
+        for xmlrow in xmlrows:
             expand_cells(xmlrow)
-            if RepetitionAttribute(xmlrow).rows > 1:
-                expand_row(xmlrow)  
-        do_not_expand_row(rows[-1])
+
+        for xmlrow in xmlrows[:-1]: # do all rows except last one
+            expand_row(xmlrow)
+
+        if len(xmlrows): # do last row
+            expand_last_row(xmlrows[-1])
 
     def align_table_columns(self):
         def append_cells(xmlrow, count):

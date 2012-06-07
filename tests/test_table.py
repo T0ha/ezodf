@@ -115,8 +115,13 @@ TABLE_5x3 = """
 
 TABLE_REP_7x7 = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
-<table:table-row><table:table-cell table:number-columns-repeated="7"/></table:table-row>
-<table:table-row table:number-rows-repeated="6"><table:table-cell table:number-columns-repeated="7" /></table:table-row>
+<table:table-header-rows>
+  <table:table-row><table:table-cell table:number-columns-repeated="6"/><table:table-cell /></table:table-row>
+</table:table-header-rows>
+<table:table-rows>
+  <table:table-row table:number-rows-repeated="5"><table:table-cell table:number-columns-repeated="6" /><table:table-cell /></table:table-row>
+  <table:table-row><table:table-cell table:number-columns-repeated="6"/><table:table-cell /></table:table-row>
+</table:table-rows>
 </table:table>
 """
 
@@ -177,8 +182,14 @@ class TestTableMethods(unittest.TestCase):
 
 TABLE_COMP = """
 <table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
-<table:table-row><table:table-cell table:number-columns-repeated="7"/></table:table-row>
-<table:table-row table:number-rows-repeated="6"><table:table-cell table:number-columns-repeated="7" /></table:table-row>
+<table:table-row table:number-rows-repeated="6">
+  <table:table-cell table:number-columns-repeated="6"/>
+  <table:table-cell/>
+</table:table-row>
+<table:table-row>
+  <table:table-cell table:number-columns-repeated="6"/>
+  <table:table-cell/>
+</table:table-row>
 </table:table>
 """
 
