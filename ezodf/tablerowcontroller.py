@@ -9,7 +9,7 @@ __author__ = "mozman <mozman@gmx.at>"
 
 from .xmlns import CN, etree
 from .nodestructuretags import TABLE_ROWS
-from .tablenormalizer import normalize_table
+from .tablenormalizer import normalize_table, global_normalizer_params
 from .tableutils import get_table_rows, new_empty_cell, is_table
 
 class TableCellAccessor(object):
@@ -17,7 +17,9 @@ class TableCellAccessor(object):
         if not is_table(xmlnode):
             raise ValueError('invalid xmlnode')
         self.xmlnode = xmlnode
-        normalize_table(xmlnode)
+        expand = global_normalizer_params.get_strategy()
+        maxcount = global_normalizer_params.get_maxcount()
+        normalize_table(xmlnode, expand, maxcount)
         self.update()
 
     def update(self):

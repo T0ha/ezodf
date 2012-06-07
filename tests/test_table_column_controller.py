@@ -11,6 +11,7 @@ import unittest
 
 from ezodf.xmlns import CN, etree
 from ezodf.nodestructuretags import TABLE_PRELUDE
+from ezodf import global_normalizer_params
 
 # objects to test
 from ezodf.tablecolumncontroller import TableColumnController
@@ -237,6 +238,37 @@ class TestColumnManagement(unittest.TestCase):
     def test_delete_cols_index_and_count_out_of_range_error(self):
         with self.assertRaises(IndexError):
             self.container.delete(9, count=2)
+
+TABLECOLUMNS_C99 = """
+<table:table xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0">
+<table:table-header-columns>
+  <table:table-column table:number-columns-repeated="33"/>
+</table:table-header-columns>
+<table:table-columns>
+  <table:table-column table:number-columns-repeated="66"/>
+</table:table-columns>
+</table:table>
+"""
+
+class TestColumnExpandingStrategies(unittest.TestCase):
+    def test_expand_all(self):
+        global_normalizer_params.set_strategy('all')
+        container = TableColumnController(etree.XML(TABLECOLUMNS_C99))
+        global_normalizer_params.reset()
+        self.assertEqual(99, len(container))
+
+
+    def test_expand_all_but_last(self):
+        global_normalizer_params.set_strategy('all_but_last')
+        container = TableColumnController(etree.XML(TABLECOLUMNS_C99))
+        global_normalizer_params.reset()
+        self.assertEqual(34, len(container))
+
+    def test_expand_all_less_maxcount(self):
+        global_normalizer_params.set_strategy('all_less_maxcount')
+        container = TableColumnController(etree.XML(TABLECOLUMNS_C99))
+        global_normalizer_params.reset()
+        self.assertEqual(2, len(container))
 
 if __name__=='__main__':
     unittest.main()

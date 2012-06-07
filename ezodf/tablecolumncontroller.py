@@ -13,9 +13,56 @@ from .xmlns import CN, etree
 from .nodestructuretags import TABLE_COLUMNS, TABLE_PRELUDE
 from .nodeorganizer import PreludeTagBlock
 from .tableutils import is_table, RepetitionAttribute
+from .tablenormalizer import global_normalizer_params
 
 def new_empty_column():
     return etree.Element(CN('table:table-column'))
+
+class _ExpandAll(object):
+    def expand_element(self, count, xmlnode):
+        while count > 1:
+            clone = copy.deepcopy(xmlnode)
+            xmlnode.addnext(clone)
+            count -= 1
+
+    def expand_column(self, xmlcolumn, maxcols):
+        repeat = RepetitionAttribute(xmlcolumn)
+        count = repeat.cols
+        if count > 1:
+            del repeat.cols
+            self.expand_element(count, xmlcolumn)
+
+    def expand_columns(self, xmlcolumns, maxcols):
+        for xmlcolumn in xmlcolumns:
+            self.expand_column(xmlcolumn, maxcols)
+
+class _ExpandAllButLast(_ExpandAll):
+    def do_not_expand_column(self, xmlcolumn):
+        repeat = RepetitionAttribute(xmlcolumn)
+        if repeat.cols > 1:
+            del repeat.cols
+
+    def expand_columns(self, xmlcolumns, maxcols):
+        for xmlcolumn in xmlcolumns[:-1]:
+            self.expand_column(xmlcolumn, maxcols)
+        if len(xmlcolumns):
+            self.do_not_expand_column(xmlcolumns[-1])
+
+class _ExpandAllLessMaxCount(_ExpandAll):
+    def expand_column(self, xmlcolumn, maxcols):
+        repeat = RepetitionAttribute(xmlcolumn)
+        count = repeat.cols
+        if 1 < count < maxcols:
+            del repeat.cols
+            self.expand_element(count, xmlcolumn)
+        elif count >= maxcols:
+            del repeat.cols # column just appears only one time
+
+expand_strategies = {
+    'all': _ExpandAll(),
+    'all_but_last': _ExpandAllButLast(),
+    'all_less_maxcount': _ExpandAllLessMaxCount(),
+    }
 
 class TableColumnController(object):
     def __init__(self, xmlnode):
@@ -43,20 +90,13 @@ class TableColumnController(object):
                 self.xmlnode.remove(child)
 
     def _expand_repeated_content(self):
-        def expand_element(count, xmlnode):
-            while count > 1:
-                clone = copy.deepcopy(xmlnode)
-                xmlnode.addnext(clone)
-                count -= 1
-
-        def expand_columns(xmlcolumn):
-            count = RepetitionAttribute(xmlcolumn).cols
-            if count > 1:
-                del RepetitionAttribute(xmlcolumn).cols
-                expand_element(count, xmlcolumn)
-
-        for xmlrow in self.xmlnode.findall('.//'+CN('table:table-column')):
-            expand_columns(xmlrow)
+        maxcols = global_normalizer_params.get_maxcols()
+        expand = global_normalizer_params.get_strategy()
+        try:
+            strategy = expand_strategies[expand]
+        except KeyError:
+            raise TypeError("Unknown expand strategy: %s" % expand)
+        strategy.expand_columns(self.xmlnode.findall('.//'+CN('table:table-column')), maxcols)
 
     def __len__(self):
         return len(self._columns)

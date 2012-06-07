@@ -13,61 +13,153 @@ from .tableutils import new_empty_cell, get_table_rows, is_table
 from .tableutils import get_min_max_cell_count, count_cells_in_row
 from .tableutils import RepetitionAttribute
 
+_DEFAULT_TABLE_EXPAND_STRATEGY = "all_less_maxcount"
+_DEFAULT_MAXCOUNT = (32, 32)
+
+class NormalizerParams(object):
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.set_strategy(_DEFAULT_TABLE_EXPAND_STRATEGY, _DEFAULT_MAXCOUNT)
+
+    def set_strategy(self, strategy, maxcount=_DEFAULT_MAXCOUNT):
+        self._strategy = strategy
+        self._maxcount = maxcount
+
+    def get_strategy(self):
+        return self._strategy
+
+    def get_maxcount(self):
+        return self._maxcount
+
+    def get_maxrows(self):
+        return self._maxcount[0]
+
+    def get_maxcols(self):
+        return self._maxcount[1]
+
+global_normalizer_params = NormalizerParams()
+
+class _ExpandAll:
+    """ Expand all rows and columns, many repeated rows/cols blow up your ram """
+    def __init__(self):
+        self.set_maxcount(_DEFAULT_MAXCOUNT)
+
+    def set_maxcount(self, maxcount):
+        self.maxrows = maxcount[0]
+        self.maxcols = maxcount[1]
+
+    def expand_element(self, xmlnode, count):
+        while count > 1:
+            clone = copy.deepcopy(xmlnode)
+            xmlnode.addnext(clone)
+            count -= 1
+
+    def expand_cell(self, xmlcell):
+        repeat = RepetitionAttribute(xmlcell)
+        count = repeat.cols
+        if count > 1:
+            del repeat.cols
+            self.expand_element(xmlcell, count)
+
+    def expand_cells(self, xmlrow):
+        for xmlcell in xmlrow:
+            self.expand_cell(xmlcell)
+
+    def expand_row(self, xmlrow):
+        repeat = RepetitionAttribute(xmlrow)
+        count = repeat.rows
+        if count > 1:
+            del repeat.rows
+            self.expand_element(xmlrow, count)
+
+    def normalize(self, xmlrows, maxcount):
+        self.set_maxcount(maxcount)
+        for xmlrow in xmlrows:
+            self.expand_cells(xmlrow)
+            self.expand_row(xmlrow)
+
+
+class _ExpandAllButLast(_ExpandAll):
+    """ Expand all but last row and column. """
+    def expand_last_cell(self, xmlcell):
+        repeat = RepetitionAttribute(xmlcell)
+        if repeat.cols > 1:
+            del repeat.cols
+
+    def expand_last_row(self, xmlrow):
+        repeat = RepetitionAttribute(xmlrow)
+        if repeat.rows > 1:
+            del repeat.rows
+
+    def expand_cells(self, xmlrow):
+        for xmlcell in xmlrow[:-1]: # do all cells except last one
+            self.expand_cell(xmlcell)
+        if len(xmlrow): # do last cell
+            self.expand_last_cell(xmlrow[-1])
+
+    def normalize(self, xmlrows, maxcount):
+        # expand columns of all rows
+        for xmlrow in xmlrows:
+            self.expand_cells(xmlrow)
+
+        for xmlrow in xmlrows[:-1]: # do all rows except last one
+            self.expand_row(xmlrow)
+
+        if len(xmlrows): # do last row
+            self.expand_last_row(xmlrows[-1])
+
+class _ExpandAllLessMaxCount(_ExpandAll):
+    """ Expand all rows and columns with less than maxcount repetitions.
+
+    Rows and cols with repetitions >= maxcount, occurs only once!
+    """
+    def expand_cell(self, xmlcell):
+        repeat = RepetitionAttribute(xmlcell)
+        count = repeat.cols
+        if 1 < count < self.maxcols:
+            del repeat.cols
+            self.expand_element(xmlcell, count)
+        elif count >= self.maxcols:
+            del repeat.cols # column just appears only one time
+
+    def expand_row(self, xmlrow):
+        repeat = RepetitionAttribute(xmlrow)
+        count = repeat.rows
+        if 1 < count < self.maxrows:
+            del repeat.rows
+            self.expand_element(xmlrow, count)
+        elif count >= self.maxrows:
+            del repeat.rows # row just appears only one time
+
+expand_strategies = {
+    'all': _ExpandAll(),
+    'all_but_last': _ExpandAllButLast(),
+    'all_less_maxcount': _ExpandAllLessMaxCount(),
+}
+
 class TableNormalizer(object):
     def __init__(self, xmlnode):
         if not is_table(xmlnode):
             raise ValueError('invalid xmlnode')
         self.xmlnode = xmlnode
 
-    def expand_repeated_table_content(self):
-        def expand_element(xmlnode, count):
-            while count > 1:
-                clone = copy.deepcopy(xmlnode)
-                xmlnode.addnext(clone)
-                count -= 1
+    def expand_repeated_table_content(self, expand, maxcount):
+        """
+        expand (strategy):
+        'all': expand all rows and columns, many repeated rows/cols blow up your ram
+        'all_but_last': expand all but last row and column
+        'all_less_maxcount': expand all rows and columns with less than maxcount repetitions
+            rows and cols with repetitions >= maxcount, occurs only once!
 
-        def expand_cell(xmlcell):
-            repeat = RepetitionAttribute(xmlcell)
-            count = repeat.cols
-            if count > 1:
-                del repeat.cols
-                expand_element(xmlcell, count)
-                
-        def expand_last_cell(xmlcell):
-            # actual strategy: do not expand last cell
-            repeat = RepetitionAttribute(xmlcell)
-            if repeat.cols > 1:
-                del repeat.cols
+        """
+        try:
+            strategy = expand_strategies[expand]
+        except KeyError:
+            raise TypeError("Unknown expand strategy: %s" % expand)
+        strategy.normalize(get_table_rows(self.xmlnode), maxcount)
 
-        def expand_cells(xmlrow):
-            for xmlcell in xmlrow[:-1]: # do all cells except last one
-                expand_cell(xmlcell)
-            if len(xmlrow): # do last cell
-                expand_last_cell(xmlrow[-1])
-
-        def expand_row(xmlrow):
-            repeat = RepetitionAttribute(xmlrow)
-            count = repeat.rows
-            if count > 1:
-                del repeat.rows
-                expand_element(xmlrow, count)
-            
-        def expand_last_row(xmlrow):
-            # actual strategy: do not expand last row
-            repeat = RepetitionAttribute(xmlrow)
-            if repeat.rows > 1:
-                del repeat.rows
-            
-        xmlrows = get_table_rows(self.xmlnode)
-        # expand columns of all rows
-        for xmlrow in xmlrows:
-            expand_cells(xmlrow)
-
-        for xmlrow in xmlrows[:-1]: # do all rows except last one
-            expand_row(xmlrow)
-
-        if len(xmlrows): # do last row
-            expand_last_row(xmlrows[-1])
 
     def align_table_columns(self):
         def append_cells(xmlrow, count):
@@ -84,7 +176,7 @@ class TableNormalizer(object):
         if cmin != cmax:
             _align_table_columns(cmax)
 
-def normalize_table(xmlnode):
+def normalize_table(xmlnode, expand=_DEFAULT_TABLE_EXPAND_STRATEGY, maxcount=_DEFAULT_MAXCOUNT):
     normalizer = TableNormalizer(xmlnode)
-    normalizer.expand_repeated_table_content()
+    normalizer.expand_repeated_table_content(expand, maxcount)
     normalizer.align_table_columns()

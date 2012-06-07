@@ -32,6 +32,7 @@ from .text import Span, Paragraph, Heading, Section, Hyperlink
 from .text import List, ListHeader, ListItem, NumberedParagraph
 from .table import Table
 from .cells import Cell
+from .tablenormalizer import global_normalizer_params
 
 Sheet = Table
 

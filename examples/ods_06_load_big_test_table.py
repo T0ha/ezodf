@@ -15,7 +15,7 @@ doc = ezodf.opendoc("big-test-table.ods")
 print("Spreadsheet contains %d sheets.\n" % len(doc.sheets))
 for sheet in doc.sheets:
     print("Sheet name: '%s'" % sheet.name)
-    print("Size of Sheet : (%d, %d)" % (sheet.nrows(), sheet.ncols()) )
+    print("Size of Sheet : (rows=%d, cols=%d)" % (sheet.nrows(), sheet.ncols()) )
     print("-"*40)
     
 doc.save()
