@@ -6,7 +6,7 @@ Version 0.2.4 - June 2012
 
   * Alpha version
   * can open tables with many repeated rows/cols, 3 opening strategies are supported
-  * tested: on Windows7 32 Bit with CPython 2.7 and CPython 3.2
+  * tested: on Win7/Ubuntu 32-Bit with CPython 2.7 and CPython 3.2
 
 Version 0.2.3 - January 2012
 

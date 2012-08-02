@@ -9,7 +9,7 @@ Welcome to ezodf's documentation!
 **ezodf** is a Python package to create new or open existing OpenDocumentFormat
 files to extract, add, modify or delete document data. Supported python versions
 are CPython 2.7 and CPython 3.2+, because the `lxml` package is needed, PyPy
-support isn't possible at this time (01.01.2012).
+support isn't possible at this time (08.06.2012).
 
 To open an existing document, just use the :func:`ezodf.opendoc` function::
 
