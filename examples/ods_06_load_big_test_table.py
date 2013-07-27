@@ -3,7 +3,7 @@
 # Purpose: swap row/columns of a table
 # Created: 28.05.2012
 # Copyright (C) 2012, Manfred Moitzi
-# License: GPLv3
+# License: MIT license
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 

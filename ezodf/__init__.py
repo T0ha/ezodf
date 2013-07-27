@@ -4,7 +4,7 @@
 #          OpenDocumentFormat files.
 # Created: 27.12.2010
 # Copyright (C) 2010, Manfred Moitzi
-# License: GPLv3
+# License: MIT license
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-version = (0, 2, 4)
+version = (0, 2, 5)
 VERSION = '%d.%d.%d' % version
 
 from .document import opendoc, newdoc

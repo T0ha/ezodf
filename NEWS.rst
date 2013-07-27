@@ -2,6 +2,12 @@
 NEWS
 ====
 
+Version 0.2.5 - Juli 2012
+
+  * Alpha version
+  * license changed to MIT license
+  * development stopped - for now
+
 Version 0.2.4 - June 2012
 
   * Alpha version

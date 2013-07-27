@@ -3,7 +3,7 @@
 # Purpose: test meta.py
 # Created: 28.12.2010
 # Copyright (C) 2010, Manfred Moitzi
-# License: GPLv3
+# License: MIT license
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 

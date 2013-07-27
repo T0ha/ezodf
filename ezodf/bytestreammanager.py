@@ -3,7 +3,7 @@
 # Purpose: byte stream manager
 # Created: 25.02.2011
 # Copyright (C) 2011, Manfred Moitzi
-# License: GPLv3
+# License: MIT license
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
