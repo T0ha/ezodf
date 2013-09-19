@@ -33,7 +33,7 @@ Dependencies
   declaration (xlmns:prefix="global:namespace:specifier") in the root element.
   Declarations for unused prefixes are also possible.
 
-The target platform is CPython 2.7 and CPython 3.2+.
+The target platform is CPython 2.7 and CPython 3.3+.
 
 Installation
 ============

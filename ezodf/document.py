@@ -21,7 +21,7 @@ from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
 from . import observer
 
-from . import body # no used, but important to register body classes
+from . import body # not used, but important to register body classes
 
 class InvalidFiletypeError(TypeError):
     pass
@@ -39,7 +39,7 @@ def opendoc(filename):
         fm = ByteStreamManager(filename)
     else:
         try:
-            xmlnode = etree.parse(filename)
+            xmlnode = etree.parse(filename).getroot()
             return FlatXMLDocument(filename=filename, xmlnode=xmlnode)
         except etree.ParseError:
             raise IOError("File '%s' is neither a zip-package nor a flat " \
