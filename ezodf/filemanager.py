@@ -180,7 +180,7 @@ def check_zipfile_for_oasis_validity(filename, mimetype):
     """
     def check_manifest(stream):
         xmltree = etree.XML(stream)
-        directory = { e.get(CN('manifest:full-path')):e for e in xmltree.findall(CN('manifest:file-entry')) }
+        directory = dict([ (e.get(CN('manifest:full-path')), e) for e in xmltree.findall(CN('manifest:file-entry')) ])
         for name in ('content.xml', 'meta.xml', 'styles.xml', '/'):
             if name not in directory:
                 return False

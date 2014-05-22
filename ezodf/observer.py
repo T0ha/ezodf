@@ -7,7 +7,7 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-from weakref import WeakSet
+from weakrefset import WeakSet
 
 class Observer(object):
     """ Simple implementation of the observer pattern for broadcasting messages
