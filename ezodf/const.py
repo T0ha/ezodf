@@ -31,9 +31,9 @@ MIMETYPES = {
     'oth': "application/vnd.oasis.opendocument.text-web",
 }
 
-FILE_EXT_FOR_MIMETYPE = { mimetype:ext for ext, mimetype in MIMETYPES.items() }
+FILE_EXT_FOR_MIMETYPE = dict([(mimetype, ext) for ext, mimetype in MIMETYPES.items()])
 
-ANIM_NS ="urn:oasis:names:tc:opendocument:xmlns:animation:1.0"
+ANIM_NS = "urn:oasis:names:tc:opendocument:xmlns:animation:1.0"
 DB_NS = "urn:oasis:names:tc:opendocument:xmlns:database:1.0"
 CHART_NS = "urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
 CONFIG_NS = "urn:oasis:names:tc:opendocument:xmlns:config:1.0"
