@@ -28,7 +28,11 @@ class InvalidFiletypeError(TypeError):
 
 def is_valid_stream(buffer):
     if is_bytes(buffer):
-        return zipfile.is_zipfile(io.BytesIO(buffer))
+        try:
+            return zipfile.is_zipfile(io.BytesIO(buffer))
+        except TypeError:
+            raise NotImplementedError("File like objects are not compatiable with zipfile in"
+                                      "Python before 2.7 version")
     else:
         return False
 
@@ -42,7 +46,7 @@ def opendoc(filename):
             xmlnode = etree.parse(filename).getroot()
             return FlatXMLDocument(filename=filename, xmlnode=xmlnode)
         except etree.ParseError:
-            raise IOError("File '%s' is neither a zip-package nor a flat " \
+            raise IOError("File '%s' is neither a zip-package nor a flat "
                           "XML OpenDocumentFormat file." % filename)
 
     mimetype = fm.get_text('mimetype')
@@ -58,13 +62,14 @@ def newdoc(doctype="odt", filename="", template=None):
         document = _new_doc_from_template(filename, template)
     return document
 
+
 def _new_doc_from_template(filename, templatename):
     #TODO: only works with zip packaged documents
     def get_filemanager(buffer):
-        if is_valid_stream(buffer):
-            return ByteStreamManager(buffer)
-        elif zipfile.is_zipfile(buffer):
+        if zipfile.is_zipfile(buffer):
             return FileManager(buffer)
+        elif is_valid_stream(buffer):
+            return ByteStreamManager(buffer)
         else:
             raise IOError('File does not exist or it is not a zipfile: %s' % tostr(buffer))
 
