@@ -53,6 +53,6 @@ http://packages.python.org/ezodf
 
 send feedback to mozman@gmx.at
 
-ezodf can be found on bitbucket.org at:
+ezodf can be found on GitHub at:
 
-http://bitbucket.org/mozman/ezodf
+https://github.com/T0ha/ezodf
