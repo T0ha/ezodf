@@ -33,7 +33,8 @@ Dependencies
   declaration (xlmns:prefix="global:namespace:specifier") in the root element.
   Declarations for unused prefixes are also possible.
 
-The target platform is CPython 2.7 and CPython 3.3+.
+The target platform is CPython 2.7 and CPython 3.3+, work on compability with 
+CPython 2.6 is in progress.
 
 Installation
 ============
@@ -51,7 +52,7 @@ Documentation
 
 http://packages.python.org/ezodf
 
-send feedback to mozman@gmx.at
+send feedback to t0hashvein@gmail..com
 
 ezodf can be found on GitHub at:
 
