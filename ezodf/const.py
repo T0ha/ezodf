@@ -9,7 +9,9 @@ __author__ = "mozman <mozman@gmx.at>"
 
 import sys
 
-VERSION = "0.1.0"
+version = (0, 2, 5)
+VERSION = '%d.%d.%d' % version
+
 GENERATOR = "http://pypi.python.org/pypi/ezodf/%s$Python%s" % (VERSION, sys.version)
 
 MIMETYPES = {

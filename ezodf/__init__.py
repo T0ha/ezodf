@@ -21,9 +21,7 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-version = (0, 2, 5)
-VERSION = '%d.%d.%d' % version
-
+from .const import VERSION
 from .document import opendoc, newdoc
 
 # register classes by import
