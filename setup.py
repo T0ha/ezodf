@@ -11,7 +11,7 @@
 import os
 from distutils.core import setup
 
-from ezodf import VERSION
+from version import VERSION
 
 AUTHOR_NAME = 'Manfred Moitzi'
 AUTHOR_EMAIL = 'mozman@gmx.at'
