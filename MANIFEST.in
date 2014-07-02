@@ -1,6 +1,7 @@
 include NEWS.txt README.rst LICENSE.rst TODO.rst
 include runtests.bat
 include runtests.py
+include version.py
 recursive-include examples *.py *.bat *.sh
 recursive-include tests *.py
 recursive-include tests/data *
