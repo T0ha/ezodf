@@ -49,8 +49,23 @@ def opendoc(filename):
             raise IOError("File '%s' is neither a zip-package nor a flat "
                           "XML OpenDocumentFormat file." % filename)
 
-    mimetype = fm.get_text('mimetype')
-    return PackagedDocument(filemanager=fm, mimetype=mimetype)
+    mime_type = __detect_mime_type(fm)
+    return PackagedDocument(filemanager=fm, mimetype=mime_type)
+
+
+def __detect_mime_type(file_manager):
+    mime_type = file_manager.get_text('mimetype')
+    if mime_type is not None:
+        return mime_type
+    # Fall-through to next mechanism
+    entry = file_manager.manifest.find('/')
+    if entry is not None:
+        mime_type = entry.get(CN('manifest:media-type'))
+    else:
+        # use file ext name
+        ext = os.path.splitext(file_manager.zipname)[1]
+        mime_type = MIMETYPES[ext]
+    return mime_type
 
 
 def newdoc(doctype="odt", filename="", template=None):

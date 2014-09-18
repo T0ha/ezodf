@@ -11,3 +11,6 @@ docs/_build/*
 *.*~
 *.wpr
 MANIFEST
+
+# IDE
+.idea/*
