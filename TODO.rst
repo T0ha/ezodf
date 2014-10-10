@@ -41,4 +41,9 @@ Version 0.2.4
   * Beta
   * basic style management
 
-DEVELOPMENT STOPPED
+Version 0.2.5
+-------------
+
+  * Simple Variables and User Fields handling
+  * Full python 2.6 support
+  * Tests moved to tox

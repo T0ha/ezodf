@@ -46,3 +46,15 @@ fstr = "of:=%s" % cfunc('SUM', crange, '[.B1]', '[.B2]')
 
 cref: ok, for sheetnames with and without spaces
 cfunc: NOT necessary, write a good tutorial for formula writing
+
+
+Variables and User Fields handling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Look spec v1.2 pp 139 - 144
+
+from ezodf import opendocument
+
+doc = opendocument('PATH')
+
+doc.vars.simple['varname'] = u"AnyData"
+doc.vars.user_field['varname'] = u"AnyData"
