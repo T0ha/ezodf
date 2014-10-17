@@ -30,6 +30,7 @@ from .text import List, ListHeader, ListItem, NumberedParagraph
 from .table import Table
 from .cells import Cell
 from .conf import config
+from .variables import SimpleVariables
 
 Sheet = Table
 
