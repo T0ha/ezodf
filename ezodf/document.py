@@ -11,7 +11,7 @@ import zipfile
 import os
 import io
 
-from .compatibility import tostr, is_bytes
+from .compatibility import tostr, is_bytes, StringIO
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
 from .xmlns import subelement, CN, etree, wrap, ALL_NSMAP, fake_element
 from .filemanager import FileManager
@@ -36,11 +36,11 @@ def is_valid_stream(buffer):
     else:
         return False
 
-def opendoc(filename):
-    if zipfile.is_zipfile(filename):
+def opendoc(filename, file_content=None):
+    if filename is not None:
         fm = FileManager(filename)
-    elif is_valid_stream(filename):
-        fm = ByteStreamManager(filename)
+    elif file_content is not None:
+        fm = ByteStreamManager(file_content)
     else:
         try:
             xmlnode = etree.parse(filename).getroot()
