@@ -87,7 +87,7 @@ class TestNewDocument(unittest.TestCase):
         doc.save()
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.spreadsheet"))
-        remove(docname)        
+        remove(docname)
 
     def test_new_odp(self):
         docname = getdatafile('new.odp')
