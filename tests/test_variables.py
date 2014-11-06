@@ -109,7 +109,7 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         self.assertEqual(variable.type, u'string')
         self.assertEqual(variable.name, u'simple1')
 
-    def test_get_string(self):
+    def test_get_string(self):  # {{{2
         """
         Gets variable
         This is not exact unittest, but it's very usefull
@@ -117,8 +117,20 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         decls_node = etree.XML(SIMPLE_VARIABLE_DECLS)
         decls = SimpleVariables(xmlnode=decls_node)
         node = etree.XML(SIMPLE_VARIABLE_SET)
-        variable = SimpleVariableInstance(xmlnode=node)
-        self.assertEqual(decls[u'simple1'].get(), u"simple1")
+        SimpleVariableInstance(xmlnode=node)
+        self.assertEqual(decls[u'simple1'].value, u"simple1")
+
+    def test_set_string(self):  # {{{2
+        """
+        Gets variable
+        This is not exact unittest, but it's very usefull
+        """
+        decls_node = etree.XML(SIMPLE_VARIABLE_DECLS)
+        decls = SimpleVariables(xmlnode=decls_node)
+        node = etree.XML(SIMPLE_VARIABLE_SET)
+        SimpleVariableInstance(xmlnode=node)
+        decls[u'simple1'].value = u"test1"
+        self.assertEqual(decls[u'simple1'].value, u"test1")
 
 
 class TestSimpleVariableInstance(unittest.TestCase):  # {{{1
@@ -152,14 +164,23 @@ class TestSimpleVariableInstance(unittest.TestCase):  # {{{1
         self.assertEqual(variable.xmlnode.tag, CN('text:variable-set'))
         self.assertIn(variable, decls[u'simple1'].instances)
 
-    def test_get_string(self):
+    def test_get_string(self):  # {{{2
         """
-        Gets variable
+        Gets variable with string value
         """
         node = etree.XML(SIMPLE_VARIABLE_SET)
         variable = SimpleVariableInstance(xmlnode=node)
-        self.assertEqual(variable.get(), u"simple1")
+        self.assertEqual(variable.value, u"simple1")
 
+    def test_set_string(self):  # {{{2
+        """
+        Sets variable with string value
+        """
+        node = etree.XML(SIMPLE_VARIABLE_SET)
+        variable = SimpleVariableInstance(xmlnode=node)
+        variable.value = u"test1"
+        self.assertEqual(variable.value, u"test1")
+        self.assertEqual(variable.plaintext(), u"test1")
 
 
 if __name__ == '__main__':  # {{{1
