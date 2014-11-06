@@ -30,9 +30,9 @@ class SimpleVariables(GenericWrapper):  # {{{1
 
     def __setitem__(self, index, value):  # {{{2
         if index in self.variables:
-            self.variables[index].set(value)
+            self.variables[index].value = value
         else:
-            return self.set_child(index)
+            return self.set_child(index, value)
 
 
 @register_class
@@ -43,7 +43,6 @@ class SimpleVariable(GenericWrapper):  # {{{1
         """docstring for __init__"""
         super(SimpleVariable, self).__init__(xmlnode)
         self.name = self.xmlnode.get(CN('text:name'))
-        self.type = self.xmlnode.get(CN('office:value-type'))
         self.instances = []
 
     @property
@@ -59,8 +58,27 @@ class SimpleVariable(GenericWrapper):  # {{{1
         """
         Set variable value
         """
+        vtype = type(v)
+
         for instance in self.instances:
             instance.value = v
+
+        if vtype == bool:
+            self.type = u'boolean'
+        elif vtype == int or vtype == float:
+            self.type = u'float'
+        else:
+            self.type = u'string'
+
+    @property
+    def type(self):  # {{{2
+        """Gets type of variable"""
+        return self.get_attr(CN('office:value-type'), u'string')
+
+    @type.setter
+    def type(self, t):  # {{{2
+        """Sets type of variable"""
+        self.set_attr(CN('office:value-type'), unicode(t))
 
 
 @register_class
@@ -83,7 +101,7 @@ class SimpleVariableInstance(GenericWrapper):  # {{{1
         elif self.type == u'boolean':
             return self.text == 'true'
         elif self.type == u'float':
-            return flaot(self.text)
+            return float(self.text)
         else:
             return self.text
 
@@ -101,12 +119,12 @@ class SimpleVariableInstance(GenericWrapper):  # {{{1
             self.type = u'string'
 
     @property
-    def type(self):
+    def type(self):  # {{{2
         """Gets type of variable"""
         return self.get_attr(CN('office:value-type'), u'string')
 
     @type.setter
-    def type(self, t):
+    def type(self, t):  # {{{2
         """Sets type of variable"""
         self.set_attr(CN('office:value-type'), unicode(t))
 

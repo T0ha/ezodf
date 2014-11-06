@@ -84,7 +84,18 @@ class TestSimpleVariables(unittest.TestCase):  # {{{1
         self.assertEqual(variables[u'simple1'].type, variable.type)
         self.assertEqual(variables[u'simple1'].name, variable.name)
 
-
+    def test_simple_variable_dict_manipulation(self):  # {{{2
+        """docstring for setUp"""
+        node = etree.XML(SIMPLE_VARIABLE_DECLS)
+        variables = SimpleVariables(xmlnode=node)
+        vnode = etree.XML(SIMPLE_VARIABLE_SET)
+        variable = SimpleVariableInstance(xmlnode=vnode)
+        variables[u'simple1'] = u'test123'
+        self.assertTrue(isinstance(variables, GenericWrapper))
+        self.assertEqual(variables.xmlnode.tag, CN('text:variable-decls'))
+        self.assertEqual(variables[u'simple1'].type, variable.type)
+        self.assertEqual(variables[u'simple1'].name, variable.name)
+        self.assertEqual(variables[u'simple1'].value, u"test123")
 
 
 class TestSimpleVariable(unittest.TestCase):  # {{{1
@@ -122,7 +133,7 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
 
     def test_set_string(self):  # {{{2
         """
-        Gets variable
+        Sets variable
         This is not exact unittest, but it's very usefull
         """
         decls_node = etree.XML(SIMPLE_VARIABLE_DECLS)
@@ -132,6 +143,18 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         decls[u'simple1'].value = u"test1"
         self.assertEqual(decls[u'simple1'].value, u"test1")
 
+    def test_set_float(self):  # {{{2
+        """
+        Sets variable
+        This is not exact unittest, but it's very usefull
+        """
+        decls_node = etree.XML(SIMPLE_VARIABLE_DECLS)
+        decls = SimpleVariables(xmlnode=decls_node)
+        node = etree.XML(SIMPLE_VARIABLE_SET)
+        SimpleVariableInstance(xmlnode=node)
+        decls[u'simple1'].value = 1.2
+        self.assertEqual(decls[u'simple1'].type, u'float')
+        self.assertEqual(decls[u'simple1'].value, 1.2)
 
 class TestSimpleVariableInstance(unittest.TestCase):  # {{{1
     def test_bare(self):  # {{{2
