@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding:utf-8
+# coding:utf-8
 # Purpose: body
 # Created: 11.01.2011
 # Copyright (C) 2011, Manfred Moitzi
@@ -7,15 +7,20 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-from .xmlns import register_class, CN
+from .xmlns import register_class, CN, wrap, subelement
 from .base import GenericWrapper
 from .sheets import Sheets
 from .pages import Pages
 from .nodeorganizer import EpilogueTagBlock
 from .nodestructuretags import TEXT_EPILOGUE
 
+
 class GenericBody(GenericWrapper):
-    pass
+    def __init__(self, xmlnode=None):
+        super(GenericBody, self).__init__(xmlnode=xmlnode)
+        self.simple_variables = wrap(subelement(self.xmlnode,
+                                                CN("text:variable-decls")))
+
 
 @register_class
 class TextBody(GenericBody):
