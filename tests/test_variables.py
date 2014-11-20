@@ -21,6 +21,7 @@ from ezodf.base import GenericWrapper
 # objects to test
 from ezodf.variables import SimpleVariables, SimpleVariable
 from ezodf.variables import SimpleVariableInstance
+from ezodf import opendoc
 
 ## Contacts decloration {{{1
 SIMPLE_VARIABLE_DECL = '<text:variable-decl '\
@@ -58,64 +59,81 @@ class TestSimpleVariables(unittest.TestCase):  # {{{1
         """docstring for setUp"""
         variables = SimpleVariables()
         self.assertTrue(isinstance(variables, GenericWrapper))
-        self.assertEqual(variables.xmlnode.tag, CN('text:variable-decls'))
+        self.assertTrue(isinstance(variables,
+                                   SimpleVariables))
+        self.assertEqual(variables.xmlnode.tag,
+                         CN('text:variable-decls'))
 
     def test_init_xmlroot(self):  # {{{2
         node = etree.Element(CN('text:variable-decls'), test="variables")
         variables = SimpleVariables(xmlnode=node)
         self.assertTrue(isinstance(variables, GenericWrapper))
-        self.assertEqual(variables.xmlnode.tag, CN('text:variable-decls'))
-        self.assertEqual(variables.xmlnode.get('test'), "variables")
+        self.assertTrue(isinstance(variables,
+                                   SimpleVariables))
+        self.assertEqual(variables.xmlnode.tag,
+                         CN('text:variable-decls'))
+        self.assertEqual(variables.xmlnode.get('test'),
+                         "variables")
 
     def test_init_XML(self):  # {{{2
         node = etree.XML(SIMPLE_VARIABLE_DECLS)
         variables = SimpleVariables(xmlnode=node)
         self.assertTrue(isinstance(variables, GenericWrapper))
+        self.assertTrue(isinstance(variables,
+                                   SimpleVariables))
         self.assertEqual(variables.xmlnode.tag, CN('text:variable-decls'))
 
     def test_simple_variable_dict(self):  # {{{2
-        """docstring for setUp"""
+        """Tests decloration integrity"""
         node = etree.XML(SIMPLE_VARIABLE_DECLS)
         variables = SimpleVariables(xmlnode=node)
-        vnode = etree.XML(SIMPLE_VARIABLE_DECL)
-        variable = SimpleVariable(xmlnode=vnode)
         self.assertTrue(isinstance(variables, GenericWrapper))
         self.assertEqual(variables.xmlnode.tag, CN('text:variable-decls'))
-        self.assertEqual(variables[u'simple1'].type, variable.type)
-        self.assertEqual(variables[u'simple1'].name, variable.name)
+        self.assertEqual(variables[u'simple1'].type, u"string")
+        self.assertEqual(variables[u'simple1'].name, u"simple1")
 
-    def test_simple_variable_dict_manipulation(self):  # {{{2
-        """docstring for setUp"""
-        node = etree.XML(SIMPLE_VARIABLE_DECLS)
-        variables = SimpleVariables(xmlnode=node)
-        vnode = etree.XML(SIMPLE_VARIABLE_SET)
-        variable = SimpleVariableInstance(xmlnode=vnode)
-        variables[u'simple1'] = u'test123'
-        self.assertTrue(isinstance(variables, GenericWrapper))
-        self.assertEqual(variables.xmlnode.tag, CN('text:variable-decls'))
-        self.assertEqual(variables[u'simple1'].type, variable.type)
-        self.assertEqual(variables[u'simple1'].name, variable.name)
-        self.assertEqual(variables[u'simple1'].value, u"test123")
+    def test_simple_variables_integeational(self):  # {{{2
+        """Not exactly unittest but very usefull"""
+        doc = opendoc("tests/data/variables.odt")
+        self.assertTrue(isinstance(doc.body.variables,
+                                   GenericWrapper))
+        self.assertTrue(isinstance(doc.body.variables,
+                                   SimpleVariables))
+        self.assertEqual(doc.body.variables.xmlnode.tag,
+                         CN('text:variable-decls'))
 
+        self.assertEqual(doc.body.variables[u'simple1'].value,
+                         u"simple1")
+
+        doc.body.variables[u'simple1'] = u'test123'
+        self.assertEqual(doc.body.variables[u'simple1'].value,
+                         u"test123")
+
+        doc.body.variables[u'simple1'] = 1
+        self.assertEqual(doc.body.variables[u'simple1'].value, 1)
+        self.assertEqual(doc.body.variables[u'simple1'].type, u"float")
 
 class TestSimpleVariable(unittest.TestCase):  # {{{1
     def test_bare(self):  # {{{2
         """docstring for setUp"""
         variable = SimpleVariable()
         self.assertTrue(isinstance(variable, GenericWrapper))
+        self.assertTrue(isinstance(variable, SimpleVariable))
         self.assertEqual(variable.xmlnode.tag, CN('text:variable-decl'))
 
     def test_init_xmlroot(self):  # {{{2
         node = etree.Element(CN('text:variable-decl'), test="variable")
-        variables = SimpleVariables(xmlnode=node)
-        self.assertTrue(isinstance(variables, GenericWrapper))
-        self.assertEqual(variables.xmlnode.tag, CN('text:variable-decl'))
-        self.assertEqual(variables.xmlnode.get('test'), "variable")
+        variable = SimpleVariable(xmlnode=node)
+        self.assertTrue(isinstance(variable, GenericWrapper))
+        self.assertTrue(isinstance(variable, SimpleVariable))
+        self.assertEqual(variable.xmlnode.tag, CN('text:variable-decl'))
+        self.assertEqual(variable.xmlnode.get('test'), "variable")
 
     def test_init_XML(self):  # {{{2
         node = etree.XML(SIMPLE_VARIABLE_DECL)
         variable = SimpleVariable(xmlnode=node)
         self.assertTrue(isinstance(variable, GenericWrapper))
+        self.assertTrue(isinstance(variable, SimpleVariable))
         self.assertEqual(variable.xmlnode.tag, CN('text:variable-decl'))
         self.assertEqual(variable.type, u'string')
         self.assertEqual(variable.name, u'simple1')
@@ -128,6 +146,7 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         decls_node = etree.XML(SIMPLE_VARIABLE_DECLS)
         decls = SimpleVariables(xmlnode=decls_node)
         node = etree.XML(SIMPLE_VARIABLE_SET)
+        decls_node.append(node)
         SimpleVariableInstance(xmlnode=node)
         self.assertEqual(decls[u'simple1'].value, u"simple1")
 
@@ -139,6 +158,7 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         decls_node = etree.XML(SIMPLE_VARIABLE_DECLS)
         decls = SimpleVariables(xmlnode=decls_node)
         node = etree.XML(SIMPLE_VARIABLE_SET)
+        decls_node.append(node)
         SimpleVariableInstance(xmlnode=node)
         decls[u'simple1'].value = u"test1"
         self.assertEqual(decls[u'simple1'].value, u"test1")
@@ -151,6 +171,7 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         decls_node = etree.XML(SIMPLE_VARIABLE_DECLS)
         decls = SimpleVariables(xmlnode=decls_node)
         node = etree.XML(SIMPLE_VARIABLE_SET)
+        decls_node.append(node)
         SimpleVariableInstance(xmlnode=node)
         decls[u'simple1'].value = 1.2
         self.assertEqual(decls[u'simple1'].type, u'float')
@@ -161,31 +182,25 @@ class TestSimpleVariableInstance(unittest.TestCase):  # {{{1
         """docstring for setUp"""
         variable = SimpleVariableInstance()
         self.assertTrue(isinstance(variable, GenericWrapper))
+        self.assertTrue(isinstance(variable, SimpleVariableInstance))
         self.assertEqual(variable.xmlnode.tag, CN('text:variable-set'))
 
     def test_init_xmlroot(self):  # {{{2
         node = etree.Element(CN('text:variable-set'), test="variable")
-        variables = SimpleVariableInstance(xmlnode=node)
-        self.assertTrue(isinstance(variables, GenericWrapper))
-        self.assertEqual(variables.xmlnode.tag, CN('text:variable-set'))
-        self.assertEqual(variables.xmlnode.get('test'), "variable")
+        variable = SimpleVariableInstance(xmlnode=node)
+        self.assertTrue(isinstance(variable, GenericWrapper))
+        self.assertTrue(isinstance(variable, SimpleVariableInstance))
+        self.assertEqual(variable.xmlnode.tag, CN('text:variable-set'))
+        self.assertEqual(variable.xmlnode.get('test'), "variable")
 
     def test_init_XML(self):  # {{{2
         node = etree.XML(SIMPLE_VARIABLE_SET)
         variable = SimpleVariableInstance(xmlnode=node)
         self.assertTrue(isinstance(variable, GenericWrapper))
+        self.assertTrue(isinstance(variable, SimpleVariableInstance))
         self.assertEqual(variable.xmlnode.tag, CN('text:variable-set'))
         self.assertEqual(variable.type, u'string')
         self.assertEqual(variable.name, u'simple1')
-
-    def test_init_with_decls(self):  # {{{2
-        decls_node = etree.XML(SIMPLE_VARIABLE_DECLS)
-        decls = SimpleVariables(xmlnode=decls_node)
-        node = etree.XML(SIMPLE_VARIABLE_SET)
-        variable = SimpleVariableInstance(xmlnode=node)
-        self.assertTrue(isinstance(variable, GenericWrapper))
-        self.assertEqual(variable.xmlnode.tag, CN('text:variable-set'))
-        self.assertIn(variable, decls[u'simple1'].instances)
 
     def test_get_string(self):  # {{{2
         """

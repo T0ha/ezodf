@@ -18,7 +18,7 @@ from .nodestructuretags import TEXT_EPILOGUE
 class GenericBody(GenericWrapper):
     def __init__(self, xmlnode=None):
         super(GenericBody, self).__init__(xmlnode=xmlnode)
-        self.simple_variables = wrap(subelement(self.xmlnode,
+        self.variables = wrap(subelement(self.xmlnode,
                                                 CN("text:variable-decls")))
 
 

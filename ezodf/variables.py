@@ -7,18 +7,19 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "T0ha <t0hashvein@gmail.com>"
 
-from .xmlns import register_class, CN
+from .xmlns import register_class, CN, wrap
 from .base import GenericWrapper
+from .compatibility import itermap, tostr
 
 
 @register_class
 class SimpleVariables(GenericWrapper):  # {{{1
     TAG = CN('text:variable-decls')
-    variables = {}
 
     def __init__(self, xmlnode=None):  # {{{2
         """docstring for __init__"""
         super(SimpleVariables, self).__init__(xmlnode)
+        self.variables = {}
         for v in self:
             self.variables[v.name] = v
 
@@ -43,7 +44,13 @@ class SimpleVariable(GenericWrapper):  # {{{1
         """docstring for __init__"""
         super(SimpleVariable, self).__init__(xmlnode)
         self.name = self.xmlnode.get(CN('text:name'))
-        self.instances = []
+
+    @property
+    def instances(self):
+        return itermap(wrap, self.get_xmlroot().findall(".//%s[@%s='%s']" %
+                                                        (CN('text:variable-set'),
+                                                         CN('text:name'),
+                                                         self.name)))
 
     @property
     def value(self):  # {{{2
@@ -51,7 +58,7 @@ class SimpleVariable(GenericWrapper):  # {{{1
         Get variable value
         FIXME: (it's assumed that all instances have the same value)
         """
-        return self.instances[0].value
+        return list(self.instances)[0].value
 
     @value.setter
     def value(self, v):  # {{{2
@@ -78,7 +85,9 @@ class SimpleVariable(GenericWrapper):  # {{{1
     @type.setter
     def type(self, t):  # {{{2
         """Sets type of variable"""
-        self.set_attr(CN('office:value-type'), unicode(t))
+        self.set_attr(CN('office:value-type'), tostr(t))
+        for instance in self.instances:
+            instance.type = t
 
 
 @register_class
@@ -88,10 +97,6 @@ class SimpleVariableInstance(GenericWrapper):  # {{{1
     def __init__(self, xmlnode=None):  # {{{2
         super(SimpleVariableInstance, self).__init__(xmlnode)
         self.name = self.xmlnode.get(CN('text:name'))
-        try:
-            SimpleVariables.variables[self.name].instances.append(self)
-        except KeyError:
-            pass
 
     @property
     def value(self):  # {{{2
@@ -110,7 +115,7 @@ class SimpleVariableInstance(GenericWrapper):  # {{{1
         """Sets instavce value"""
 
         vtype = type(v)
-        self.text = unicode(v)
+        self.text = tostr(v)
         if vtype == bool:
             self.type = u'boolean'
         elif vtype == int or vtype == float:
@@ -126,5 +131,5 @@ class SimpleVariableInstance(GenericWrapper):  # {{{1
     @type.setter
     def type(self, t):  # {{{2
         """Sets type of variable"""
-        self.set_attr(CN('office:value-type'), unicode(t))
+        self.set_attr(CN('office:value-type'), tostr(t))
 
