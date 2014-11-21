@@ -20,6 +20,8 @@ class GenericBody(GenericWrapper):
         super(GenericBody, self).__init__(xmlnode=xmlnode)
         self.variables = wrap(subelement(self.xmlnode,
                                                 CN("text:variable-decls")))
+        self.userfields = wrap(subelement(self.xmlnode,
+                                                CN("text:user-field-decls")))
 
 
 @register_class

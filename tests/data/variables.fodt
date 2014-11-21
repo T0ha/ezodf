@@ -238,13 +238,13 @@
     <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
    </text:sequence-decls>
    <text:user-field-decls>
-    <text:user-field-decl office:value-type="string" office:string-value="user_field1_copy" text:name="user_field1"/>
+    <text:user-field-decl office:value-type="string" office:string-value="test_rest" text:name="user_field1"/>
    </text:user-field-decls>
    <text:p text:style-name="Standard"><text:variable-set text:name="simple1" office:value-type="string">simple1</text:variable-set></text:p>
    <text:p text:style-name="Standard"><text:variable-get text:name="simple1">simple1</text:variable-get></text:p>
    <text:p text:style-name="Standard"/>
    <text:p text:style-name="Standard"><text:user-field-get text:name="user_field1">user_field1_copy</text:user-field-get></text:p>
-   <text:p text:style-name="Standard"><text:user-field-get text:name="user_field1">user_field1_copy</text:user-field-get></text:p>
+   <text:p text:style-name="Standard"><text:user-field-get text:name="user_field1">user_field1</text:user-field-get></text:p>
   </office:text>
  </office:body>
 </office:document>

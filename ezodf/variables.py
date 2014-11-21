@@ -112,29 +112,8 @@ class SimpleVariable(Variable):  # {{{1
 
 
 @register_class
-class UserField(GenericWrapper):  # {{{1
+class UserField(Variable):  # {{{1
     TAG = CN('text:user-field-decl')
-
-    def __init__(self, xmlnode=None):  # {{{2
-        """docstring for __init__"""
-        super(UserField, self).__init__(xmlnode)
-        self.name = self.xmlnode.get(CN('text:name'))
-
-    @property
-    def instances(self):
-        vs = self.get_xmlroot().findall(".//%s[@%s='%s']" %
-                                                      (CN('text:user-field-set'),
-                                                       CN('text:name'),
-                                                       self.name))
-        vg = self.get_xmlroot().findall(".//%s[@%s='%s']" %
-                                                      (CN('text:user-field-get'),
-                                                       CN('text:name'),
-                                                       self.name))
-        vi = self.get_xmlroot().findall(".//%s[@%s='%s']" %
-                                                      (CN('text:user-field-input'),
-                                                       CN('text:name'),
-                                                       self.name))
-        return itermap(wrap, vs + vg + vi)
 
     @property
     def value(self):  # {{{2
@@ -142,7 +121,12 @@ class UserField(GenericWrapper):  # {{{1
         Get user-field value
         FIXME: (it's assumed that all instances have the same value)
         """
-        return list(self.instances)[0].value
+
+        if self.type == u'boolean':
+            return self.get_bool_attr(CN('office:boolean-value'))
+        elif self.type == u'string':
+            return self.get_attr(CN('office:string-value'))
+        return float(self.get_attr(CN('office:value')))
 
     @value.setter
     def value(self, v):  # {{{2
@@ -156,22 +140,13 @@ class UserField(GenericWrapper):  # {{{1
 
         if vtype == bool:
             self.type = u'boolean'
+            self.set_bool_attr(CN('office:boolean-value'), v)
         elif vtype == int or vtype == float:
+            self.set_attr(CN('office:value'), v)
             self.type = u'float'
         else:
+            self.set_attr(CN('office:string-value'), v)
             self.type = u'string'
-
-    @property
-    def type(self):  # {{{2
-        """Gets type of user-field"""
-        return self.get_attr(CN('office:value-type'), u'string')
-
-    @type.setter
-    def type(self, t):  # {{{2
-        """Sets type of user-field"""
-        self.set_attr(CN('office:value-type'), tostr(t))
-        for instance in self.instances:
-            instance.type = t
 
 
 class SimpleVariableInstance(GenericWrapper):  # {{{1
