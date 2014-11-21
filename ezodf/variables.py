@@ -12,13 +12,11 @@ from .base import GenericWrapper
 from .compatibility import itermap, tostr
 
 
-@register_class
-class SimpleVariables(GenericWrapper):  # {{{1
-    TAG = CN('text:variable-decls')
+class Variables(GenericWrapper):  # {{{1
 
     def __init__(self, xmlnode=None):  # {{{2
         """docstring for __init__"""
-        super(SimpleVariables, self).__init__(xmlnode)
+        super(Variables, self).__init__(xmlnode)
         self.variables = {}
         for v in self:
             self.variables[v.name] = v
@@ -37,20 +35,55 @@ class SimpleVariables(GenericWrapper):  # {{{1
 
 
 @register_class
-class SimpleVariable(GenericWrapper):  # {{{1
-    TAG = CN('text:variable-decl')
+class SimpleVariables(Variables):  # {{{1
+    TAG = CN('text:variable-decls')
+
+
+@register_class
+class UserFields(Variables):  # {{{1
+    TAG = CN('text:user-field-decls')
+
+
+class Variable(GenericWrapper):  # {{{1
 
     def __init__(self, xmlnode=None):  # {{{2
         """docstring for __init__"""
-        super(SimpleVariable, self).__init__(xmlnode)
+        super(Variable, self).__init__(xmlnode)
         self.name = self.xmlnode.get(CN('text:name'))
 
     @property
-    def instances(self):
-        return itermap(wrap, self.get_xmlroot().findall(".//%s[@%s='%s']" %
-                                                        (CN('text:variable-set'),
-                                                         CN('text:name'),
-                                                         self.name)))
+    def instances(self):  # {{{2
+        vs = self.get_xmlroot().findall(".//%s[@%s='%s']" %
+                                                      (CN('text:variable-set'),
+                                                       CN('text:name'),
+                                                       self.name))
+        vg = self.get_xmlroot().findall(".//%s[@%s='%s']" %
+                                                      (CN('text:variable-get'),
+                                                       CN('text:name'),
+                                                       self.name))
+        vi = self.get_xmlroot().findall(".//%s[@%s='%s']" %
+                                                      (CN('text:variable-input'),
+                                                       CN('text:name'),
+                                                       self.name))
+        return itermap(wrap, vs + vg + vi)
+
+    @property
+    def type(self):  # {{{2
+        """Gets type of variable"""
+        return self.get_attr(CN('office:value-type'), u'string')
+
+    @type.setter
+    def type(self, t):  # {{{2
+        """Sets type of variable"""
+        self.set_attr(CN('office:value-type'), tostr(t))
+        for instance in self.instances:
+            instance.type = t
+
+
+
+@register_class
+class SimpleVariable(Variable):  # {{{1
+    TAG = CN('text:variable-decl')
 
     @property
     def value(self):  # {{{2
@@ -77,22 +110,71 @@ class SimpleVariable(GenericWrapper):  # {{{1
         else:
             self.type = u'string'
 
+
+@register_class
+class UserField(GenericWrapper):  # {{{1
+    TAG = CN('text:user-field-decl')
+
+    def __init__(self, xmlnode=None):  # {{{2
+        """docstring for __init__"""
+        super(UserField, self).__init__(xmlnode)
+        self.name = self.xmlnode.get(CN('text:name'))
+
+    @property
+    def instances(self):
+        vs = self.get_xmlroot().findall(".//%s[@%s='%s']" %
+                                                      (CN('text:user-field-set'),
+                                                       CN('text:name'),
+                                                       self.name))
+        vg = self.get_xmlroot().findall(".//%s[@%s='%s']" %
+                                                      (CN('text:user-field-get'),
+                                                       CN('text:name'),
+                                                       self.name))
+        vi = self.get_xmlroot().findall(".//%s[@%s='%s']" %
+                                                      (CN('text:user-field-input'),
+                                                       CN('text:name'),
+                                                       self.name))
+        return itermap(wrap, vs + vg + vi)
+
+    @property
+    def value(self):  # {{{2
+        """
+        Get user-field value
+        FIXME: (it's assumed that all instances have the same value)
+        """
+        return list(self.instances)[0].value
+
+    @value.setter
+    def value(self, v):  # {{{2
+        """
+        Set user-field value
+        """
+        vtype = type(v)
+
+        for instance in self.instances:
+            instance.value = v
+
+        if vtype == bool:
+            self.type = u'boolean'
+        elif vtype == int or vtype == float:
+            self.type = u'float'
+        else:
+            self.type = u'string'
+
     @property
     def type(self):  # {{{2
-        """Gets type of variable"""
+        """Gets type of user-field"""
         return self.get_attr(CN('office:value-type'), u'string')
 
     @type.setter
     def type(self, t):  # {{{2
-        """Sets type of variable"""
+        """Sets type of user-field"""
         self.set_attr(CN('office:value-type'), tostr(t))
         for instance in self.instances:
             instance.type = t
 
 
-@register_class
 class SimpleVariableInstance(GenericWrapper):  # {{{1
-    TAG = CN('text:variable-set')
 
     def __init__(self, xmlnode=None):  # {{{2
         super(SimpleVariableInstance, self).__init__(xmlnode)
@@ -133,3 +215,74 @@ class SimpleVariableInstance(GenericWrapper):  # {{{1
         """Sets type of variable"""
         self.set_attr(CN('office:value-type'), tostr(t))
 
+
+@register_class
+class SimpleVariableSet(SimpleVariableInstance):  # {{{1
+    TAG = CN('text:variable-set')
+
+
+@register_class
+class SimpleVariableGet(SimpleVariableInstance):  # {{{1
+    TAG = CN('text:variable-get')
+
+
+@register_class
+class SimpleVariableInput(SimpleVariableInstance):  # {{{1
+    TAG = CN('text:variable-input')
+
+
+class UserFieldInstance(GenericWrapper):  # {{{1
+
+    def __init__(self, xmlnode=None):  # {{{2
+        super(UserFieldInstance, self).__init__(xmlnode)
+        self.name = self.xmlnode.get(CN('text:name'))
+
+    @property
+    def value(self):  # {{{2
+        """Gets instavce value"""
+        if self.type == u'string':
+            return self.text
+        elif self.type == u'boolean':
+            return self.text == 'true'
+        elif self.type == u'float':
+            return float(self.text)
+        else:
+            return self.text
+
+    @value.setter
+    def value(self, v):  # {{{2
+        """Sets instavce value"""
+
+        vtype = type(v)
+        self.text = tostr(v)
+        if vtype == bool:
+            self.type = u'boolean'
+        elif vtype == int or vtype == float:
+            self.type = u'float'
+        else:
+            self.type = u'string'
+
+    @property
+    def type(self):  # {{{2
+        """Gets type of user-field"""
+        return self.get_attr(CN('office:value-type'), u'string')
+
+    @type.setter
+    def type(self, t):  # {{{2
+        """Sets type of user-field"""
+        self.set_attr(CN('office:value-type'), tostr(t))
+
+
+@register_class
+class UserFieldSet(SimpleVariableInstance):  # {{{1
+    TAG = CN('text:user-field-set')
+
+
+@register_class
+class UserFieldGet(SimpleVariableInstance):  # {{{1
+    TAG = CN('text:user-field-get')
+
+
+@register_class
+class UserFieldInput(SimpleVariableInstance):  # {{{1
+    TAG = CN('text:user-field-input')
