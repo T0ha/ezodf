@@ -70,7 +70,7 @@ class Variable(GenericWrapper):  # {{{1
     @property
     def type(self):  # {{{2
         """Gets type of variable"""
-        return self.get_attr(CN('office:value-type'), u'string')
+        return self.get_attr(CN('office:value-type'), 'string')
 
     @type.setter
     def type(self, t):  # {{{2

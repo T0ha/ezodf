@@ -102,8 +102,8 @@ class TestSimpleVariables(unittest.TestCase):  # {{{1
         variables = SimpleVariables(xmlnode=node)
         self.assertTrue(isinstance(variables, GenericWrapper))
         self.assertEqual(variables.xmlnode.tag, CN('text:variable-decls'))
-        self.assertEqual(variables[u'simple1'].type, u"string")
-        self.assertEqual(variables[u'simple1'].name, u"simple1")
+        self.assertEqual(variables['simple1'].type, "string")
+        self.assertEqual(variables['simple1'].name, "simple1")
 
     def test_simple_variables_integeational(self):  # {{{2
         """Not exactly unittest but very usefull"""
@@ -115,16 +115,16 @@ class TestSimpleVariables(unittest.TestCase):  # {{{1
         self.assertEqual(doc.body.variables.xmlnode.tag,
                          CN('text:variable-decls'))
 
-        self.assertEqual(doc.body.variables[u'simple1'].value,
-                         u"simple1")
+        self.assertEqual(doc.body.variables['simple1'].value,
+                         "simple1")
 
-        doc.body.variables[u'simple1'] = u'test123'
-        self.assertEqual(doc.body.variables[u'simple1'].value,
-                         u"test123")
+        doc.body.variables['simple1'] = 'test123'
+        self.assertEqual(doc.body.variables['simple1'].value,
+                         "test123")
 
-        doc.body.variables[u'simple1'] = 1
-        self.assertEqual(doc.body.variables[u'simple1'].value, 1)
-        self.assertEqual(doc.body.variables[u'simple1'].type, u"float")
+        doc.body.variables['simple1'] = 1
+        self.assertEqual(doc.body.variables['simple1'].value, 1)
+        self.assertEqual(doc.body.variables['simple1'].type, "float")
 
 class TestSimpleVariable(unittest.TestCase):  # {{{1
     def test_bare(self):  # {{{2
@@ -148,8 +148,8 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         self.assertTrue(isinstance(variable, GenericWrapper))
         self.assertTrue(isinstance(variable, SimpleVariable))
         self.assertEqual(variable.xmlnode.tag, CN('text:variable-decl'))
-        self.assertEqual(variable.type, u'string')
-        self.assertEqual(variable.name, u'simple1')
+        self.assertEqual(variable.type, 'string')
+        self.assertEqual(variable.name, 'simple1')
 
     def test_get_string(self):  # {{{2
         """
@@ -161,7 +161,7 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         decls_node.append(node)
         decls = SimpleVariables(xmlnode=decls_node)
         self.assertTrue(isinstance(decls['simple1'], GenericWrapper))
-        self.assertEqual(decls[u'simple1'].value, u"simple1")
+        self.assertEqual(decls['simple1'].value, "simple1")
 
     def test_set_string(self):  # {{{2
         """
@@ -173,8 +173,8 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         node = etree.XML(SIMPLE_VARIABLE_SET)
         decls_node.append(node)
         SimpleVariableInstance(xmlnode=node)
-        decls[u'simple1'].value = u"test1"
-        self.assertEqual(decls[u'simple1'].value, u"test1")
+        decls['simple1'].value = "test1"
+        self.assertEqual(decls['simple1'].value, "test1")
 
     def test_set_float(self):  # {{{2
         """
@@ -186,9 +186,9 @@ class TestSimpleVariable(unittest.TestCase):  # {{{1
         node = etree.XML(SIMPLE_VARIABLE_SET)
         decls_node.append(node)
         SimpleVariableInstance(xmlnode=node)
-        decls[u'simple1'].value = 1.2
-        self.assertEqual(decls[u'simple1'].type, u'float')
-        self.assertEqual(decls[u'simple1'].value, 1.2)
+        decls['simple1'].value = 1.2
+        self.assertEqual(decls['simple1'].type, 'float')
+        self.assertEqual(decls['simple1'].value, 1.2)
 
 class TestSimpleVariableInstance(unittest.TestCase):  # {{{1
     def test_bare(self):  # {{{2
@@ -212,8 +212,8 @@ class TestSimpleVariableInstance(unittest.TestCase):  # {{{1
         self.assertTrue(isinstance(variable, GenericWrapper))
         self.assertTrue(isinstance(variable, SimpleVariableInstance))
         self.assertEqual(variable.xmlnode.tag, CN('text:variable-set'))
-        self.assertEqual(variable.type, u'string')
-        self.assertEqual(variable.name, u'simple1')
+        self.assertEqual(variable.type, 'string')
+        self.assertEqual(variable.name, 'simple1')
 
     def test_get_string(self):  # {{{2
         """
@@ -221,7 +221,7 @@ class TestSimpleVariableInstance(unittest.TestCase):  # {{{1
         """
         node = etree.XML(SIMPLE_VARIABLE_SET)
         variable = SimpleVariableInstance(xmlnode=node)
-        self.assertEqual(variable.value, u"simple1")
+        self.assertEqual(variable.value, "simple1")
 
     def test_set_string(self):  # {{{2
         """
@@ -229,9 +229,9 @@ class TestSimpleVariableInstance(unittest.TestCase):  # {{{1
         """
         node = etree.XML(SIMPLE_VARIABLE_SET)
         variable = SimpleVariableInstance(xmlnode=node)
-        variable.value = u"test1"
-        self.assertEqual(variable.value, u"test1")
-        self.assertEqual(variable.plaintext(), u"test1")
+        variable.value = "test1"
+        self.assertEqual(variable.value, "test1")
+        self.assertEqual(variable.plaintext(), "test1")
 
 
 class TestUserFields(unittest.TestCase):  # {{{1
@@ -269,9 +269,9 @@ class TestUserFields(unittest.TestCase):  # {{{1
         variables = UserFields(xmlnode=node)
         self.assertTrue(isinstance(variables, GenericWrapper))
         self.assertEqual(variables.xmlnode.tag, CN('text:user-field-decls'))
-        self.assertEqual(variables[u'user_field1'].type, u"string")
-        self.assertEqual(variables[u'user_field1'].name, u"user_field1")
-        self.assertEqual(variables[u'user_field1'].value, u"user_field1_copy")
+        self.assertEqual(variables['user_field1'].type, "string")
+        self.assertEqual(variables['user_field1'].name, "user_field1")
+        self.assertEqual(variables['user_field1'].value, "user_field1_copy")
 
     def test_user_fields_integeational(self):  # {{{2
         """Not exactly unittest but very usefull"""
@@ -283,16 +283,16 @@ class TestUserFields(unittest.TestCase):  # {{{1
         self.assertEqual(doc.body.userfields.xmlnode.tag,
                          CN('text:user-field-decls'))
 
-        self.assertEqual(doc.body.userfields[u'user_field1'].value,
-                         u"user_field1_copy")
+        self.assertEqual(doc.body.userfields['user_field1'].value,
+                         "user_field1_copy")
 
-        doc.body.userfields[u'user_field1'] = u'test123'
-        self.assertEqual(doc.body.userfields[u'user_field1'].value,
-                         u"test123")
+        doc.body.userfields['user_field1'] = 'test123'
+        self.assertEqual(doc.body.userfields['user_field1'].value,
+                         "test123")
 
-        doc.body.userfields[u'user_field1'] = 1
-        self.assertEqual(doc.body.userfields[u'user_field1'].value, 1)
-        self.assertEqual(doc.body.userfields[u'user_field1'].type, u"float")
+        doc.body.userfields['user_field1'] = 1
+        self.assertEqual(doc.body.userfields['user_field1'].value, 1)
+        self.assertEqual(doc.body.userfields['user_field1'].type, "float")
 
 class TestUserField(unittest.TestCase):  # {{{1
     def test_bare(self):  # {{{2
@@ -316,9 +316,9 @@ class TestUserField(unittest.TestCase):  # {{{1
         self.assertTrue(isinstance(variable, GenericWrapper))
         self.assertTrue(isinstance(variable, UserField))
         self.assertEqual(variable.xmlnode.tag, CN('text:user-field-decl'))
-        self.assertEqual(variable.type, u'string')
-        self.assertEqual(variable.name, u'user_field1')
-        self.assertEqual(variable.value, u'user_field1_copy')
+        self.assertEqual(variable.type, 'string')
+        self.assertEqual(variable.name, 'user_field1')
+        self.assertEqual(variable.value, 'user_field1_copy')
 
     def test_get_string(self):  # {{{2
         """
@@ -328,7 +328,7 @@ class TestUserField(unittest.TestCase):  # {{{1
         decls_node = etree.XML(USER_FIELD_DECLS)
         decls = UserFields(xmlnode=decls_node)
         self.assertTrue(isinstance(decls['user_field1'], GenericWrapper))
-        self.assertEqual(decls[u'user_field1'].value, u"user_field1_copy")
+        self.assertEqual(decls['user_field1'].value, "user_field1_copy")
 
     def test_set_string(self):  # {{{2
         """
@@ -337,8 +337,8 @@ class TestUserField(unittest.TestCase):  # {{{1
         """
         decls_node = etree.XML(USER_FIELD_DECLS)
         decls = UserFields(xmlnode=decls_node)
-        decls[u'user_field1'].value = u"test1"
-        self.assertEqual(decls[u'user_field1'].value, u"test1")
+        decls['user_field1'].value = "test1"
+        self.assertEqual(decls['user_field1'].value, "test1")
 
     def test_set_float(self):  # {{{2
         """
@@ -347,9 +347,9 @@ class TestUserField(unittest.TestCase):  # {{{1
         """
         decls_node = etree.XML(USER_FIELD_DECLS)
         decls = UserFields(xmlnode=decls_node)
-        decls[u'user_field1'].value = 1.2
-        self.assertEqual(decls[u'user_field1'].type, u'float')
-        self.assertEqual(decls[u'user_field1'].value, 1.2)
+        decls['user_field1'].value = 1.2
+        self.assertEqual(decls['user_field1'].type, 'float')
+        self.assertEqual(decls['user_field1'].value, 1.2)
 
 class TestUserFieldInstance(unittest.TestCase):  # {{{1
     def test_bare(self):  # {{{2
@@ -373,8 +373,8 @@ class TestUserFieldInstance(unittest.TestCase):  # {{{1
         self.assertTrue(isinstance(variable, GenericWrapper))
         self.assertTrue(isinstance(variable, UserFieldInstance))
         self.assertEqual(variable.xmlnode.tag, CN('text:user-field-get'))
-        self.assertEqual(variable.type, u'string')
-        self.assertEqual(variable.name, u'user_field1')
+        self.assertEqual(variable.type, 'string')
+        self.assertEqual(variable.name, 'user_field1')
 
     def test_get_string(self):  # {{{2
         """
@@ -382,7 +382,7 @@ class TestUserFieldInstance(unittest.TestCase):  # {{{1
         """
         node = etree.XML(USER_FIELD_GET)
         variable = UserFieldInstance(xmlnode=node)
-        self.assertEqual(variable.value, u"user_field1_copy")
+        self.assertEqual(variable.value, "user_field1_copy")
 
     def test_set_string(self):  # {{{2
         """
@@ -390,9 +390,9 @@ class TestUserFieldInstance(unittest.TestCase):  # {{{1
         """
         node = etree.XML(USER_FIELD_GET)
         variable = UserFieldInstance(xmlnode=node)
-        variable.value = u"test1"
-        self.assertEqual(variable.value, u"test1")
-        self.assertEqual(variable.plaintext(), u"test1")
+        variable.value = "test1"
+        self.assertEqual(variable.value, "test1")
+        self.assertEqual(variable.plaintext(), "test1")
 
 
 #if __name__ == '__main__':  # {{{1
