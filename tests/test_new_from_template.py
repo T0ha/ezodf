@@ -9,7 +9,10 @@ __author__ = "mozman <mozman@gmx.at>"
 
 # Standard Library
 import os
-import unittest
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 # trusted or separately tested modules
 from mytesttools import getdatafile

@@ -7,7 +7,11 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-import unittest
+# Standard Library
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from ezodf.xmlns import CN, etree
 from ezodf.tableutils import get_table_rows, get_min_max_cell_count

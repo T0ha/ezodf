@@ -104,11 +104,11 @@ class SimpleVariable(Variable):  # {{{1
             instance.value = v
 
         if vtype == bool:
-            self.type = u'boolean'
+            self.type = 'boolean'
         elif vtype == int or vtype == float:
-            self.type = u'float'
+            self.type = 'float'
         else:
-            self.type = u'string'
+            self.type = 'string'
 
 
 @register_class
@@ -122,9 +122,9 @@ class UserField(Variable):  # {{{1
         FIXME: (it's assumed that all instances have the same value)
         """
 
-        if self.type == u'boolean':
+        if self.type == 'boolean':
             return self.get_bool_attr(CN('office:boolean-value'))
-        elif self.type == u'string':
+        elif self.type == 'string':
             return self.get_attr(CN('office:string-value'))
         return float(self.get_attr(CN('office:value')))
 
@@ -139,14 +139,14 @@ class UserField(Variable):  # {{{1
             instance.value = v
 
         if vtype == bool:
-            self.type = u'boolean'
+            self.type = 'boolean'
             self.set_bool_attr(CN('office:boolean-value'), v)
         elif vtype == int or vtype == float:
             self.set_attr(CN('office:value'), v)
-            self.type = u'float'
+            self.type = 'float'
         else:
             self.set_attr(CN('office:string-value'), v)
-            self.type = u'string'
+            self.type = 'string'
 
 
 class SimpleVariableInstance(GenericWrapper):  # {{{1
@@ -158,11 +158,11 @@ class SimpleVariableInstance(GenericWrapper):  # {{{1
     @property
     def value(self):  # {{{2
         """Gets instavce value"""
-        if self.type == u'string':
+        if self.type == 'string':
             return self.text
-        elif self.type == u'boolean':
+        elif self.type == 'boolean':
             return self.text == 'true'
-        elif self.type == u'float':
+        elif self.type == 'float':
             return float(self.text)
         else:
             return self.text
@@ -174,16 +174,16 @@ class SimpleVariableInstance(GenericWrapper):  # {{{1
         vtype = type(v)
         self.text = tostr(v)
         if vtype == bool:
-            self.type = u'boolean'
+            self.type = 'boolean'
         elif vtype == int or vtype == float:
-            self.type = u'float'
+            self.type = 'float'
         else:
-            self.type = u'string'
+            self.type = 'string'
 
     @property
     def type(self):  # {{{2
         """Gets type of variable"""
-        return self.get_attr(CN('office:value-type'), u'string')
+        return self.get_attr(CN('office:value-type'), 'string')
 
     @type.setter
     def type(self, t):  # {{{2
@@ -215,11 +215,11 @@ class UserFieldInstance(GenericWrapper):  # {{{1
     @property
     def value(self):  # {{{2
         """Gets instavce value"""
-        if self.type == u'string':
+        if self.type == 'string':
             return self.text
-        elif self.type == u'boolean':
+        elif self.type == 'boolean':
             return self.text == 'true'
-        elif self.type == u'float':
+        elif self.type == 'float':
             return float(self.text)
         else:
             return self.text
@@ -231,16 +231,16 @@ class UserFieldInstance(GenericWrapper):  # {{{1
         vtype = type(v)
         self.text = tostr(v)
         if vtype == bool:
-            self.type = u'boolean'
+            self.type = 'boolean'
         elif vtype == int or vtype == float:
-            self.type = u'float'
+            self.type = 'float'
         else:
-            self.type = u'string'
+            self.type = 'string'
 
     @property
     def type(self):  # {{{2
         """Gets type of user-field"""
-        return self.get_attr(CN('office:value-type'), u'string')
+        return self.get_attr(CN('office:value-type'), 'string')
 
     @type.setter
     def type(self, t):  # {{{2
