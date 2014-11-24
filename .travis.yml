@@ -6,6 +6,6 @@ python:
     - "3.3"
     - "3.4"
 install:
-    - "pip install lxml nose" 
+    - "pip install weakrefset lxml" 
 
 script: nosetests
