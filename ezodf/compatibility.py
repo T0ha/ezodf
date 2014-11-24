@@ -7,12 +7,13 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-import sys
+import sys, zipfile
 
 PY3 = sys.version_info[0] > 2
 
 if PY3:
     itermap=map
+    is_zipfile=zipfile.is_zipfile
     tostr = str
     def is_string(value):
         return isinstance(value, str)
@@ -53,3 +54,15 @@ else: # PY2
 
     def bytes2unicode(bytes):
         return bytes.decode('utf-8')
+
+    def is_zipfile(data):
+        """zipfile.is_zipfile for PY26 compatibility"""
+        try:
+            return zipfile.is_zipfile(data)
+        except TypeError:
+            from tempfile import mkstemp
+            _, tmp = mkstemp()
+            with open(tmp, 'w') as f:
+                f.write(data.getvalue())
+                f.flush()
+                return zipfile.is_zipfile(tmp)

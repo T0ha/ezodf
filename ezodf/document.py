@@ -9,9 +9,10 @@ __author__ = "mozman <mozman@gmx.at>"
 
 import zipfile
 import os
-import io
 
-from .compatibility import tostr, is_bytes
+from io import BytesIO
+
+from .compatibility import tostr, is_bytes, is_zipfile
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
 from .xmlns import subelement, CN, etree, wrap, ALL_NSMAP, fake_element
 from .filemanager import FileManager
@@ -29,7 +30,7 @@ class InvalidFiletypeError(TypeError):
 def is_valid_stream(buffer):
     if is_bytes(buffer):
         try:
-            return zipfile.is_zipfile(io.BytesIO(buffer))
+            return is_zipfile(BytesIO(buffer))
         except TypeError:
             raise NotImplementedError("File like objects are not compatiable with zipfile in"
                                       "Python before 2.7 version")
@@ -37,7 +38,7 @@ def is_valid_stream(buffer):
         return False
 
 def opendoc(filename):
-    if zipfile.is_zipfile(filename):
+    if is_zipfile(filename):
         fm = FileManager(filename)
     elif is_valid_stream(filename):
         fm = ByteStreamManager(filename)
@@ -81,7 +82,7 @@ def newdoc(doctype="odt", filename="", template=None):
 def _new_doc_from_template(filename, templatename):
     #TODO: only works with zip packaged documents
     def get_filemanager(buffer):
-        if zipfile.is_zipfile(buffer):
+        if is_zipfile(buffer):
             return FileManager(buffer)
         elif is_valid_stream(buffer):
             return ByteStreamManager(buffer)
