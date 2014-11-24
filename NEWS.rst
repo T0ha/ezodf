@@ -2,6 +2,14 @@
 NEWS
 ====
 
+Version 0.3.0 - November 2014
+
+  * Maitainer changed
+  * Simple variables and user fields support added
+  * Tests system changed to nose
+  * Travis CI support added
+  * Python 2.6 - 3.4 support added
+
 Version 0.2.5 - Juli 2012
 
   * Alpha version

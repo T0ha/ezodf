@@ -41,7 +41,7 @@ Version 0.2.4
   * Beta
   * basic style management
 
-Version 0.2.5
+Version 0.3.0
 -------------
 
   * Simple Variables and User Fields handling
