@@ -182,7 +182,7 @@ htmlhelp_basename = 'ezodfdoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'ezodf.tex', u'ezodf Documentation',
-   u'Manfred Moitzi', 'manual'),
+   u'Manfred Moitzi & Anton Shvein', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

@@ -36,6 +36,7 @@ class Variables(GenericWrapper):  # {{{1
 
 @register_class
 class SimpleVariables(Variables):  # {{{1
+    """Simple variables dict-like container"""
     TAG = CN('text:variable-decls')
 
 
