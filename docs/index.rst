@@ -52,6 +52,8 @@ Contents
    document.rst
    meta.rst
    styles.rst
+   variable_managment.rst
+   variables.rst
    textdocument.rst
    spreadsheetdocument.rst
    tableobjects.rst

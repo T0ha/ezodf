@@ -1,13 +1,12 @@
 .. _variables:
 
-Simple Variables and User Fields classes
-========================================
+Variables Objects
+=================
 
-Variables class and subclasses
+Variables Class and Subclasses
 ------------------------------
 
 .. class:: Variables()
-~~~~~~~~~~~~~~~~~~~~~~
 
    The :class:`Variables` is dict-like container for subclasses of :class:`Variable`.
    This is superclass for :class:`SimpleVariables` and :class:`UserFields`
@@ -18,7 +17,7 @@ Variables class and subclasses
 
 
 Methods
-^^^^^^^
+~~~~~~~
 
 .. method::  Variables.__getitem__(key)
     
@@ -39,12 +38,10 @@ Methods
     :return: Variable class instance
 
 .. class:: SimpleVariables()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
    The :class:`SimpleVariables` is dict-like container for :class:`SimpleVariable`, it's a subclass of :class:`Variables`
    
 .. class:: UserFields()
-~~~~~~~~~~~~~~~~~~~~~~
 
    The :class:`UserFields` is dict-like container for :class:`UserField`, it's a subclass of :class:`Variables`
    
@@ -53,13 +50,12 @@ Variable class and subclasses
 -----------------------------
 
 .. class:: Variable()
-~~~~~~~~~~~~~~~~~~~~~
 
     This class represents a variable. 
     The instances of it can be found in :class:`Variables` and accessed through `document.body.variables['somevar']` or `document.body.userfields['somevar']`
 
 Attributes
-^^^^^^^^^^
+~~~~~~~~~~
 
 .. attribute:: Variable.type(read/write)
     
@@ -82,12 +78,11 @@ Attributes
     Use with caution can work a bit unexpected
 
 .. class:: SimpleVariable()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This class represents a simple variable. The instances of it can be found in :class:`SimpleVariables` and accessed through `document.body.variables['somevar']`
 
 Attributes
-^^^^^^^^^^
+~~~~~~~~~~
 
 .. attribute:: SimpleVariable.instances(read/write)
 
@@ -98,12 +93,11 @@ Attributes
     Use with caution can work a bit unexpected
 
 .. class:: UserField()
-~~~~~~~~~~~~~~~~~~~~~~
 
     This class represents a simple variable. The instances of it can be found in :class:`SimpleVariables` and accessed through `document.body.variables['somevar']`
 
 Attributes
-^^^^^^^^^^
+~~~~~~~~~~
 
 .. attribute:: UserField.instances(read/write)
 
@@ -117,12 +111,11 @@ Simple Variable Instance Subclasses
 -----------------------------------
 
 .. class:: SimpleVariableInstance()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Base class for :class:`SimpleVariableGet`, :class:`SimpleVariableSet` and :class:`SimpleVariableInput`
 
 Attributes
-^^^^^^^^^^
+~~~~~~~~~~
 
 .. attribute:: SimpleVariableInstance.type(read/write)
     
@@ -137,16 +130,13 @@ Attributes
     :type: str, float, boolean
 
 .. class:: SimpleVariableGet()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Subclass of :class:`SimpleVariableInstance` handling "text:variable-get" tag.
 
 .. class:: SimpleVariableSet()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Subclass of :class:`SimpleVariableInstance` handling "text:variable-set" tag.
 
 .. class:: SimpleVariableInput()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Subclass of :class:`SimpleVariableInstance` handling "text:variable-input" tag.
