@@ -12,7 +12,7 @@ script: nosetests
 deploy:
   provider: pypi
   user: t0ha
-  on:
-    tags: true
   password:
     secure: phV3xvoCLFgXo/9ljsDx5oJOfvvQ8R/aIKBed6pMrM81Dr/GXi41E3IpdMNRrZIgM/cBzRTVdt8ATL1m/XDS7cyaNjqWNfh2zhdawB2+uTitLaql2DUJyPYHJjZ/sfS7dHtC1DIY1xEX5z9V4M/cvmOqkSuau4Wu7HPiYzGvq3M=
+  on:
+    tags: true

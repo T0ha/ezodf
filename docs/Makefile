@@ -41,6 +41,12 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
+zippedhtml:
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@($(BUILDDIR)/html; zip -r $(BUILDDIR)/html.zip *)
+	@echo
+	@echo "Build finished. Zipped HTML pages are in $(BUILDDIR)/html.zip."
+
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo
