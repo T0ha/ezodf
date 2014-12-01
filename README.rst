@@ -3,6 +3,10 @@ EzODF.py
 
 .. image:: https://travis-ci.org/T0ha/ezodf.svg?branch=master
     :target: https://travis-ci.org/T0ha/ezodf
+If you want to support us
+
+.. image:: https://api.flattr.com/button/flattr-badge-large.png
+    :target: https://flattr.com/submit/auto?user_id=t0ha&url=https://github.com/T0ha/ezodf&title=ezodf&language=python&tags=github&category=software
 
 Abstract
 ========
