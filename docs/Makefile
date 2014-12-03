@@ -44,7 +44,7 @@ html:
 
 zippedhtml:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
-	@($(BUILDDIR)/html; zip -r $(BUILDDIR)/html.zip *)
+	@(cd $(BUILDDIR)/html; zip -r ../html.zip ./*)
 	@echo
 	@echo "Build finished. Zipped HTML pages are in $(BUILDDIR)/html.zip."
 
