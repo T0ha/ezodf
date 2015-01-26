@@ -12,6 +12,9 @@ import sys, zipfile
 PY3 = sys.version_info[0] > 2
 
 if PY3:
+    # distiguish StringIO
+    from io import BytesIO as StringIO
+    
     itermap=map
     is_zipfile=zipfile.is_zipfile
     tostr = str
@@ -33,6 +36,9 @@ if PY3:
         return str(bytes, 'utf-8')
 
 else: # PY2
+    # distiguish StringIO
+    from StringIO import StringIO
+    
     tostr=unicode
     def is_string(value):
         # TODO: ??? shouldn't be an instance of 'unicode' ???
