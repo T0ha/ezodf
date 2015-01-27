@@ -9,8 +9,13 @@ __author__ = "mozman <mozman@gmx.at>"
 
 # Standard Library
 import os
-import unittest
 import zipfile
+
+# Standard Library
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 # trusted or separately tested modules
 from mytesttools import getdatafile
@@ -87,7 +92,7 @@ class TestNewDocument(unittest.TestCase):
         doc.save()
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.spreadsheet"))
-        remove(docname)
+        remove(docname)        
 
     def test_new_odp(self):
         docname = getdatafile('new.odp')

@@ -7,7 +7,11 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-import unittest
+# Standard Library
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 # dependencies
 from ezodf.xmlns import etree, CN
@@ -54,8 +58,8 @@ class TestStreamTextBody(unittest.TestCase):
         body.append(ODFContentMock(CN("text:h")))
         result = StreamTextBodyChecker.is_valid(body.xmlnode)
         self.assertTrue(result)
-        self.assertEqual(body[0].kind, "Paragraph")
-        self.assertEqual(body[1].kind, "Heading")
+        self.assertEqual(body[2].kind, "Paragraph")
+        self.assertEqual(body[3].kind, "Heading")
 
     def test_append_text_with_existing_epilogue(self):
         body = TextBody()
@@ -65,8 +69,8 @@ class TestStreamTextBody(unittest.TestCase):
 
         result = StreamTextBodyChecker.is_valid(body.xmlnode)
         self.assertTrue(result)
-        self.assertEqual(body[0].kind, "Paragraph")
-        self.assertEqual(body[1].kind, "Heading")
+        self.assertEqual(body[2].kind, "Paragraph")
+        self.assertEqual(body[3].kind, "Heading")
 
 
 if __name__=='__main__':

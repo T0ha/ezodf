@@ -8,7 +8,10 @@ from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
 # Standard Library
-import unittest
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 from datetime import timedelta, date, datetime
 
 # objects to test

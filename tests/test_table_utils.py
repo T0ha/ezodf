@@ -7,7 +7,10 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-import unittest
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from ezodf.tableutils import address_to_index, iter_cell_range
 

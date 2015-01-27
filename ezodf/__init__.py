@@ -30,6 +30,10 @@ from .text import List, ListHeader, ListItem, NumberedParagraph
 from .table import Table
 from .cells import Cell
 from .conf import config
+from .variables import SimpleVariables, SimpleVariable
+from .variables import SimpleVariableSet, SimpleVariableGet, SimpleVariableInput
+from .variables import UserFields, UserField
+from .variables import UserFieldSet, UserFieldGet
 
 Sheet = Table
 

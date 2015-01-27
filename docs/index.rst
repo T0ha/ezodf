@@ -40,6 +40,9 @@ or save it with a new name::
 
    doc.saveas('newname.ext')
 
+.. image:: https://api.flattr.com/button/flattr-badge-large.png
+    :target: https://flattr.com/submit/auto?user_id=t0ha&url=https://github.com/T0ha/ezodf&title=ezodf&language=python&tags=github&category=software
+
 Contents
 --------
 
@@ -52,6 +55,8 @@ Contents
    document.rst
    meta.rst
    styles.rst
+   variable_managment.rst
+   variables.rst
    textdocument.rst
    spreadsheetdocument.rst
    tableobjects.rst

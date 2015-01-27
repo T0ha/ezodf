@@ -7,8 +7,15 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-import unittest
-import zipfile, io
+# Standard Library
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
+
+import zipfile
+from io import BytesIO
+from ezodf.compatibility import is_zipfile
 # trusted or separately tested modules
 from mytesttools import getdatafile
 
@@ -46,11 +53,11 @@ class TestByteStreamManager(unittest.TestCase):
         fm.register('addsecond', 'SinCity')
         fm.register('mimetype', 'MaxPayne')
         resultbuffer = fm.tobytes()
-        self.assertTrue(zipfile.is_zipfile(io.BytesIO(resultbuffer)))
+        self.assertTrue(is_zipfile(BytesIO(resultbuffer)))
 
     def test_tobytes_result_content(self):
         def get_filelist(buffer):
-            z = zipfile.ZipFile(io.BytesIO(buffer), 'r')
+            z = zipfile.ZipFile(BytesIO(buffer), 'r')
             files = z.namelist()
             z.close()
             return files

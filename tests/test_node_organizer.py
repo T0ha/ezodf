@@ -7,7 +7,11 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-import unittest
+# Standard Library
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 # test helpers
 from mytesttools import SimpleStructureChecker, create_node, get_n_random_tags

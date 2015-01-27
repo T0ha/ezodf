@@ -75,12 +75,12 @@ example::
     import ezodf
 
     # if it is necessary to expand all rows/columns
-    ezodf.config.set_table_expanding_strategy('all')
+    ezodf.config.set_table_expand_strategy('all')
 
     spreadsheet = ezodf.opendoc('expand_all_cells.ods')
 
     # advice: always reset table expanding strategy
-    ezodf.config.reset_table_expanding_strategy()
+    ezodf.config.reset_table_expand_strategy()
 
 
 .. _newdoc:

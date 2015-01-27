@@ -15,7 +15,7 @@ from datetime import datetime
 
 from .xmlns import etree, CN
 from .manifest import Manifest
-from .compatibility import tobytes, bytes2unicode, is_bytes, StringIO
+from .compatibility import tobytes, bytes2unicode, is_bytes, is_zipfile, StringIO
 
 FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -51,7 +51,7 @@ class FileManager(object):
 
     def has_zip(self):
         if self.zipname is not None:
-            return zipfile.is_zipfile(self.zipname)
+            return is_zipfile(self.zipname)
         return False
 
     def _open_bytestream(self):
@@ -199,7 +199,7 @@ def check_zipfile_for_oasis_validity(filename, mimetype):
         return True
 
     assert is_bytes(mimetype)
-    if not zipfile.is_zipfile(filename):
+    if not is_zipfile(filename):
         return False
     # The first file in an OpenDocumentFormat zipfile should be the uncompressed
     # mimetype file, in a regular zipfile this file starts at byte position 30.

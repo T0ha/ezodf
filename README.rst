@@ -1,3 +1,12 @@
+EzODF.py
+--------
+
+.. image:: https://travis-ci.org/T0ha/ezodf.svg?branch=master
+    :target: https://travis-ci.org/T0ha/ezodf
+If you want to support us
+
+.. image:: https://api.flattr.com/button/flattr-badge-large.png
+    :target: https://flattr.com/submit/auto?user_id=t0ha&url=https://github.com/T0ha/ezodf&title=ezodf&language=python&tags=github&category=software
 
 Abstract
 ========
@@ -33,7 +42,16 @@ Dependencies
   declaration (xlmns:prefix="global:namespace:specifier") in the root element.
   Declarations for unused prefixes are also possible.
 
-The target platform is CPython 2.7 and CPython 3.3+, work on compability with 
+* nose <https://nose.readthedocs.org> for testing
+
+For CPython 2.6 compatibility:
+
+* weakrefset <https://pypi.python.org/pypi/weakrefset> for fixing incompatibility with
+  weakref module before 2.7
+
+* unittest2 <https://pypi.python.org/pypi/unittest2> for asserts like in python 2.7+
+
+The target platform is CPython 2.7 and CPython 3.2+, work on compability with 
 CPython 2.6 is in progress.
 
 Installation
