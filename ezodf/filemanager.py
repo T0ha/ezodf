@@ -15,7 +15,7 @@ from datetime import datetime
 
 from .xmlns import etree, CN
 from .manifest import Manifest
-from .compatibility import tobytes, bytes2unicode, is_bytes, is_zipfile
+from .compatibility import tobytes, bytes2unicode, is_bytes, is_zipfile, StringIO
 
 FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -77,11 +77,21 @@ class FileManager(object):
 
     def save(self, filename, backup=True):
         # always create a new zipfile
-        tmpfilename = self.tmpfilename(filename)
+        write_to_memory = False
+        if isinstance(filename, StringIO):
+            write_to_memory = True
+        if write_to_memory:
+            tmpfilename = filename
+        else:
+            tmpfilename = self.tmpfilename(filename)
         zippo = zipfile.ZipFile(tmpfilename, 'w', zipfile.ZIP_DEFLATED)
         self._tozip(zippo)
         zippo.close()
 
+        if write_to_memory:
+            # job done
+            return
+            
         if os.path.exists(filename):
             if backup:
                 # existing document becomes the backup file

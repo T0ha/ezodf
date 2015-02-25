@@ -24,6 +24,8 @@ from ezodf.xmlns import fake_element
 
 # objects to test
 from ezodf import document, const
+from ezodf.compatibility import StringIO
+
 
 def get_zip_names(zipname):
     z = zipfile.ZipFile(zipname)
@@ -90,7 +92,7 @@ class TestNewDocument(unittest.TestCase):
         doc.save()
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.spreadsheet"))
-        remove(docname)
+        remove(docname)        
 
     def test_new_odp(self):
         docname = getdatafile('new.odp')
@@ -124,5 +126,37 @@ class TestNewDocument(unittest.TestCase):
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.graphics"))
         remove(docname)
 
+class TestOdsInMemory(unittest.TestCase):
+    def open_in_memory_and_saveas(self, filename, msg=""):
+        infile = getdatafile(filename)
+        names1 = get_zip_names(infile)
+        outfile = getdatafile('new.'+filename)
+        with open(os.path.join("tests", "data", filename), "rb") as f:
+            content = f.read()
+            odt = document.opendoc(None, content)
+            odt.saveas(outfile)
+            names2 = get_zip_names(outfile)
+            remove(outfile)
+            self.assertSequenceEqual(sorted(names1), sorted(names2), msg)
+
+    def test_open_and_saveas_all(self):
+        for filename in ['empty.odt', 'empty.ods', 'empty.odg', 'empty.odp']:
+            self.open_in_memory_and_saveas(filename, "open and saveas faild on '%s'" % filename)
+
+    def open_and_saveas_in_memory(self, filename, msg=""):
+        infile = getdatafile(filename)
+        names1 = get_zip_names(infile)
+        outfile = getdatafile('new.'+filename)
+        odt = document.opendoc(infile)
+        io = StringIO()
+        odt.saveas(io)
+        names2 = get_zip_names(io)
+        #no need to remove(outfile)
+        self.assertSequenceEqual(sorted(names1), sorted(names2), msg)
+
+    def test_open_and_saveas_all_in_memory(self):
+        for filename in ['empty.odt', 'empty.ods', 'empty.odg', 'empty.odp']:
+            self.open_and_saveas_in_memory(filename, "open and saveas faild on '%s'" % filename)
+    
 if __name__=='__main__':
     unittest.main()
