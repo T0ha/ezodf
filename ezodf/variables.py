@@ -21,6 +21,10 @@ class Variables(GenericWrapper):  # {{{1
         for v in self:
             self.variables[v.name] = v
 
+    def __contains__(self, key):  # {{{2
+        """docstring for __contains__"""
+        return key in self.variables
+
     def __getitem__(self, index):  # {{{2
         if index in self.variables:
             return self.variables[index]

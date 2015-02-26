@@ -9,7 +9,6 @@ __author__ = "mozman <mozman@gmx.at>"
 
 import os
 import zipfile
-import io
 import random
 from datetime import datetime
 
@@ -91,7 +90,7 @@ class FileManager(object):
         if write_to_memory:
             # job done
             return
-            
+
         if os.path.exists(filename):
             if backup:
                 # existing document becomes the backup file
@@ -176,7 +175,7 @@ class FileManager(object):
                 tozip.writestr(zipinfo, fromzip.read(zipinfo.filename))
 
     def tobytes(self):
-        iobuffer = io.BytesIO()
+        iobuffer = StringIO()
         zippo = zipfile.ZipFile(iobuffer, 'w', zipfile.ZIP_DEFLATED)
         self._tozip(zippo)
         zippo.close()

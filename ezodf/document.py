@@ -9,7 +9,6 @@ __author__ = "mozman <mozman@gmx.at>"
 
 import zipfile
 import os
-from io import BytesIO
 
 from .compatibility import tostr, is_bytes, is_zipfile, StringIO
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
@@ -21,26 +20,29 @@ from .styles import OfficeDocumentStyles
 from .content import OfficeDocumentContent
 from . import observer
 
-from . import body # not used, but important to register body classes
+from . import body  # not used, but important to register body classes
+
 
 class InvalidFiletypeError(TypeError):
     pass
 
+
 def is_valid_stream(buffer):
     if is_bytes(buffer):
         try:
-            return is_zipfile(BytesIO(buffer))
+            return is_zipfile(StringIO(buffer))
         except TypeError:
             raise NotImplementedError("File like objects are not compatiable with zipfile in"
                                       "Python before 2.7 version")
     else:
         return False
 
-def opendoc(filename, file_content=None):
-    if filename is not None:
+
+def opendoc(filename):
+    if isinstance(filename, StringIO):
+        fm = ByteStreamManager(filename)
+    elif filename is not None:
         fm = FileManager(filename)
-    elif file_content is not None:
-        fm = ByteStreamManager(file_content)
     else:
         try:
             xmlnode = etree.parse(filename).getroot()

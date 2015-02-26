@@ -7,13 +7,16 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-import io
 
+from compatibility import StringIO
 from .filemanager import FileManager
 
 class ByteStreamManager(FileManager):
     def __init__(self, buffer=None):
-        self._zipfile_as_bytes = buffer
+        if isinstance(buffer, StringIO):
+            self._zipfile_as_bytes = buffer.getvalue()
+        else:
+            self._zipfile_as_bytes = buffer
         super(ByteStreamManager, self).__init__()
 
     def save(self, filename, backup=False):
@@ -24,4 +27,4 @@ class ByteStreamManager(FileManager):
         return self._zipfile_as_bytes is not None
 
     def _open_bytestream(self):
-        return io.BytesIO(self._zipfile_as_bytes)
+        return StringIO(self._zipfile_as_bytes)

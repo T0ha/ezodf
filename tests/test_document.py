@@ -92,7 +92,7 @@ class TestNewDocument(unittest.TestCase):
         doc.save()
         self.assertTrue(os.path.exists(docname))
         self.assertTrue(check_zipfile_for_oasis_validity(docname, b"application/vnd.oasis.opendocument.spreadsheet"))
-        remove(docname)        
+        remove(docname)
 
     def test_new_odp(self):
         docname = getdatafile('new.odp')
@@ -133,7 +133,7 @@ class TestOdsInMemory(unittest.TestCase):
         outfile = getdatafile('new.'+filename)
         with open(os.path.join("tests", "data", filename), "rb") as f:
             content = f.read()
-            odt = document.opendoc(None, content)
+            odt = document.opendoc(StringIO(content))
             odt.saveas(outfile)
             names2 = get_zip_names(outfile)
             remove(outfile)
@@ -157,6 +157,6 @@ class TestOdsInMemory(unittest.TestCase):
     def test_open_and_saveas_all_in_memory(self):
         for filename in ['empty.odt', 'empty.ods', 'empty.odg', 'empty.odp']:
             self.open_and_saveas_in_memory(filename, "open and saveas faild on '%s'" % filename)
-    
+
 if __name__=='__main__':
     unittest.main()
