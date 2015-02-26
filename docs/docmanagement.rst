@@ -21,7 +21,8 @@ Open an existing Document
 
 .. function:: ezodf.opendoc(filename)
 
-   :param str filename: a filename  or the file-content as `bytes`
+   :param filename: a filename  or the file-content as file-like object (`StringIO` or `BytesIO`)
+   :type filename: str or StringIO or BytesIO 
    :returns: :class:`~document.PackagedDocument` or :class:`~document.FlatXMLDocument`
 
    Open the document `filename`. Returns an instance of the :class:`~document.PackagedDocument`
@@ -93,8 +94,9 @@ Create a new Document
 
   :param str doctype: document type, three character string like the usual file
     extensions (``'odt'`` for text, ``'ods'`` for spreadsheets and so on)
-  :param str filename: filename of the document, can also be set by the
+  :param filename: filename or file-like object of the document, can also be set by the
     :func:`~document.PackagedDocument.saveas()` method
+  :type filename: str or StringIO or BytesIO 
   :param str template: filename of a template file or the file-content as
     `bytes`, it has to be a zip-packed document and the parameter `doctype`
     is ignored, because the template content determines the document type.
