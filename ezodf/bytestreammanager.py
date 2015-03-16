@@ -8,7 +8,7 @@ from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
 
-from compatibility import StringIO
+from .compatibility import StringIO
 from .filemanager import FileManager
 
 class ByteStreamManager(FileManager):
