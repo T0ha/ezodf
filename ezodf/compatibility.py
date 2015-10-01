@@ -14,7 +14,7 @@ PY3 = sys.version_info[0] > 2
 if PY3:
     # distiguish StringIO
     from io import BytesIO as StringIO
-    
+
     itermap=map
     is_zipfile=zipfile.is_zipfile
     tostr = str
@@ -38,7 +38,7 @@ if PY3:
 else: # PY2
     # distiguish StringIO
     from StringIO import StringIO
-    
+
     tostr=unicode
     def is_string(value):
         # TODO: ??? shouldn't be an instance of 'unicode' ???
@@ -63,6 +63,7 @@ else: # PY2
 
     def is_zipfile(data):
         """zipfile.is_zipfile for PY26 compatibility"""
+        print(data)
         try:
             return zipfile.is_zipfile(data)
         except TypeError:

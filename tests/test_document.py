@@ -158,5 +158,24 @@ class TestOdsInMemory(unittest.TestCase):
         for filename in ['empty.odt', 'empty.ods', 'empty.odg', 'empty.odp']:
             self.open_and_saveas_in_memory(filename, "open and saveas faild on '%s'" % filename)
 
+
+class TestNewFromInMemoryTemplate(unittest.TestCase):
+    def new_from_in_memory_template_and_saveas(self, filename, msg=""):
+        infile = getdatafile(filename)
+        names1 = get_zip_names(infile)
+        outfile = getdatafile('new.'+filename)
+        with open(os.path.join("tests", "data", filename), "rb") as f:
+            content = f.read()
+            odt = document.newdoc(template=StringIO(content))
+            odt.saveas(outfile)
+            names2 = get_zip_names(outfile)
+            remove(outfile)
+            self.assertSequenceEqual(sorted(names1), sorted(names2), msg)
+
+    def test_new_from_in_memory_template_and_saveas_all(self):
+        for filename in ['empty.odt', 'empty.ods', 'empty.odg', 'empty.odp']:
+            self.new_from_in_memory_template_and_saveas(filename, "new and saveas faild on '%s'" % filename)
+
+
 if __name__=='__main__':
     unittest.main()
