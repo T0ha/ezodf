@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#coding:utf-8
+# coding:utf-8
 # Author:  mozman
 # Purpose: setup
 # Created: 27.12.2010
@@ -18,6 +18,7 @@ AUTHOR_EMAIL = 'mozman@gmx.at'
 
 MAINTAINER_NAME = 'Anton Shvein'
 MAINTAINER_EMAIL = 't0hashvein@gmail.com'
+
 
 def read(fname):
     try:
