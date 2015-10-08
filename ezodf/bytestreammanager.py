@@ -20,9 +20,9 @@ class ByteStreamManager(FileManager):
             self._zipfile_as_bytes = buffer
         super(ByteStreamManager, self).__init__()
 
-    def save(self, filename, backup=False):
-        with open(filename, 'wb') as fp:
-            fp.write(self.tobytes())
+    #def save(self, filename, backup=False):
+    #    with open(filename, 'wb') as fp:
+    #        fp.write(self.tobytes())
 
     def has_zip(self):
         return self._zipfile_as_bytes is not None
