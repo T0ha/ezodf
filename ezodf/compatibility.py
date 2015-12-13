@@ -63,7 +63,6 @@ else: # PY2
 
     def is_zipfile(data):
         """zipfile.is_zipfile for PY26 compatibility"""
-        print(data)
         try:
             return zipfile.is_zipfile(data)
         except TypeError:
