@@ -2,6 +2,10 @@
 NEWS
 ====
 
+Version 0.3.1 - December 2015
+
+  * File-like objects utilisation improved
+
 Version 0.3.0 - November 2014
 
   * Maitainer changed
