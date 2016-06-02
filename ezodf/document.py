@@ -7,7 +7,6 @@
 from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
-import zipfile
 import os
 from .compatibility import tostr, is_bytes, is_zipfile, StringIO, is_stream
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
