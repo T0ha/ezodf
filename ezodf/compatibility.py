@@ -42,7 +42,7 @@ else: # PY2
     # distiguish StringIO
     from cStringIO import StringIO
     from cStringIO import InputType, OutputType
-    from StringIO import SlowStringIO
+    from StringIO import StringIO as SlowStringIO
 
     tostr=unicode
     def is_string(value):
