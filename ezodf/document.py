@@ -81,7 +81,7 @@ def newdoc(doctype="odt", filename="", template=None):
 def _new_doc_from_template(filename, templatename):
     # TODO: only works with zip packaged documents
     def get_filemanager(buffer):
-        if isinstance(buffer, StringIO):
+        if is_stream(buffer):
             return ByteStreamManager(buffer)
         elif is_valid_stream(buffer):
             return ByteStreamManager(buffer)
