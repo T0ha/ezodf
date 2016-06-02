@@ -20,7 +20,6 @@ except ImportError:
 # trusted or separately tested modules
 from mytesttools import getdatafile
 from ezodf.filemanager import check_zipfile_for_oasis_validity
-from ezodf.xmlns import fake_element
 
 # objects to test
 from ezodf import document, const
@@ -181,12 +180,12 @@ class TestNewFromInMemoryTemplate(unittest.TestCase):
 
 
 if not PY3:
-    from cStringIO import StringIO as c_StringIO
+    from StringIO import StringIO as SlowStringIO
     class TestOdsIncStringIO(TestOdsInMemory):
-        stream_class_or_callable = c_StringIO
+        stream_class_or_callable = SlowStringIO
 
     class TestNewFromIncStringTemplate(TestNewFromInMemoryTemplate):
-        stream_class_or_callable = c_StringIO
+        stream_class_or_callable = SlowStringIO
 
 
 if __name__=='__main__':
