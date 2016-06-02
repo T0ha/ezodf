@@ -9,8 +9,7 @@ __author__ = "mozman <mozman@gmx.at>"
 
 import zipfile
 import os
-
-from .compatibility import tostr, is_bytes, is_zipfile, StringIO
+from .compatibility import tostr, is_bytes, is_zipfile, StringIO, is_stream
 from .const import MIMETYPES, MIMETYPE_BODYTAG_MAP, FILE_EXT_FOR_MIMETYPE
 from .xmlns import subelement, CN, etree, wrap, ALL_NSMAP, fake_element
 from .filemanager import FileManager
@@ -39,7 +38,7 @@ def is_valid_stream(buffer):
 
 
 def opendoc(filename):
-    if isinstance(filename, StringIO):
+    if is_stream(filename):
         fm = ByteStreamManager(filename)
     elif filename is not None:
         fm = FileManager(filename)
