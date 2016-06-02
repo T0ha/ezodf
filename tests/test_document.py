@@ -24,7 +24,7 @@ from ezodf.xmlns import fake_element
 
 # objects to test
 from ezodf import document, const
-from ezodf.compatibility import StringIO
+from ezodf.compatibility import StringIO, PY3
 
 
 def get_zip_names(zipname):
@@ -127,13 +127,15 @@ class TestNewDocument(unittest.TestCase):
         remove(docname)
 
 class TestOdsInMemory(unittest.TestCase):
+    stream_class_or_callable = StringIO
+
     def open_in_memory_and_saveas(self, filename, msg=""):
         infile = getdatafile(filename)
         names1 = get_zip_names(infile)
         outfile = getdatafile('new.'+filename)
         with open(os.path.join("tests", "data", filename), "rb") as f:
             content = f.read()
-            odt = document.opendoc(StringIO(content))
+            odt = document.opendoc(self.stream_class_or_callable(content))
             odt.saveas(outfile)
             names2 = get_zip_names(outfile)
             remove(outfile)
@@ -146,9 +148,8 @@ class TestOdsInMemory(unittest.TestCase):
     def open_and_saveas_in_memory(self, filename, msg=""):
         infile = getdatafile(filename)
         names1 = get_zip_names(infile)
-        outfile = getdatafile('new.'+filename)
         odt = document.opendoc(infile)
-        io = StringIO()
+        io = self.stream_class_or_callable()
         odt.saveas(io)
         names2 = get_zip_names(io)
         #no need to remove(outfile)
@@ -160,13 +161,15 @@ class TestOdsInMemory(unittest.TestCase):
 
 
 class TestNewFromInMemoryTemplate(unittest.TestCase):
+    stream_class_or_callable = StringIO
+
     def new_from_in_memory_template_and_saveas(self, filename, msg=""):
         infile = getdatafile(filename)
         names1 = get_zip_names(infile)
         outfile = getdatafile('new.'+filename)
         with open(os.path.join("tests", "data", filename), "rb") as f:
             content = f.read()
-            odt = document.newdoc(template=StringIO(content))
+            odt = document.newdoc(template=self.stream_class_or_callable(content))
             odt.saveas(outfile)
             names2 = get_zip_names(outfile)
             remove(outfile)
@@ -175,6 +178,15 @@ class TestNewFromInMemoryTemplate(unittest.TestCase):
     def test_new_from_in_memory_template_and_saveas_all(self):
         for filename in ['empty.odt', 'empty.ods', 'empty.odg', 'empty.odp']:
             self.new_from_in_memory_template_and_saveas(filename, "new and saveas faild on '%s'" % filename)
+
+
+if not PY3:
+    from cStringIO import StringIO as c_StringIO
+    class TestOdsIncStringIO(TestOdsInMemory):
+        stream_class_or_callable = c_StringIO
+
+    class TestNewFromIncStringTemplate(TestNewFromInMemoryTemplate):
+        stream_class_or_callable = c_StringIO
 
 
 if __name__=='__main__':
