@@ -15,9 +15,9 @@ from .filemanager import FileManager
 class ByteStreamManager(FileManager):
     def __init__(self, buffer=None):
         if is_stream(buffer):
-            self._zipfile_as_bytes = buffer.getvalue()
-        else:
             self._zipfile_as_bytes = buffer
+        else:
+            self._zipfile_as_bytes = StringIO(buffer)
         super(ByteStreamManager, self).__init__()
 
     def save(self, filename, backup=False):
@@ -31,4 +31,4 @@ class ByteStreamManager(FileManager):
         return self._zipfile_as_bytes is not None
 
     def _open_bytestream(self):
-        return StringIO(self._zipfile_as_bytes)
+        return self._zipfile_as_bytes
