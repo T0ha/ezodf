@@ -40,8 +40,9 @@ if PY3:
 
 else: # PY2
     # distiguish StringIO
-    from StringIO import StringIO
+    from cStringIO import StringIO
     from cStringIO import InputType, OutputType
+    from StringIO import SlowStringIO
 
     tostr=unicode
     def is_string(value):
@@ -80,4 +81,4 @@ else: # PY2
     def is_stream(instance):
         return (isinstance(instance, InputType) or
                 isinstance(instance, OutputType) or
-                isinstance(instance, StringIO))
+                isinstance(instance, SlowStringIO))
