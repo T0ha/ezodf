@@ -35,9 +35,14 @@ if PY3:
     def bytes2unicode(bytes):
         return str(bytes, 'utf-8')
 
+    def is_stream(instance):
+        return  isinstance(instance, StringIO)
+
 else: # PY2
     # distiguish StringIO
-    from StringIO import StringIO
+    from cStringIO import StringIO
+    from cStringIO import InputType, OutputType
+    from StringIO import StringIO as SlowStringIO
 
     tostr=unicode
     def is_string(value):
@@ -72,3 +77,8 @@ else: # PY2
                 f.write(data.getvalue())
                 f.flush()
                 return zipfile.is_zipfile(tmp)
+
+    def is_stream(instance):
+        return (isinstance(instance, InputType) or
+                isinstance(instance, OutputType) or
+                isinstance(instance, SlowStringIO))

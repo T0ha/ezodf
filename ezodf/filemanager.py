@@ -14,7 +14,8 @@ from datetime import datetime
 
 from .xmlns import etree, CN
 from .manifest import Manifest
-from .compatibility import tobytes, bytes2unicode, is_bytes, is_zipfile, StringIO
+from .compatibility import tobytes, bytes2unicode, is_bytes, is_zipfile
+from .compatibility import is_stream, StringIO
 
 FNCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -77,7 +78,7 @@ class FileManager(object):
     def save(self, filename, backup=True):
         # always create a new zipfile
         write_to_memory = False
-        if isinstance(filename, StringIO):
+        if is_stream(filename):
             write_to_memory = True
         if write_to_memory:
             tmpfilename = filename

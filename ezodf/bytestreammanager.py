@@ -8,20 +8,20 @@ from __future__ import unicode_literals, print_function, division
 __author__ = "mozman <mozman@gmx.at>"
 
 
-from .compatibility import StringIO
+from .compatibility import is_stream, StringIO
 from .filemanager import FileManager
 
 
 class ByteStreamManager(FileManager):
     def __init__(self, buffer=None):
-        if isinstance(buffer, StringIO):
+        if is_stream(buffer):
             self._zipfile_as_bytes = buffer.getvalue()
         else:
             self._zipfile_as_bytes = buffer
         super(ByteStreamManager, self).__init__()
 
     def save(self, filename, backup=False):
-        if isinstance(filename, StringIO):
+        if is_stream(filename):
             filename.write(self.tobytes())
         else:
             with open(filename, 'wb') as fp:
