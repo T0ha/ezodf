@@ -77,7 +77,26 @@ class Cell(GenericWrapper):
         else:
             result = convert(self.xmlnode.get(TYPE_VALUE_MAP[t]), t)
         return result
+    
+    def value_as(self, value_type=None):
+        def convert(value, value_type):
+            if value is None:
+                pass
+            elif value_type in NUMERIC_TYPES:
+                value = float(value)
+            elif value_type == 'boolean':
+                value = True if value == 'true' else False
+            return value
 
+        t = value_type
+        if  t is None:
+            result = None
+        elif t == 'string':
+            result = self.plaintext()
+        else:
+            result = convert(self.xmlnode.get(TYPE_VALUE_MAP[t]), t)
+        return result
+     
     def set_value(self, value, value_type=None, currency=None):
 
         def is_valid_value(value):
