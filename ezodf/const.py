@@ -14,12 +14,14 @@ GENERATOR = "http://pypi.python.org/pypi/ezodf/%s$Python%s" % (VERSION, sys.vers
 
 MIMETYPES = {
     'odt': "application/vnd.oasis.opendocument.text",
+    'fodt': "application/xml",
     'ott': "application/vnd.oasis.opendocument.text-template",
     'odg': "application/vnd.oasis.opendocument.graphics",
     'otg': "application/vnd.oasis.opendocument.graphics-template",
     'odp': "application/vnd.oasis.opendocument.presentation",
     'otp': "application/vnd.oasis.opendocument.presentation-template",
     'ods': "application/vnd.oasis.opendocument.spreadsheet",
+    'fods': "application/xml",
     'ots': "application/vnd.oasis.opendocument.spreadsheet-template",
     'odc': "application/vnd.oasis.opendocument.chart",
     'otc': "application/vnd.oasis.opendocument.chart-template",

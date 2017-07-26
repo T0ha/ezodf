@@ -39,17 +39,17 @@ def is_valid_stream(buffer):
 def opendoc(filename):
     if is_stream(filename):
         fm = ByteStreamManager(filename)
-    elif filename is not None:
-        fm = FileManager(filename)
     else:
+        fm = FileManager(filename)
+
+    mime_type = __detect_mime_type(fm)
+    if (mime_type == "application/xml"):
         try:
             xmlnode = etree.parse(filename).getroot()
             return FlatXMLDocument(filename=filename, xmlnode=xmlnode)
         except etree.ParseError:
-            raise IOError("File '%s' is neither a zip-package nor a flat "
-                          "XML OpenDocumentFormat file." % filename)
-
-    mime_type = __detect_mime_type(fm)
+            raise IOError("File '%s' is detected as a flat "
+                          "XML OpenDocumentFormat file but failed to be parsed." % filename)
     return PackagedDocument(filemanager=fm, mimetype=mime_type)
 
 
@@ -64,7 +64,7 @@ def __detect_mime_type(file_manager):
     else:
         # use file ext name
         ext = os.path.splitext(file_manager.zipname)[1]
-        mime_type = MIMETYPES[ext]
+        mime_type = MIMETYPES[ext[1:]]
     return mime_type
 
 
