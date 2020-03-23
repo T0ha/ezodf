@@ -28,7 +28,7 @@ def iter_cell_range_without_start_pos(pos, size):
     next(generator)
     return generator
 
-CELL_ADDRESS = re.compile('^([A-Z]+)(\d+)$')
+CELL_ADDRESS = re.compile(r'^([A-Z]+)(\d+)$')
 
 def address_to_index(address):
     def column_name_to_index(colname):
