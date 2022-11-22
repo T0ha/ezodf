@@ -63,7 +63,7 @@ def __detect_mime_type(file_manager):
         mime_type = entry.get(CN('manifest:media-type'))
     else:
         # use file ext name
-        ext = os.path.splitext(file_manager.zipname)[1]
+        ext = os.path.splitext(file_manager.zipname)[1][1:]
         mime_type = MIMETYPES[ext]
     return mime_type
 
