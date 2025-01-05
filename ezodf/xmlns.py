@@ -9,7 +9,7 @@ __author__ = "mozman <mozman@gmx.at>"
 
 from lxml import etree
 
-from .const import ALL_NSMAP
+from ezodf.const import ALL_NSMAP
 
 def subelement(parent, tag, new=True):
     """ Find/create SubElement `tag` in parent node.
