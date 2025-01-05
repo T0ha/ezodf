@@ -64,6 +64,7 @@ def __detect_mime_type(file_manager):
     else:
         # use file ext name
         ext = os.path.splitext(file_manager.zipname)[1]
+        ext = ext.replace('.', '')
         mime_type = MIMETYPES[ext]
     return mime_type
 
